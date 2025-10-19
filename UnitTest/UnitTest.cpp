@@ -92,6 +92,21 @@ namespace UnitTest
 
       Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result.contains(U"わかめ"));
+
+    }
+
+    TEST_METHOD(GetReachWords_IntegratesWithKeywordDictionary)
+    {
+      BlockManager manager;
+      const Array<String> blocks = { U"ら", U"わ" };
+
+      const auto result = manager.GetReachWords(blocks, keywords);
+
+      Assert::AreEqual(static_cast<size_t>(2), result.size());
+      Assert::IsTrue(result[0].first == U"かわら");
+      Assert::IsTrue(result[0].second == U"か");
+      Assert::IsTrue(result[1].first == U"わらう");
+      Assert::IsTrue(result[1].second == U"う");
     }
   };
 }
