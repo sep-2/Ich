@@ -11,6 +11,8 @@ Game::Game(const InitData& init)
   : IScene{ init }
   , m_emoji{ U"🐥"_emoji }
   , menu_(std::make_unique<Menu>())
+  , ui_(std::make_shared<Ui>())
+  , air_amount_(1.0f)
 {
   //PRINT << U"Game::Game()";
 
@@ -27,6 +29,10 @@ Game::Game(const InitData& init)
   auto& data = getData<SaveData>();
 
   PRINT << data.click_count_;
+
+  // UIの初期設定
+  ui_->SetAirGaugePosition(50, 50);  // 画面左上にエアゲージを配置
+  ui_->SetAirGauge(air_amount_);
 }
 
 Game::~Game()
@@ -65,6 +71,27 @@ void Game::update()
     }
 
     return;  // ゲームロジックは更新しない
+  }
+
+  // UIの更新（メニューが閉じている時のみ）
+  if (ui_) {
+    ui_->Update(static_cast<float>(Scene::DeltaTime()));
+    
+    // デモ用：時間経過でエアが減少
+    air_amount_ -= static_cast<float>(Scene::DeltaTime() * 0.1);  // 10秒で空になる
+    if (air_amount_ < 0.0f) {
+      air_amount_ = 0.0f;
+    }
+    
+    // スペースキーでエア回復（デモ用）
+    if (KeySpace.pressed()) {
+      air_amount_ += static_cast<float>(Scene::DeltaTime() * 0.5);  // 2秒で満タン
+      if (air_amount_ > 1.0f) {
+        air_amount_ = 1.0f;
+      }
+    }
+    
+    ui_->SetAirGauge(air_amount_);
   }
 
   // 以下、通常のゲームロジック
@@ -137,6 +164,13 @@ void Game::update()
 
 void Game::draw() const
 {
+  Scene::SetBackground(ColorF{ 0.6, 0.8, 0.7 });
+
+  // UIの描画（メニューより先に描画）
+  if (ui_) {
+    ui_->Render();
+  }
+
   // メニューが開いている場合は描画
   if (menu_->IsOpen()) {
     menu_->Draw();

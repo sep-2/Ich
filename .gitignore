@@ -403,7 +403,8 @@ savedata.bin
 
 **/Saved/*
 *.identifier
-/Ich/App/settings.json
-/Ich/App/game.save
-*.exe
-Ich/App/Ich(debug).exe
+
+
+**/settings.json
+**/game.save
+**/*.exe

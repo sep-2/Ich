@@ -160,6 +160,12 @@
     <Filter Include="Source Files\System\Logic">
       <UniqueIdentifier>{efabd3e4-ef61-4dcb-881c-8b76c25b5856}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\InGame">
+      <UniqueIdentifier>{f4e5d03d-eb1a-4c5b-b078-d5bf31e70197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\InGame\Ui">
+      <UniqueIdentifier>{58a835f4-b480-4723-a2a0-5513532a67df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -203,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="Sample.cpp">
       <Filter>Source Files\System\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="InGame\Ui.cpp">
+      <Filter>Source Files\InGame\Ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -910,6 +919,9 @@
     </ClInclude>
     <ClInclude Include="System\Menu\MenuSoundManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InGame\Ui.h">
+      <Filter>Source Files\InGame\Ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
