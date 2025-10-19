@@ -157,6 +157,9 @@
     <Filter Include="Source Files\System\Save">
       <UniqueIdentifier>{aa7d79e1-3775-41bd-bde0-b84c8f6055ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\System\Logic">
+      <UniqueIdentifier>{efabd3e4-ef61-4dcb-881c-8b76c25b5856}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\InGame">
       <UniqueIdentifier>{f4e5d03d-eb1a-4c5b-b078-d5bf31e70197}</UniqueIdentifier>
     </Filter>
@@ -203,6 +206,9 @@
     </ClCompile>
     <ClCompile Include="System\Menu\MenuSoundManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>Source Files\System\Logic</Filter>
     </ClCompile>
     <ClCompile Include="InGame\Ui.cpp">
       <Filter>Source Files\InGame\Ui</Filter>

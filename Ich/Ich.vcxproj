@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Scenes\InGame.cpp" />
     <ClCompile Include="Scenes\Title.cpp" />
     <ClCompile Include="stdafx.cpp">
