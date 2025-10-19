@@ -344,7 +344,6 @@
     <Xml Include="App\example\xml\test.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BlockManager.h" />
     <ClInclude Include="InGame\Ui.h" />
     <ClInclude Include="Scenes\Enum.h" />
     <ClInclude Include="Scenes\InGame.h" />

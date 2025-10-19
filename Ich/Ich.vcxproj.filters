@@ -930,9 +930,6 @@
       <Filter>Source Files\InGame\Ui</Filter>
     </ClInclude>
     <ClInclude Include="System\System\BlockManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BlockManager.h">
       <Filter>Source Files\System\Logic</Filter>
     </ClInclude>
   </ItemGroup>
