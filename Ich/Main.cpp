@@ -32,8 +32,8 @@ void Main()
 	App manager;
 
 	// 各シーンを登録する
+  manager.add<Game>(EnumScene::kInGame);
 	manager.add<Title>(EnumScene::kTitle);
-	manager.add<Game>(EnumScene::kInGame);
 
 	while (System::Update())
 	{

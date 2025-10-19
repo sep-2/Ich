@@ -72,6 +72,13 @@ public:
 
   void SetScale(float scale);
 
+  /// <summary>
+  /// X軸とY軸のスケールを個別に設定
+  /// </summary>
+  /// <param name="scale_x">X軸のスケール</param>
+  /// <param name="scale_y">Y軸のスケール</param>
+  void SetScale(float scale_x, float scale_y);
+
   float GetScale() const;
 
   void SetIsCenter(bool is_center);
@@ -102,6 +109,16 @@ private:
   ColorF color_ = ColorF{1};
 
   float scale_ = 1.0f;
+
+  /// <summary>
+  /// X軸のスケール
+  /// </summary>
+  float scale_x_ = 1.0f;
+
+  /// <summary>
+  /// Y軸のスケール
+  /// </summary>
+  float scale_y_ = 1.0f;
 
   bool is_center_ = false;
 };
