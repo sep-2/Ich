@@ -1,0 +1,9 @@
+﻿root = true
+
+[*.{c,cxx,cpp,h,hpp}]
+end_of_line = lf
+charset = utf-8-bom
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = false
