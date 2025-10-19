@@ -2,6 +2,7 @@
 #include "Scenes/Enum.h"
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/Menu.h"
+#include "InGame/Ui.h"
 
 // ゲームシーン
 class Game : public SceneManager<EnumScene, SaveData>::Scene
@@ -52,6 +53,9 @@ private:
   // メニュー
   std::unique_ptr<Menu> menu_;
 
+  // UI管理
+  std::shared_ptr<Ui> ui_;
+
   // 登場する絵文字
   const Array<String> emojis = BuildAllEmojis();
 
@@ -84,5 +88,8 @@ private:
 
   // 2D カメラ
   Camera2D camera{ Vec2{ 0, -200 } };
+
+  // エア残量（デモ用）
+  float air_amount_ = 1.0f;
 };
 

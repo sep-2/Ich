@@ -88,9 +88,9 @@ void TextureWrapper::Render() {
     else {
       // 通常描画
       if (is_center_) {
-        texture_->scaled(scale_).drawAt(x_, y_, color_);
+        texture_->scaled(scale_x_, scale_y_).drawAt(x_, y_, color_);
       } else {
-        texture_->scaled(scale_).draw(x_, y_, color_);
+        texture_->scaled(scale_x_, scale_y_).draw(x_, y_, color_);
       }
     }
   }
@@ -103,6 +103,19 @@ void TextureWrapper::SetColor(ColorF color) {
 
 void TextureWrapper::SetScale(float scale) {
   scale_ = scale;
+  scale_x_ = scale;
+  scale_y_ = scale;
+}
+
+/// <summary>
+/// X軸とY軸のスケールを個別に設定
+/// </summary>
+/// <param name="scale_x">X軸のスケール</param>
+/// <param name="scale_y">Y軸のスケール</param>
+void TextureWrapper::SetScale(float scale_x, float scale_y) {
+  scale_x_ = scale_x;
+  scale_y_ = scale_y;
+  scale_ = scale_x; // 互換性のため
 }
 
 float TextureWrapper::GetScale() const {
