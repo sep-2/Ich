@@ -405,3 +405,4 @@ savedata.bin
 *.identifier
 /Ich/App/settings.json
 /Ich/App/game.save
+*.exe
