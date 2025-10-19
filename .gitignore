@@ -403,6 +403,7 @@ savedata.bin
 
 **/Saved/*
 *.identifier
+
 **/settings.json
 **/game.save
 **/*.exe
