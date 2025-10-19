@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ich", "Ich\Ich.vcxproj", "{322E99CB-A295-41E5-A2E1-B26D2730433B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{1723FD3C-92BD-E27E-67A3-92BABFB90E1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{322E99CB-A295-41E5-A2E1-B26D2730433B}.Debug|x64.Build.0 = Debug|x64
 		{322E99CB-A295-41E5-A2E1-B26D2730433B}.Release|x64.ActiveCfg = Release|x64
 		{322E99CB-A295-41E5-A2E1-B26D2730433B}.Release|x64.Build.0 = Release|x64
+		{1723FD3C-92BD-E27E-67A3-92BABFB90E1A}.Debug|x64.ActiveCfg = Debug|x64
+		{1723FD3C-92BD-E27E-67A3-92BABFB90E1A}.Debug|x64.Build.0 = Debug|x64
+		{1723FD3C-92BD-E27E-67A3-92BABFB90E1A}.Release|x64.ActiveCfg = Release|x64
+		{1723FD3C-92BD-E27E-67A3-92BABFB90E1A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
