@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <Siv3D.hpp>
+#include <utility>
 
 Array<String> keywords = {
 U"あいこくしん",

@@ -6,6 +6,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 // Forward declaration for the function implemented in Sample.cpp.
 int Add(int left, int right);
+extern Array<String> keywords;
 
 namespace UnitTest
 {
@@ -80,6 +81,17 @@ namespace UnitTest
       Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result[0].first == U"がく");
       Assert::IsTrue(result[0].second == U"が");
+    }
+
+    TEST_METHOD(GetHitWords_IntegratesWithKeywordDictionary)
+    {
+      BlockManager manager;
+      const Array<String> blocks = { U"か", U"わ", U"る", U"め", U"を" };
+
+      const auto result = manager.GetHitWords(blocks, keywords);
+
+      Assert::AreEqual(static_cast<size_t>(1), result.size());
+      Assert::IsTrue(result.contains(U"わかめ"));
     }
   };
 }
