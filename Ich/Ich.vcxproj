@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InGame\Ui.cpp" />
+    <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Scenes\InGame.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="System\Menu\MenuSoundManager.cpp" />
     <ClCompile Include="System\Renderer\Renderer.cpp" />
     <ClCompile Include="System\Renderer\TextureWrapper.cpp" />
+    <ClCompile Include="System\System\BlockManager.cpp" />
     <ClCompile Include="System\Task\Task.cpp" />
     <ClCompile Include="System\Task\TaskManager.cpp" />
   </ItemGroup>
@@ -342,6 +344,7 @@
     <Xml Include="App\example\xml\test.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlockManager.h" />
     <ClInclude Include="InGame\Ui.h" />
     <ClInclude Include="Scenes\Enum.h" />
     <ClInclude Include="Scenes\InGame.h" />
@@ -356,6 +359,7 @@
     <ClInclude Include="System\Renderer\Renderer.h" />
     <ClInclude Include="System\Renderer\TextureWrapper.h" />
     <ClInclude Include="System\SaveData\SaveData.hpp" />
+    <ClInclude Include="System\System\BlockManager.h" />
     <ClInclude Include="System\Task\Task.h" />
     <ClInclude Include="System\Task\TaskManager.h" />
   </ItemGroup>

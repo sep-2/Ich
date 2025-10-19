@@ -213,6 +213,12 @@
     <ClCompile Include="InGame\Ui.cpp">
       <Filter>Source Files\InGame\Ui</Filter>
     </ClCompile>
+    <ClCompile Include="Keywords.cpp">
+      <Filter>Source Files\System\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="System\System\BlockManager.cpp">
+      <Filter>Source Files\System\Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -922,6 +928,12 @@
     </ClInclude>
     <ClInclude Include="InGame\Ui.h">
       <Filter>Source Files\InGame\Ui</Filter>
+    </ClInclude>
+    <ClInclude Include="System\System\BlockManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockManager.h">
+      <Filter>Source Files\System\Logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
