@@ -406,3 +406,4 @@ savedata.bin
 /Ich/App/settings.json
 /Ich/App/game.save
 *.exe
+Ich/App/Ich(debug).exe
