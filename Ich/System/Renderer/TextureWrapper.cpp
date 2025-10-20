@@ -81,8 +81,12 @@ void TextureWrapper::Update(float delta_time) {
 void TextureWrapper::Render() {
   if (texture_) {
     if (uv_rect_) {
+      if (is_center_) {
       // UV座標指定あり（スプライトシート）
-      //texture_->operator()(*uv_rect_).scaled(scale_).draw(x_, y_, color_);
+        texture_->operator()(uv_rect_).scaled(scale_x_, scale_y_).drawAt(x_, y_, color_);
+      } else {
+        texture_->operator()(uv_rect_).scaled(scale_x_, scale_y_).draw(x_, y_, color_);
+      }
       //texture_->draw(x_, y_);
     }
     else {

@@ -166,6 +166,9 @@
     <Filter Include="Source Files\InGame\Ui">
       <UniqueIdentifier>{58a835f4-b480-4723-a2a0-5513532a67df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\InGame\Player">
+      <UniqueIdentifier>{a69409d1-1de1-4265-9f95-37d5406565f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="System\System\BlockManager.cpp">
       <Filter>Source Files\System\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\InGame\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -931,6 +937,9 @@
     </ClInclude>
     <ClInclude Include="System\System\BlockManager.h">
       <Filter>Source Files\System\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

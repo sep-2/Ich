@@ -3,6 +3,7 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/Menu.h"
 #include "InGame/Ui.h"
+#include "Player.hpp"
 
 // ゲームシーン
 class Game : public SceneManager<EnumScene, SaveData>::Scene
@@ -55,6 +56,9 @@ private:
 
   // UI管理
   std::shared_ptr<Ui> ui_;
+
+  // プレイヤー
+  std::shared_ptr<Player> player_;
 
   // 登場する絵文字
   const Array<String> emojis = BuildAllEmojis();
