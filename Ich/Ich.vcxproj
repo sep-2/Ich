@@ -122,6 +122,7 @@
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Scenes\InGame.cpp" />
     <ClCompile Include="Scenes\Title.cpp" />
@@ -345,6 +346,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InGame\Ui.h" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="Scenes\Enum.h" />
     <ClInclude Include="Scenes\InGame.h" />
     <ClInclude Include="Scenes\Title.h" />

@@ -12,6 +12,7 @@ Game::Game(const InitData& init)
   , m_emoji{ U"🐥"_emoji }
   , menu_(std::make_unique<Menu>())
   , ui_(std::make_shared<Ui>())
+  , player_(std::make_shared<Player>())
   , air_amount_(1.0f)
 {
   //PRINT << U"Game::Game()";
@@ -36,8 +37,12 @@ Game::Game(const InitData& init)
   
   // サイドボックスを画面右下に配置（3倍スケール考慮）
   // 画面サイズ800x600想定、サイドボックスのテクスチャサイズを考慮して右下に配置
-  //ui_->SetSideBoxPosition(380, 100);  // 画面右下
+  //ui_->SetSideBoxPosition(600, 400);  // 画面右下
   ui_->SetSideBoxVisible(true);
+
+  // プレイヤーの初期設定
+  player_->SetPosition(100.0f, 200.0f);  // 画面中央下部に配置
+  player_->SetMoveSpeed(250.0f);         // 移動速度を250ピクセル/秒に設定
 }
 
 Game::~Game()
@@ -99,72 +104,77 @@ void Game::update()
     ui_->SetAirGauge(air_amount_);
   }
 
+  // プレイヤーの更新（メニューが閉じている時のみ）
+  if (player_) {
+    player_->Update(static_cast<float>(Scene::DeltaTime()));
+  }
+
   // 以下、通常のゲームロジック
   accumulatedTime += Scene::DeltaTime();
 
-  while (StepTime <= accumulatedTime) {
-    // 2D 物理演算のワールドを更新する
-    world.update(StepTime);
+  //while (StepTime <= accumulatedTime) {
+  //  // 2D 物理演算のワールドを更新する
+  //  world.update(StepTime);
 
-    accumulatedTime -= StepTime;
-  }
+  //  accumulatedTime -= StepTime;
+  //}
 
-  // 地面より下に落ちた物体は削除する
-  for (auto it = bodies.begin(); it != bodies.end();) {
-    if (100 < it->getPos().y) {
-      // 対応テーブルからも削除
-      table.erase(it->id());
+  //// 地面より下に落ちた物体は削除する
+  //for (auto it = bodies.begin(); it != bodies.end();) {
+  //  if (100 < it->getPos().y) {
+  //    // 対応テーブルからも削除
+  //    table.erase(it->id());
 
-      it = bodies.erase(it);
+  //    it = bodies.erase(it);
 
-      AudioManager::GetInstance()->PlaySe(SeKind::kDecideSe);
-      changeScene(EnumScene::kTitle);
-    } else {
-      ++it;
-    }
-  }
+  //    AudioManager::GetInstance()->PlaySe(SeKind::kDecideSe);
+  //    changeScene(EnumScene::kTitle);
+  //  } else {
+  //    ++it;
+  //  }
+  //}
 
-  // 2D カメラを更新する
-  camera.update();
-  {
-    // 2D カメラから Transformer2D を作成する
-    const auto t = camera.createTransformer();
+  //// 2D カメラを更新する
+  //camera.update();
+  //{
+  //  // 2D カメラから Transformer2D を作成する
+  //  const auto t = camera.createTransformer();
 
-    // 左クリックされたら
-    if (MouseL.down()) {
-      // ボディを追加する
-      bodies << world.createPolygons(P2Dynamic, Cursor::PosF(), polygons[index], P2Material{ 0.1, 0.0, 1.0 });
+  //  // 左クリックされたら
+  //  if (MouseL.down()) {
+  //    // ボディを追加する
+  //    bodies << world.createPolygons(P2Dynamic, Cursor::PosF(), polygons[index], P2Material{ 0.1, 0.0, 1.0 });
 
-      // ボディ ID と絵文字のインデックスの組を対応テーブルに追加する
-      table.emplace(bodies.back().id(), std::exchange(index, Random(polygons.size() - 1)));
+  //    // ボディ ID と絵文字のインデックスの組を対応テーブルに追加する
+  //    table.emplace(bodies.back().id(), std::exchange(index, Random(polygons.size() - 1)));
 
-      auto& data = getData<SaveData>();
-      data.click_count_++;
+  //    auto& data = getData<SaveData>();
+  //    data.click_count_++;
 
-      // メインループの後、終了時にゲームをセーブ
-      {
-        // バイナリファイルをオープン
-        Serializer<BinaryWriter> writer{ U"game.save" };
+  //    // メインループの後、終了時にゲームをセーブ
+  //    {
+  //      // バイナリファイルをオープン
+  //      Serializer<BinaryWriter> writer{ U"game.save" };
 
-        // シリアライズに対応したデータを書き出す
-        writer(data);
-      }
-    }
+  //      // シリアライズに対応したデータを書き出す
+  //      writer(data);
+  //    }
+  //  }
 
-    // すべてのボディを描画する
-    for (const auto& body : bodies) {
-      textures[table[body.id()]].rotated(body.getAngle()).drawAt(body.getPos());
-    }
+  //  // すべてのボディを描画する
+  //  for (const auto& body : bodies) {
+  //    textures[table[body.id()]].rotated(body.getAngle()).drawAt(body.getPos());
+  //  }
 
     // 地面を描画する
     ground.draw(Palette::Green);
 
-    // 現在操作できる絵文字を描画する
-    textures[index].drawAt(Cursor::PosF(), ColorF{ 1.0, (0.5 + Periodic::Sine0_1(1s) * 0.5) });
-  }
+  //  // 現在操作できる絵文字を描画する
+  //  textures[index].drawAt(Cursor::PosF(), ColorF{ 1.0, (0.5 + Periodic::Sine0_1(1s) * 0.5) });
+  //}
 
   //// 2D カメラの操作を描画する
-  camera.draw(Palette::Orange);
+  //camera.draw(Palette::Orange);
 }
 
 void Game::draw() const
@@ -174,6 +184,11 @@ void Game::draw() const
   // UIの描画（メニューより先に描画）
   if (ui_) {
     ui_->Render();
+  }
+
+  // プレイヤーの描画
+  if (player_) {
+    player_->Render();
   }
 
   // メニューが開いている場合は描画
