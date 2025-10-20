@@ -45,7 +45,42 @@ public:
     /// <param name="y">Y座標</param>
     void SetAirGaugePosition(int x, int y);
 
+    /// <summary>
+    /// サイドボックスの表示/非表示を設定
+    /// </summary>
+    /// <param name="visible">表示する場合 true</param>
+    void SetSideBoxVisible(bool visible);
+
+    /// <summary>
+    /// サイドボックスの位置を設定
+    /// </summary>
+    /// <param name="x">X座標</param>
+    /// <param name="y">Y座標</param>
+    void SetSideBoxPosition(int x, int y);
+
+    /// <summary>
+    /// サイドボックスのサイズを設定
+    /// </summary>
+    /// <param name="width">幅</param>
+    /// <param name="height">高さ</param>
+    void SetSideBoxSize(int width, int height);
+
 private:
+    /// <summary>
+    /// Nine-Patch用のTextureWrapperを初期化
+    /// </summary>
+    void InitializeNinePatchWrappers();
+
+    /// <summary>
+    /// Nine-Patchの位置を更新
+    /// </summary>
+    void UpdateNinePatchPositions();
+
+    /// <summary>
+    /// Nine-Patchのスケールを更新
+    /// </summary>
+    void UpdateNinePatchScales();
+
     /// <summary>
     /// エアゲージ背景のテクスチャ（左端）
     /// </summary>
@@ -107,6 +142,71 @@ private:
     std::shared_ptr<TextureWrapper> air_gauge_right_wrapper_;
 
     /// <summary>
+    /// サイドボックス（インフォメーション表示用）のテクスチャ
+    /// </summary>
+    std::shared_ptr<Texture> side_box_texture_;
+
+    /// <summary>
+    /// サイドボックス表示用ラッパー
+    /// </summary>
+    std::shared_ptr<TextureWrapper> side_box_wrapper_;
+
+    // Nine-Patch用のサイドボックス要素
+    /// <summary>
+    /// サイドボックスの左上コーナー
+    /// </summary>
+    std::shared_ptr<Texture> side_box_top_left_texture_;
+    std::shared_ptr<TextureWrapper> side_box_top_left_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの上部中央（水平方向に伸縮）
+    /// </summary>
+    std::shared_ptr<Texture> side_box_top_center_texture_;
+    std::shared_ptr<TextureWrapper> side_box_top_center_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの右上コーナー
+    /// </summary>
+    std::shared_ptr<Texture> side_box_top_right_texture_;
+    std::shared_ptr<TextureWrapper> side_box_top_right_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの左部中央（垂直方向に伸縮）
+    /// </summary>
+    std::shared_ptr<Texture> side_box_left_center_texture_;
+    std::shared_ptr<TextureWrapper> side_box_left_center_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの中央部分（両方向に伸縮）
+    /// </summary>
+    std::shared_ptr<Texture> side_box_center_texture_;
+    std::shared_ptr<TextureWrapper> side_box_center_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの右部中央（垂直方向に伸縮）
+    /// </summary>
+    std::shared_ptr<Texture> side_box_right_center_texture_;
+    std::shared_ptr<TextureWrapper> side_box_right_center_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの左下コーナー
+    /// </summary>
+    std::shared_ptr<Texture> side_box_bottom_left_texture_;
+    std::shared_ptr<TextureWrapper> side_box_bottom_left_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの下部中央（水平方向に伸縮）
+    /// </summary>
+    std::shared_ptr<Texture> side_box_bottom_center_texture_;
+    std::shared_ptr<TextureWrapper> side_box_bottom_center_wrapper_;
+
+    /// <summary>
+    /// サイドボックスの右下コーナー
+    /// </summary>
+    std::shared_ptr<Texture> side_box_bottom_right_texture_;
+    std::shared_ptr<TextureWrapper> side_box_bottom_right_wrapper_;
+
+    /// <summary>
     /// エアゲージの現在値（0.0〜1.0）
     /// </summary>
     float air_ratio_;
@@ -125,5 +225,35 @@ private:
     /// エアゲージの中央部分の幅
     /// </summary>
     int center_width_;
+
+    /// <summary>
+    /// サイドボックスの表示位置X
+    /// </summary>
+    int side_box_x_;
+
+    /// <summary>
+    /// サイドボックスの表示位置Y
+    /// </summary>
+    int side_box_y_;
+
+    /// <summary>
+    /// サイドボックスの表示フラグ
+    /// </summary>
+    bool side_box_visible_;
+
+    /// <summary>
+    /// サイドボックスの拡大後の幅
+    /// </summary>
+    int side_box_width_;
+
+    /// <summary>
+    /// サイドボックスの拡大後の高さ
+    /// </summary>
+    int side_box_height_;
+
+    /// <summary>
+    /// サイドボックスの枠の厚さ（Nine-Patch用）
+    /// </summary>
+    int side_box_border_size_;
 };
 
