@@ -31,8 +31,13 @@ Game::Game(const InitData& init)
   PRINT << data.click_count_;
 
   // UIの初期設定
-  ui_->SetAirGaugePosition(50, 50);  // 画面左上にエアゲージを配置
+  ui_->SetAirGaugePosition(500, 50);  // 画面左上にエアゲージを配置
   ui_->SetAirGauge(air_amount_);
+  
+  // サイドボックスを画面右下に配置（3倍スケール考慮）
+  // 画面サイズ800x600想定、サイドボックスのテクスチャサイズを考慮して右下に配置
+  //ui_->SetSideBoxPosition(380, 100);  // 画面右下
+  ui_->SetSideBoxVisible(true);
 }
 
 Game::~Game()
