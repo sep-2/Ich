@@ -35,13 +35,13 @@ public:
 
   /// <summary>
   /// 辞書の単語群からランダムに文字を抜き出し、row × column のブロック配置を生成する。
-  /// blockSize 文字分を目安に辞書から文字を確保し、二次元配列に整形して返す。
-  /// row × column が blockSize の倍数でない場合は std::invalid_argument を送出する。
+  /// batchSize 文字分を目安に辞書から文字を確保し、二次元配列に整形して返す。
+  /// row × column が batchSize の倍数でない場合は std::invalid_argument を送出する。
   /// </summary>
   /// <param name="row">生成する行数。1 以上であること。</param>
   /// <param name="column">生成する列数。1 以上であること。</param>
-  /// <param name="blockSize">候補抽出時に確保したい最小文字数。辞書語を順に積み上げて到達させる。</param>
+  /// <param name="batchSize">候補抽出時に確保したい最小文字数。辞書語を順に積み上げて到達させる。</param>
   /// <param name="dictionary">ブロック候補として利用する単語一覧。空の場合は空配列を返す。</param>
   /// <returns>row × column のサイズを持つブロック配列。条件を満たせない場合は空配列。</returns>
-  Array<Array<String>> GenerateBlockGrid(int32 row, int32 column, int32 blockSize, const Array<String>& dictionary) const;
+  Array<Array<String>> GenerateBlockGrid(int32 row, int32 column, int32 batchSize, const Array<String>& dictionary) const;
 };

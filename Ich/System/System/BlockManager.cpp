@@ -210,20 +210,20 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
   return result;
 }
 
-Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 blockSize, const Array<String>& dictionary) const
+Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 batchSize, const Array<String>& dictionary) const
 {
   Array<Array<String>> grid;
 
   // 生成条件が満たされない場合は空配列を返却する（早期リターン）。
-  if (row <= 0 || column <= 0 || blockSize <= 0 || dictionary.isEmpty())
+  if (row <= 0 || column <= 0 || batchSize <= 0 || dictionary.isEmpty())
   {
     return grid;
   }
 
   const int32 requiredSize = row * column;
-  if (requiredSize % blockSize != 0)
+  if (requiredSize % batchSize != 0)
   {
-    throw std::invalid_argument("row * column must be a multiple of blockSize.");
+    throw std::invalid_argument("row * column must be a multiple of batchSize.");
   }
 
   // 抽出した文字を一次元で蓄えるバッファ。後で二次元配列へ整形する。
@@ -242,13 +242,13 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 
     int32 accumulated = 0;
 
-    // blockSize に到達するまで辞書語を積み上げて候補リストに加える。
+    // batchSize に到達するまで辞書語を積み上げて候補リストに加える。
     for (const auto& word : shuffledWords)
     {
       wordCandidates << word;
       accumulated += static_cast<int32>(word.size());
 
-      if (accumulated >= blockSize)
+      if (accumulated >= batchSize)
       {
         break;
       }

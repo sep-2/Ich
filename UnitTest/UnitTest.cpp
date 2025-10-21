@@ -151,15 +151,15 @@ namespace UnitTest
       }
     }
 
-    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBlockSize)
+    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBatchSize)
     {
       BlockManager manager;
       const Array<String> dictionary = { U"かき", U"くけこ" };
       const int32 row = 3;
       const int32 column = 4;
-      const int32 blockSize = 3;
+      const int32 batchSize = 3;
 
-      const auto grid = manager.GenerateBlockGrid(row, column, blockSize, dictionary);
+      const auto grid = manager.GenerateBlockGrid(row, column, batchSize, dictionary);
 
       Assert::AreEqual(static_cast<size_t>(row), grid.size());
 
@@ -172,17 +172,17 @@ namespace UnitTest
       }
     }
 
-    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBlockSizePlusOne)
+    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBatchSizePlusOne)
     {
       BlockManager manager;
       const Array<String> dictionary = { U"さしす", U"せそたち" };
       const int32 row = 3;
       const int32 column = 3;
-      const int32 blockSize = 4;
+      const int32 batchSize = 4;
 
       Assert::ExpectException<std::invalid_argument>([&]()
       {
-        manager.GenerateBlockGrid(row, column, blockSize, dictionary);
+        manager.GenerateBlockGrid(row, column, batchSize, dictionary);
       });
     }
 
@@ -192,9 +192,9 @@ namespace UnitTest
       const Array<String> dictionary = { U"なに", U"ぬね" };
       const int32 row = 2;
       const int32 column = 2;
-      const int32 blockSize = 4;
+      const int32 batchSize = 4;
 
-      const auto grid = manager.GenerateBlockGrid(row, column, blockSize, dictionary);
+      const auto grid = manager.GenerateBlockGrid(row, column, batchSize, dictionary);
 
       Assert::AreEqual(static_cast<size_t>(row), grid.size());
 
