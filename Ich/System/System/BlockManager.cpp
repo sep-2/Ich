@@ -1,6 +1,7 @@
 ﻿#include "./BlockManager.h"
 
 #include <unordered_map>
+#include <stdexcept>
 
 namespace
 {
@@ -207,4 +208,106 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
   }
 
   return result;
+}
+
+Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 batchSize, const Array<String>& dictionary) const
+{
+  Array<Array<String>> grid;
+
+  // 生成条件が満たされない場合は空配列を返却する（早期リターン）。
+  if (row <= 0 || column <= 0 || batchSize <= 0 || dictionary.isEmpty())
+  {
+    return grid;
+  }
+
+  const int32 requiredSize = row * column;
+  if (requiredSize % batchSize != 0)
+  {
+    throw std::invalid_argument("row * column must be a multiple of batchSize.");
+  }
+
+  // 抽出した文字を一次元で蓄えるバッファ。後で二次元配列へ整形する。
+  Array<String> candidateChars;
+  candidateChars.reserve(requiredSize);
+
+  // 辞書語を都度シャッフルして利用するためのバッファと、一度のループで使用する語リスト。
+  Array<String> shuffledWords = dictionary;
+  Array<String> wordCandidates;
+
+  // 必要な文字数を満たすまで辞書語をシャッフルしながら候補文字を追加していく。
+  while (candidateChars.size() < requiredSize)
+  {
+    shuffledWords.shuffle();
+    wordCandidates.clear();
+
+    int32 accumulated = 0;
+
+    // batchSize に到達するまで辞書語を積み上げて候補リストに加える。
+    for (const auto& word : shuffledWords)
+    {
+      wordCandidates << word;
+      accumulated += static_cast<int32>(word.size());
+
+      if (accumulated >= batchSize)
+      {
+        break;
+      }
+    }
+
+    if (wordCandidates.isEmpty())
+    {
+      // 辞書が空、または有効な語を取得できない場合は処理を終了する。
+      break;
+    }
+
+    // 候補語自体をシャッフルし、元となる単語の順序を均一化する。
+    wordCandidates.shuffle();
+
+    // 各候補語の文字を 1 文字ずつ取り出して候補文字リストに格納。
+    for (const auto& word : wordCandidates)
+    {
+      for (const char32 ch : word)
+      {
+        candidateChars << String(1, ch);
+
+        if (candidateChars.size() >= requiredSize)
+        {
+          // 必要数を満たしたら即座に外側のループへ抜ける。
+          break;
+        }
+      }
+
+      if (candidateChars.size() >= requiredSize)
+      {
+        break;
+      }
+    }
+  }
+
+  // 候補文字リストを行列構造に再配置する。
+  grid.reserve(row);
+  size_t index = 0;
+
+  for (int32 r = 0; r < row; ++r)
+  {
+    Array<String> line;
+    line.reserve(column);
+
+    for (int32 c = 0; c < column; ++c)
+    {
+      if (index < candidateChars.size())
+      {
+        line << candidateChars[index++];
+      }
+      else
+      {
+        // 候補が不足した場合は空文字を詰めてサイズを合わせる。
+        line << String();
+      }
+    }
+
+    grid << std::move(line);
+  }
+
+  return grid;
 }

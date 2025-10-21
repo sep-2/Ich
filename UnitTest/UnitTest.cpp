@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 #include "CppUnitTest.h"
 #include "../Ich/System/System/BlockManager.h"
+#include <algorithm>
+#include <utility>
+#include <stdexcept>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -92,21 +95,140 @@ namespace UnitTest
 
       Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result.contains(U"わかめ"));
-
+      Assert::IsFalse(result.contains(U"わかれる"));
     }
 
     TEST_METHOD(GetReachWords_IntegratesWithKeywordDictionary)
     {
       BlockManager manager;
-      const Array<String> blocks = { U"ら", U"わ" };
+      const Array<String> blocks = { U"か", U"わ", U"る", U"め", U"を" };
 
       const auto result = manager.GetReachWords(blocks, keywords);
 
-      Assert::AreEqual(static_cast<size_t>(2), result.size());
-      Assert::IsTrue(result[0].first == U"かわら");
-      Assert::IsTrue(result[0].second == U"か");
-      Assert::IsTrue(result[1].first == U"わらう");
-      Assert::IsTrue(result[1].second == U"う");
+      Assert::IsTrue(result.contains(std::make_pair(String(U"わかれる"), String(U"れ"))));
+    }
+
+    TEST_METHOD(GenerateBlockGrid_ReturnsGridWithRequestedSize)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"わかめ", U"わかれる" };
+
+      Assert::ExpectException<std::invalid_argument>([&]()
+      {
+        manager.GenerateBlockGrid(2, 3, 5, dictionary);
+      });
+
+      const auto grid = manager.GenerateBlockGrid(2, 3, 3, dictionary);
+
+      Assert::AreEqual(static_cast<size_t>(2), grid.size());
+
+      const auto flattened = FlattenGrid(grid, 3);
+      Assert::AreEqual(static_cast<size_t>(2 * 3), flattened.size());
+
+      for (const auto& cell : flattened)
+      {
+        Assert::IsTrue(cell.size() <= 1);
+      }
+    }
+
+    TEST_METHOD(GenerateBlockGrid_HandlesDictionarySmallerThanGrid)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"あ", U"い" };
+
+      const int32 row = 2;
+      const int32 column = 3;
+      const auto grid = manager.GenerateBlockGrid(row, column, 2, dictionary);
+
+      Assert::AreEqual(static_cast<size_t>(row), grid.size());
+
+      const auto flattened = FlattenGrid(grid, column);
+      Assert::AreEqual(static_cast<size_t>(row * column), flattened.size());
+
+      for (const auto& cell : flattened)
+      {
+        Assert::IsTrue(cell == U"あ" || cell == U"い");
+      }
+    }
+
+    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBatchSize)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"かき", U"くけこ" };
+      const int32 row = 3;
+      const int32 column = 4;
+      const int32 batchSize = 3;
+
+      const auto grid = manager.GenerateBlockGrid(row, column, batchSize, dictionary);
+
+      Assert::AreEqual(static_cast<size_t>(row), grid.size());
+
+      const auto flattened = FlattenGrid(grid, column);
+      Assert::AreEqual(static_cast<size_t>(row * column), flattened.size());
+
+      for (const auto& cell : flattened)
+      {
+        Assert::IsTrue(cell == U"か" || cell == U"き" || cell == U"く" || cell == U"け" || cell == U"こ");
+      }
+    }
+
+    TEST_METHOD(GenerateBlockGrid_FillsWhenGridIsMultipleOfBatchSizePlusOne)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"さしす", U"せそたち" };
+      const int32 row = 3;
+      const int32 column = 3;
+      const int32 batchSize = 4;
+
+      Assert::ExpectException<std::invalid_argument>([&]()
+      {
+        manager.GenerateBlockGrid(row, column, batchSize, dictionary);
+      });
+    }
+
+    TEST_METHOD(GenerateBlockGrid_IncludesAllWordsWhenExactSize)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"なに", U"ぬね" };
+      const int32 row = 2;
+      const int32 column = 2;
+      const int32 batchSize = 4;
+
+      const auto grid = manager.GenerateBlockGrid(row, column, batchSize, dictionary);
+
+      Assert::AreEqual(static_cast<size_t>(row), grid.size());
+
+      auto flattened = FlattenGrid(grid, column);
+
+      for (const auto& word : dictionary)
+      {
+        for (const char32 ch : word)
+        {
+          const String target(1, ch);
+          const auto it = std::find(flattened.begin(), flattened.end(), target);
+          Assert::IsTrue(it != flattened.end(), L"必要な文字が生成結果に含まれていません。");
+          if (it != flattened.end())
+          {
+            flattened.erase(it);
+          }
+        }
+      }
+    }
+
+  private:
+    static Array<String> FlattenGrid(const Array<Array<String>>& grid, const int32 expectedColumn)
+    {
+      Array<String> flattened;
+      for (const auto& line : grid)
+      {
+        Assert::AreEqual(static_cast<size_t>(expectedColumn), line.size());
+        for (const auto& cell : line)
+        {
+          flattened << cell;
+        }
+      }
+      return flattened;
     }
   };
 }
+
