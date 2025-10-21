@@ -32,4 +32,6 @@ public:
   /// first: 単語そのもの / second: 足りない文字（辞書の表記に合わせた1文字）。
   /// </returns>
   Array<std::pair<String, String>> GetReachWords(const Array<String>& blocks, const Array<String>& dictionary) const;
+
+  Array<Array<String>> GenerateBlockGrid(int32 row, int32 column, int32 blockSize, const Array<String>& dictionary) const;
 };

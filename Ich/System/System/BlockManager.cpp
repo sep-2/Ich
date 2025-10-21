@@ -208,3 +208,90 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
 
   return result;
 }
+
+Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 blockSize, const Array<String>& dictionary) const
+{
+  Array<Array<String>> grid;
+
+  if (row <= 0 || column <= 0 || blockSize <= 0 || dictionary.isEmpty())
+  {
+    return grid;
+  }
+
+  const int32 requiredSize = row * column;
+
+  Array<String> candidateChars;
+  candidateChars.reserve(requiredSize);
+
+  Array<String> shuffledWords = dictionary;
+  Array<String> wordCandidates;
+
+  while (candidateChars.size() < requiredSize)
+  {
+    shuffledWords.shuffle();
+    wordCandidates.clear();
+
+    int32 accumulated = 0;
+
+    for (const auto& word : shuffledWords)
+    {
+      wordCandidates << word;
+      accumulated += static_cast<int32>(word.size());
+
+      if (accumulated >= blockSize)
+      {
+        break;
+      }
+    }
+
+    if (wordCandidates.isEmpty())
+    {
+      break;
+    }
+
+    wordCandidates.shuffle();
+
+    for (const auto& word : wordCandidates)
+    {
+      for (const char32 ch : word)
+      {
+        candidateChars << String(1, ch);
+
+        if (candidateChars.size() >= requiredSize)
+        {
+          break;
+        }
+      }
+
+      if (candidateChars.size() >= requiredSize)
+      {
+        break;
+      }
+    }
+  }
+
+  grid.reserve(row);
+  size_t index = 0;
+
+  for (int32 r = 0; r < row; ++r)
+  {
+    Array<String> line;
+    line.reserve(column);
+
+    for (int32 c = 0; c < column; ++c)
+    {
+      if (index < candidateChars.size())
+      {
+        line << candidateChars[index++];
+      }
+      else
+      {
+        line << String();
+      }
+    }
+
+    grid << std::move(line);
+  }
+
+  return grid;
+}

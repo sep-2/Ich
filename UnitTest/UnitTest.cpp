@@ -92,7 +92,7 @@ namespace UnitTest
 
       Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result.contains(U"わかめ"));
-
+      Assert::IsFalse(result.contains(U"わかれる"));
     }
 
     TEST_METHOD(GetReachWords_IntegratesWithKeywordDictionary)
@@ -107,6 +107,26 @@ namespace UnitTest
       Assert::IsTrue(result[0].second == U"か");
       Assert::IsTrue(result[1].first == U"わらう");
       Assert::IsTrue(result[1].second == U"う");
+    }
+
+    TEST_METHOD(GenerateBlockGrid_ReturnsGridWithRequestedSize)
+    {
+      BlockManager manager;
+      const Array<String> dictionary = { U"わかめ", U"わかれる" };
+
+      const auto grid = manager.GenerateBlockGrid(2, 3, 5, dictionary);
+
+      Assert::AreEqual(static_cast<size_t>(2), grid.size());
+
+      for (const auto& row : grid)
+      {
+        Assert::AreEqual(static_cast<size_t>(3), row.size());
+
+        for (const auto& cell : row)
+        {
+          Assert::IsTrue(cell.size() <= 1);
+        }
+      }
     }
   };
 }
