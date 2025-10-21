@@ -36,6 +36,7 @@ public:
   /// <summary>
   /// 辞書の単語群からランダムに文字を抜き出し、row × column のブロック配置を生成する。
   /// blockSize 文字分を目安に辞書から文字を確保し、二次元配列に整形して返す。
+  /// row × column が blockSize の倍数でない場合は std::invalid_argument を送出する。
   /// </summary>
   /// <param name="row">生成する行数。1 以上であること。</param>
   /// <param name="column">生成する列数。1 以上であること。</param>

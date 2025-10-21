@@ -1,6 +1,7 @@
 ﻿#include "./BlockManager.h"
 
 #include <unordered_map>
+#include <stdexcept>
 
 namespace
 {
@@ -220,6 +221,10 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
   }
 
   const int32 requiredSize = row * column;
+  if (requiredSize % blockSize != 0)
+  {
+    throw std::invalid_argument("row * column must be a multiple of blockSize.");
+  }
 
   // 抽出した文字を一次元で蓄えるバッファ。後で二次元配列へ整形する。
   Array<String> candidateChars;

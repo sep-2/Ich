@@ -3,6 +3,7 @@
 #include "../Ich/System/System/BlockManager.h"
 #include <algorithm>
 #include <utility>
+#include <stdexcept>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -112,7 +113,12 @@ namespace UnitTest
       BlockManager manager;
       const Array<String> dictionary = { U"わかめ", U"わかれる" };
 
-      const auto grid = manager.GenerateBlockGrid(2, 3, 5, dictionary);
+      Assert::ExpectException<std::invalid_argument>([&]()
+      {
+        manager.GenerateBlockGrid(2, 3, 5, dictionary);
+      });
+
+      const auto grid = manager.GenerateBlockGrid(2, 3, 3, dictionary);
 
       Assert::AreEqual(static_cast<size_t>(2), grid.size());
 
@@ -174,17 +180,10 @@ namespace UnitTest
       const int32 column = 3;
       const int32 blockSize = 4;
 
-      const auto grid = manager.GenerateBlockGrid(row, column, blockSize, dictionary);
-
-      Assert::AreEqual(static_cast<size_t>(row), grid.size());
-
-      const auto flattened = FlattenGrid(grid, column);
-      Assert::AreEqual(static_cast<size_t>(row * column), flattened.size());
-
-      for (const auto& cell : flattened)
+      Assert::ExpectException<std::invalid_argument>([&]()
       {
-        Assert::IsTrue(cell == U"さ" || cell == U"し" || cell == U"す" || cell == U"せ" || cell == U"そ" || cell == U"た" || cell == U"ち");
-      }
+        manager.GenerateBlockGrid(row, column, blockSize, dictionary);
+      });
     }
 
     TEST_METHOD(GenerateBlockGrid_IncludesAllWordsWhenExactSize)
