@@ -46,9 +46,6 @@ Player::~Player()
 /// <param name="delta_time">前回実行フレームからの経過時間（秒）</param>
 void Player::Update(float delta_time)
 {
-  // 入力処理
-  HandleInput();
-
   // 移動処理
   if (is_moving_) {
     // アニメーション更新
@@ -66,9 +63,9 @@ void Player::Update(float delta_time)
 
     // 左右反転（左を向く場合は-1.0でスケール）
     if (facing_left_) {
-      player_wrapper_->SetScale(-1.0f, 1.0);
+      player_wrapper_->SetScale(-0.5f, 0.5);
     } else {
-      player_wrapper_->SetScale(1.0f, 1.0f);
+      player_wrapper_->SetScale(0.5f, 0.5f);
     }
   }
 }
@@ -115,35 +112,48 @@ void Player::SetMoveSpeed(float speed)
 }
 
 /// <summary>
+/// 移動状態を設定
+/// </summary>
+/// <param name="isMoving">移動中かどうか</param>
+void Player::SetMoving(bool isMoving)
+{
+  is_moving_ = isMoving;
+}
+
+/// <summary>
+/// 向きを設定
+/// </summary>
+/// <param name="facingLeft">左を向いているか</param>
+void Player::SetFacingLeft(bool facingLeft)
+{
+  facing_left_ = facingLeft;
+}
+
+/// <summary>
+/// プレイヤーの実際の幅を取得（スケール適用後）
+/// </summary>
+/// <returns>プレイヤーの幅</returns>
+float Player::GetWidth() const
+{
+  return kSpriteWidth * kScale;
+}
+
+/// <summary>
+/// プレイヤーの実際の高さを取得（スケール適用後）
+/// </summary>
+/// <returns>プレイヤーの高さ</returns>
+float Player::GetHeight() const
+{
+  return kSpriteHeight * kScale;
+}
+
+/// <summary>
 /// 入力処理
 /// </summary>
 void Player::HandleInput()
 {
+  // 入力処理は InGame クラスで行うため、ここでは何もしない
   is_moving_ = false;
-
-  // 左移動（左キーまたはAキー）
-  if (KeyLeft.pressed() || KeyA.pressed()) {
-    position_.x -= move_speed_ * Scene::DeltaTime();
-    facing_left_ = true;
-    is_moving_ = true;
-
-    // 画面左端での制限
-    if (position_.x < kSpriteWidth / 2) {
-      position_.x = kSpriteWidth / 2;
-    }
-  }
-
-  // 右移動（右キーまたはDキー）
-  if (KeyRight.pressed() || KeyD.pressed()) {
-    position_.x += move_speed_ * Scene::DeltaTime();
-    facing_left_ = false;
-    is_moving_ = true;
-
-    // 画面右端での制限（画面幅800と仮定）
-    if (position_.x > 800 - kSpriteWidth / 2) {
-      position_.x = 800 - kSpriteWidth / 2;
-    }
-  }
 }
 
 /// <summary>

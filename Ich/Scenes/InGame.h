@@ -4,6 +4,7 @@
 #include "System/Menu/Menu.h"
 #include "InGame/Ui.h"
 #include "Player.hpp"
+#include "System/System/BlockManager.h"
 
 // ゲームシーン
 class Game : public SceneManager<EnumScene, SaveData>::Scene
@@ -18,7 +19,7 @@ public:
 
   void draw() const override;
 
-  void drawFadeIn(double t) const override;
+  //void drawFadeIn(double t) const override;
 
   void drawFadeOut(double t) const override;
 
@@ -43,6 +44,42 @@ private:
 
     return e;
   }
+
+  /// <summary>
+  /// プレイヤーの足元のブロックを破壊する
+  /// </summary>
+  void DestroyBlockUnderPlayer();
+
+  /// <summary>
+  /// プレイヤーのグリッド位置を取得
+  /// </summary>
+  /// <param name="gridRow">グリッド行</param>
+  /// <param name="gridCol">グリッド列</param>
+  /// <returns>有効な位置の場合true</returns>
+  bool GetPlayerGridPosition(int32& gridRow, int32& gridCol) const;
+
+  /// <summary>
+  /// プレイヤーを落下させる
+  /// </summary>
+  void UpdatePlayerFall(float delta_time);
+
+  /// <summary>
+  /// 指定位置にブロックが存在するかチェック
+  /// </summary>
+  /// <param name="gridRow">グリッド行</param>
+  /// <param name="gridCol">グリッド列</param>
+  /// <returns>ブロックが存在する場合true</returns>
+  bool HasBlockAt(int32 gridRow, int32 gridCol) const;
+
+  /// <summary>
+  /// プレイヤーの移動を処理（衝突判定付き）
+  /// </summary>
+  void UpdatePlayerMovement(float delta_time);
+
+  /// <summary>
+  /// デバッグ情報を描画
+  /// </summary>
+  void DrawDebugInfo() const;
 
   Texture m_emoji;
 
@@ -95,5 +132,40 @@ private:
 
   // エア残量（デモ用）
   float air_amount_ = 1.0f;
+
+  // ブロックマネージャー
+  BlockManager block_manager_;
+
+  // ブロックグリッド
+  Array<Array<String>> block_grid_;
+
+  // 辞書
+  Array<String> dictionary_;
+
+  // ブロック描画用フォント
+  Font block_font_;
+
+  // デバッグ用フォント
+  Font debug_font_;
+
+  // ブロック描画の定数
+  static constexpr int32 kBlockSize = 80;
+  static constexpr int32 kStartX = 50;
+  static constexpr int32 kStartY = 100;
+
+  // プレイヤーの落下速度
+  float player_fall_velocity_ = 0.0f;
+  static constexpr float kGravity = 800.0f;  // ピクセル/秒^2
+  static constexpr float kMaxFallSpeed = 600.0f;  // 最大落下速度
+
+  // プレイヤーの移動入力
+  Vec2 player_move_input_ = Vec2::Zero();
+
+  // デバッグモード
+#if _DEBUG
+  static constexpr bool kDebugMode = true;
+#else
+  static constexpr bool kDebugMode = false;
+#endif
 };
 
