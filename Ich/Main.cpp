@@ -16,6 +16,10 @@ void Main()
 {
   PRINT << U"Hello, Siv3D!" << 123 << 45.67;
 
+  // 画面サイズを1280x720に設定
+  Window::Resize(1280, 720);
+  Window::SetTitle(U"Ich Game - 1280x720");
+
   // ウィンドウを閉じるユーザアクションのみを終了操作に設定する
   System::SetTerminationTriggers(UserAction::CloseButtonClicked);
 

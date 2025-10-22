@@ -51,9 +51,33 @@ public:
     /// <param name="speed">移動速度（ピクセル/秒）</param>
     void SetMoveSpeed(float speed);
 
+    /// <summary>
+    /// 移動状態を設定
+    /// </summary>
+    /// <param name="isMoving">移動中かどうか</param>
+    void SetMoving(bool isMoving);
+
+    /// <summary>
+    /// 向きを設定
+    /// </summary>
+    /// <param name="facingLeft">左を向いているか</param>
+    void SetFacingLeft(bool facingLeft);
+
+    /// <summary>
+    /// プレイヤーの実際の幅を取得（スケール適用後）
+    /// </summary>
+    /// <returns>プレイヤーの幅</returns>
+    float GetWidth() const;
+
+    /// <summary>
+    /// プレイヤーの実際の高さを取得（スケール適用後）
+    /// </summary>
+    /// <returns>プレイヤーの高さ</returns>
+    float GetHeight() const;
+
 private:
     /// <summary>
-    /// 入力処理
+    /// 入力処理（現在は使用しない）
     /// </summary>
     void HandleInput();
 
@@ -117,12 +141,17 @@ private:
     /// <summary>
     /// スプライトの1フレームのサイズ
     /// </summary>
-    static const int kSpriteWidth = 128;   // 612 / 5 = 122.4 ≈ 122
+    static const int kSpriteWidth = 128;
     static const int kSpriteHeight = 408;
     
     /// <summary>
     /// アニメーションフレーム数
     /// </summary>
     static const int kAnimationFrames = 5;
+
+    /// <summary>
+    /// スケール（0.5倍に縮小）
+    /// </summary>
+    static constexpr float kScale = 0.5f;
 };
 
