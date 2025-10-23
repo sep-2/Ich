@@ -86,6 +86,8 @@ public:
   void SetScale(float scale_x, float scale_y);
 
   float GetScale() const;
+  float GetScaleX() const;
+  float GetScaleY() const;
 
   void SetIsCenter(bool is_center);
 

@@ -135,6 +135,14 @@ float TextureWrapper::GetScale() const {
   return scale_;
 }
 
+float TextureWrapper::GetScaleX() const {
+  return scale_x_;
+}
+
+float TextureWrapper::GetScaleY() const {
+  return scale_y_;
+}
+
 void TextureWrapper::SetIsCenter(bool is_center) {
   is_center_ = is_center;
 }

@@ -3,6 +3,7 @@
 #include "System/Renderer/TextureWrapper.h"
 #include "System/Renderer/Renderer.h"
 #include "System/Renderer/Priority.h"
+#include <cmath>
 
 namespace PlayerConstants {
   struct PoseTextureEntry
@@ -44,7 +45,6 @@ Player::Player()
     player_wrapper_ = std::make_shared<TextureWrapper>(initialTexture,
       static_cast<int>(position_.x), static_cast<int>(position_.y));
     player_wrapper_->SetIsCenter(true);
-    player_wrapper_->SetScale(kScale, kScale);
   }
 
   if (player_wrapper_)
@@ -158,11 +158,12 @@ float Player::GetWidth() const
   {
     if (const auto texture = player_wrapper_->GetTexture())
     {
-      return static_cast<float>(texture->width()) * kScale;
+      return static_cast<float>(texture->width()) * std::abs(player_wrapper_->GetScaleX());
     }
   }
 
-  return kSpriteWidth * kScale;
+  const float fallbackScale = kTargetHeight / static_cast<float>(kSpriteHeight);
+  return kSpriteWidth * fallbackScale;
 }
 
 /// <summary>
@@ -175,11 +176,11 @@ float Player::GetHeight() const
   {
     if (const auto texture = player_wrapper_->GetTexture())
     {
-      return static_cast<float>(texture->height()) * kScale;
+      return static_cast<float>(texture->height()) * std::abs(player_wrapper_->GetScaleY());
     }
   }
 
-  return kSpriteHeight * kScale;
+  return kTargetHeight;
 }
 
 /// <summary>
@@ -302,18 +303,25 @@ void Player::UpdateTextureForPose()
 
   player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
 
-  float scaleX = kScale;
-  const float scaleY = kScale;
+  const float textureHeight = static_cast<float>(texture->height());
+  float scaleY = (textureHeight > 0.0f) ? (kTargetHeight / textureHeight) : kScale;
+  if (!std::isfinite(scaleY) || scaleY <= 0.0f)
+  {
+    scaleY = kScale;
+  }
+
+  float scaleX = scaleY;
 
   switch (pose_)
   {
   case Pose::kStrafeRight:
-    scaleX = -kScale;
+    scaleX = -scaleY;
     break;
   default:
-    scaleX = kScale;
+    scaleX = scaleY;
     break;
   }
 
   player_wrapper_->SetScale(scaleX, scaleY);
 }
+
