@@ -57,6 +57,12 @@ public:
   /// <returns>テクスチャ</returns>
   std::shared_ptr<Texture> GetTexture() const;
 
+  /// <summary>
+  /// テクスチャを差し替える
+  /// </summary>
+  /// <param name="texture">新しいテクスチャ</param>
+  void SetTexture(std::shared_ptr<Texture> texture);
+
   void SetColor(ColorF color);
 
   /// <summary>

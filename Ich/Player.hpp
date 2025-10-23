@@ -120,17 +120,6 @@ private:
     void UpdateAnimation(float delta_time);
 
     /// <summary>
-    /// 現在のスプライトフレームを取得
-    /// </summary>
-    /// <returns>スプライトのUV座標</returns>
-    Rect GetCurrentSpriteFrame() const;
-
-    /// <summary>
-    /// プレイヤーの歩行スプライトテクスチャ
-    /// </summary>
-    std::shared_ptr<Texture> player_texture_;
-
-    /// <summary>
     /// プレイヤー表示用ラッパー
     /// </summary>
     std::shared_ptr<TextureWrapper> player_wrapper_;
@@ -174,6 +163,26 @@ private:
     /// プレイヤーのポーズ
     /// </summary>
     Pose pose_;
+
+    /// <summary>
+    /// ポーズごとのテクスチャを読み込む
+    /// </summary>
+    void LoadPoseTextures();
+
+    /// <summary>
+    /// 指定したポーズに対応するテクスチャを取得
+    /// </summary>
+    std::shared_ptr<Texture> GetTextureForPose(Pose pose) const;
+
+    /// <summary>
+    /// 現在のポーズに応じてテクスチャとスケールを更新
+    /// </summary>
+    void UpdateTextureForPose();
+
+    /// <summary>
+    /// ポーズごとのテクスチャキャッシュ
+    /// </summary>
+    HashTable<Pose, std::shared_ptr<Texture>> pose_textures_;
 
     /// <summary>
     /// 移動フラグから算出される基本ポーズを取得

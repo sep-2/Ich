@@ -68,6 +68,15 @@ std::shared_ptr<Texture> TextureWrapper::GetTexture() const {
 }
 
 /// <summary>
+/// テクスチャを差し替える
+/// </summary>
+/// <param name="texture">新しいテクスチャ</param>
+void TextureWrapper::SetTexture(std::shared_ptr<Texture> texture) {
+  texture_ = std::move(texture);
+  uv_rect_ = Rect{ 0, 0, 0, 0 };
+}
+
+/// <summary>
 /// 毎フレーム更新処理
 /// </summary>
 /// <param name="delta_time">前回実行フレームからの経過時間（秒）</param>

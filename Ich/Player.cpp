@@ -5,7 +5,21 @@
 #include "System/Renderer/Priority.h"
 
 namespace PlayerConstants {
-  const String kPlayerWalkImagePath = U"Assets/Image/Player/player_walk.png";
+  struct PoseTextureEntry
+  {
+    Player::Pose pose;
+    FilePath path;
+  };
+
+  const Array<PoseTextureEntry> kPoseTextures = {
+    { Player::Pose::kIdle,             U"Assets/Image/Player/Idle1.png" },
+    { Player::Pose::kStrafeLeft,       U"Assets/Image/Player/Left1.png" },
+    { Player::Pose::kStrafeRight,      U"Assets/Image/Player/Left1.png" }, // 右向きは水平反転で対応
+    { Player::Pose::kWalkForwardLeft,  U"Assets/Image/Player/WalkA1.png" },
+    { Player::Pose::kWalkForwardRight, U"Assets/Image/Player/WalkB1.png" },
+    { Player::Pose::kFall,             U"Assets/Image/Player/Fall1.png" },
+    { Player::Pose::kGameOver,         U"Assets/Image/Player/GameOver1.png" },
+  };
 }
 
 /// <summary>
@@ -22,16 +36,21 @@ Player::Player()
   , is_moving_(false)
   , pose_(Pose::kIdle)
 {
-  // プレイヤーのスプライトテクスチャを読み込み
-  player_texture_ = std::make_shared<Texture>(PlayerConstants::kPlayerWalkImagePath);
+  LoadPoseTextures();
 
-  // TextureWrapperを初期化（初期フレームで作成）
-  Rect initial_frame = GetCurrentSpriteFrame();
-  player_wrapper_ = std::make_shared<TextureWrapper>(player_texture_,
-    static_cast<int>(position_.x), static_cast<int>(position_.y), initial_frame);
+  const auto initialTexture = GetTextureForPose(pose_);
+  if (initialTexture)
+  {
+    player_wrapper_ = std::make_shared<TextureWrapper>(initialTexture,
+      static_cast<int>(position_.x), static_cast<int>(position_.y));
+    player_wrapper_->SetIsCenter(true);
+    player_wrapper_->SetScale(kScale, kScale);
+  }
 
-  // 中央揃えで表示
-  player_wrapper_->SetIsCenter(true);
+  if (player_wrapper_)
+  {
+    UpdateTextureForPose();
+  }
 }
 
 /// <summary>
@@ -60,14 +79,6 @@ void Player::Update(float delta_time)
   // TextureWrapperの位置とUV座標を更新
   if (player_wrapper_) {
     player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
-    player_wrapper_->SetUVRect(GetCurrentSpriteFrame());
-
-    // 左右反転（左を向く場合は-1.0でスケール）
-    if (facing_left_) {
-      player_wrapper_->SetScale(-0.5f, 0.5);
-    } else {
-      player_wrapper_->SetScale(0.5f, 0.5f);
-    }
   }
 }
 
@@ -101,6 +112,11 @@ void Player::SetPosition(float x, float y)
 {
   position_.x = x;
   position_.y = y;
+
+  if (player_wrapper_)
+  {
+    player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
+  }
 }
 
 /// <summary>
@@ -138,6 +154,14 @@ void Player::SetFacingLeft(bool facingLeft)
 /// <returns>プレイヤーの幅</returns>
 float Player::GetWidth() const
 {
+  if (player_wrapper_)
+  {
+    if (const auto texture = player_wrapper_->GetTexture())
+    {
+      return static_cast<float>(texture->width()) * kScale;
+    }
+  }
+
   return kSpriteWidth * kScale;
 }
 
@@ -147,6 +171,14 @@ float Player::GetWidth() const
 /// <returns>プレイヤーの高さ</returns>
 float Player::GetHeight() const
 {
+  if (player_wrapper_)
+  {
+    if (const auto texture = player_wrapper_->GetTexture())
+    {
+      return static_cast<float>(texture->height()) * kScale;
+    }
+  }
+
   return kSpriteHeight * kScale;
 }
 
@@ -164,7 +196,13 @@ Player::Pose Player::GetPose() const
 /// <param name="pose">設定するポーズ</param>
 void Player::SetPose(const Pose pose)
 {
+  if (pose_ == pose)
+  {
+    return;
+  }
+
   pose_ = pose;
+  UpdateTextureForPose();
 }
 
 /// <summary>
@@ -200,14 +238,8 @@ void Player::UpdateAnimation(float delta_time)
 }
 
 /// <summary>
-/// 現在のスプライトフレームを取得
+/// 移動・向き情報から妥当なポーズを算出
 /// </summary>
-/// <returns>スプライトのUV座標</returns>
-Rect Player::GetCurrentSpriteFrame() const
-{
-  return Rect(current_frame_ * kSpriteWidth, 0, kSpriteWidth, kSpriteHeight);
-}
-
 Player::Pose Player::CalculateMovementPose() const
 {
   if (is_moving_) {
@@ -219,11 +251,69 @@ Player::Pose Player::CalculateMovementPose() const
 
 void Player::ApplyPoseFromMovement(const bool force)
 {
-  if (!force) {
-    if (pose_ == Pose::kFall || pose_ == Pose::kGameOver) {
-      return;
-    }
+  if (!force && (pose_ == Pose::kFall || pose_ == Pose::kGameOver)) {
+    return;
   }
 
-  pose_ = CalculateMovementPose();
+  const Pose newPose = CalculateMovementPose();
+  if (force || pose_ != newPose)
+  {
+    pose_ = newPose;
+    UpdateTextureForPose();
+  }
+}
+
+void Player::LoadPoseTextures()
+{
+  for (const auto& entry : PlayerConstants::kPoseTextures)
+  {
+    pose_textures_.emplace(entry.pose, std::make_shared<Texture>(entry.path));
+  }
+}
+
+std::shared_ptr<Texture> Player::GetTextureForPose(const Pose pose) const
+{
+  if (const auto it = pose_textures_.find(pose); it != pose_textures_.end())
+  {
+    return it->second;
+  }
+
+  return nullptr;
+}
+
+void Player::UpdateTextureForPose()
+{
+  const auto texture = GetTextureForPose(pose_);
+  if (!texture)
+  {
+    return;
+  }
+
+  if (!player_wrapper_)
+  {
+    player_wrapper_ = std::make_shared<TextureWrapper>(texture,
+      static_cast<int>(position_.x), static_cast<int>(position_.y));
+    player_wrapper_->SetIsCenter(true);
+  }
+  else
+  {
+    player_wrapper_->SetTexture(texture);
+  }
+
+  player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
+
+  float scaleX = kScale;
+  const float scaleY = kScale;
+
+  switch (pose_)
+  {
+  case Pose::kStrafeRight:
+    scaleX = -kScale;
+    break;
+  default:
+    scaleX = kScale;
+    break;
+  }
+
+  player_wrapper_->SetScale(scaleX, scaleY);
 }

@@ -179,6 +179,14 @@ void Game::UpdatePlayerMovement(float delta_time)
   Vec2 moveInput = Vec2::Zero();
   bool isMoving = false;
   bool facingLeft = false;
+  const bool walkForwardLeft = KeyUp.pressed() || KeyW.pressed();
+  const bool walkForwardRight = KeyDown.pressed() || KeyS.pressed();
+
+  if (walkForwardLeft || walkForwardRight) {
+    player_->SetMoving(false);
+    player_->SetPose(walkForwardLeft ? Player::Pose::kWalkForwardLeft : Player::Pose::kWalkForwardRight);
+    return;
+  }
   
   if (KeyLeft.pressed() || KeyA.pressed()) {
     moveInput.x = -1.0f;
