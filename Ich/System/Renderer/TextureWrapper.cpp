@@ -131,14 +131,23 @@ void TextureWrapper::SetScale(float scale_x, float scale_y) {
   scale_ = scale_x; // 互換性のため
 }
 
+/// <summary>
+/// 旧API互換用のスカラー値。内部的にはX軸スケールを代表値として返す。
+/// </summary>
 float TextureWrapper::GetScale() const {
   return scale_;
 }
 
+/// <summary>
+/// 実際に描画へ適用されるX軸スケール。左右反転すると負値になる点に注意。
+/// </summary>
 float TextureWrapper::GetScaleX() const {
   return scale_x_;
 }
 
+/// <summary>
+/// 実際に描画へ適用されるY軸スケール。上下反転などを行った場合はこちらが負値になる。
+/// </summary>
 float TextureWrapper::GetScaleY() const {
   return scale_y_;
 }

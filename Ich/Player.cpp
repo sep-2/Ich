@@ -12,6 +12,9 @@ namespace PlayerConstants {
     FilePath path;
   };
 
+  // ポーズ毎に使用するテクスチャの対応表。
+  // 右向き専用素材が無い場合は「左右反転で流用する」想定で Left1.png を割り当てている。
+  // （反転処理は後段の UpdateTextureForPose 内で行う）
   const Array<PoseTextureEntry> kPoseTextures = {
     { Player::Pose::kIdle,             U"Assets/Image/Player/Idle1.png" },
     { Player::Pose::kStrafeLeft,       U"Assets/Image/Player/Left1.png" },
@@ -37,6 +40,10 @@ Player::Player()
   , is_moving_(false)
   , pose_(Pose::kIdle)
 {
+  // ★フェーズ3要件★
+  // ここからは歩行/待機などポーズ単位で正式版画像を差し替える準備を行う。
+  // 1) 起動時に必要なPNGを読み込んでキャッシュする
+  // 2) 初期ポーズに応じたテクスチャをTextureWrapperへ設定する
   LoadPoseTextures();
 
   const auto initialTexture = GetTextureForPose(pose_);
@@ -49,7 +56,7 @@ Player::Player()
 
   if (player_wrapper_)
   {
-    UpdateTextureForPose();
+    UpdateTextureForPose(); // 初期状態でもポーズに応じたスケール・反転を適用しておく
   }
 }
 
@@ -135,7 +142,7 @@ void Player::SetMoveSpeed(float speed)
 void Player::SetMoving(bool isMoving)
 {
   is_moving_ = isMoving;
-  ApplyPoseFromMovement(false);
+  ApplyPoseFromMovement(false); // 移動フラグを更新したらポーズも追従させる
 }
 
 /// <summary>
@@ -145,7 +152,7 @@ void Player::SetMoving(bool isMoving)
 void Player::SetFacingLeft(bool facingLeft)
 {
   facing_left_ = facingLeft;
-  ApplyPoseFromMovement(false);
+  ApplyPoseFromMovement(false); // 右左の向きが変わった瞬間に画像も反転させたい
 }
 
 /// <summary>
@@ -158,7 +165,7 @@ float Player::GetWidth() const
   {
     if (const auto texture = player_wrapper_->GetTexture())
     {
-      return static_cast<float>(texture->width()) * std::abs(player_wrapper_->GetScaleX());
+      return static_cast<float>(texture->width()) * std::abs(player_wrapper_->GetScaleX()); // 実際の描画倍率を反映
     }
   }
 
@@ -176,7 +183,7 @@ float Player::GetHeight() const
   {
     if (const auto texture = player_wrapper_->GetTexture())
     {
-      return static_cast<float>(texture->height()) * std::abs(player_wrapper_->GetScaleY());
+      return static_cast<float>(texture->height()) * std::abs(player_wrapper_->GetScaleY()); // 縦方向も実スケールで返却
     }
   }
 
@@ -211,7 +218,7 @@ void Player::SetPose(const Pose pose)
 /// </summary>
 void Player::RefreshPoseFromMovement()
 {
-  ApplyPoseFromMovement(true);
+  ApplyPoseFromMovement(true); // 落下終了など強制的に移動ポーズへ戻したい時はこちらを使用
 }
 
 /// <summary>
@@ -253,6 +260,7 @@ Player::Pose Player::CalculateMovementPose() const
 void Player::ApplyPoseFromMovement(const bool force)
 {
   if (!force && (pose_ == Pose::kFall || pose_ == Pose::kGameOver)) {
+    // 落下/ゲームオーバー中は移動フラグがどうであれ姿勢を固定したいので更新しない
     return;
   }
 
@@ -260,12 +268,13 @@ void Player::ApplyPoseFromMovement(const bool force)
   if (force || pose_ != newPose)
   {
     pose_ = newPose;
-    UpdateTextureForPose();
+    UpdateTextureForPose(); // 画像・スケール・反転を即時更新
   }
 }
 
 void Player::LoadPoseTextures()
 {
+  // 起動時にまとめてPNGを読み込む。HashTable に保持しておけばポーズ切替時に都度読み直さなくて済む。
   for (const auto& entry : PlayerConstants::kPoseTextures)
   {
     pose_textures_.emplace(entry.pose, std::make_shared<Texture>(entry.path));
@@ -274,6 +283,7 @@ void Player::LoadPoseTextures()
 
 std::shared_ptr<Texture> Player::GetTextureForPose(const Pose pose) const
 {
+  // 存在しないポーズが指定される可能性もあるので find で安全に探索する
   if (const auto it = pose_textures_.find(pose); it != pose_textures_.end())
   {
     return it->second;
@@ -287,6 +297,7 @@ void Player::UpdateTextureForPose()
   const auto texture = GetTextureForPose(pose_);
   if (!texture)
   {
+    // 想定外だが読み込み失敗などでテクスチャが取れなかった場合は何もせず早期リターン
     return;
   }
 
@@ -304,6 +315,8 @@ void Player::UpdateTextureForPose()
   player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
 
   const float textureHeight = static_cast<float>(texture->height());
+  // 目標とする見た目の高さ(kTargetHeight)から縮尺を逆算。
+  // 画像サイズが想定外でも最終的には「おおむね既定の大きさ」で描画できる。
   float scaleY = (textureHeight > 0.0f) ? (kTargetHeight / textureHeight) : kScale;
   if (!std::isfinite(scaleY) || scaleY <= 0.0f)
   {
@@ -325,6 +338,7 @@ void Player::UpdateTextureForPose()
     break;
   }
 
+  // TextureWrapper へ反映。左右反転した場合もCollider計算のため絶対値を保持している。
   player_wrapper_->SetScale(scaleX, scaleY);
 }
 

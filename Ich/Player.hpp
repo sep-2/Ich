@@ -210,5 +210,8 @@ private:
     /// スケール（0.5倍に縮小）
     /// </summary>
     static constexpr float kScale = 0.5f;
+    /// <summary>
+    /// 最終的に描画したい概ねの高さ（ピクセル）。ポーズによって画像サイズが異なるので、ここを基準にリサイズする。
+    /// </summary>
     static constexpr float kTargetHeight = 90.0f;
 };
