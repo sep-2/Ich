@@ -135,19 +135,19 @@ private:
     float move_speed_;
 
     /// <summary>
-    /// 現在のアニメーションフレーム（0-4）
+    /// 現在のポーズにおけるフレーム番号（0開始）
     /// </summary>
-    int current_frame_;
+    int current_pose_frame_;
 
     /// <summary>
-    /// アニメーションタイマー
+    /// アニメーションタイマー（経過時間の積算）
     /// </summary>
     float animation_timer_;
 
     /// <summary>
-    /// 1フレーム当たりの時間（秒）
+    /// フレームを切り替える間隔（秒）
     /// </summary>
-    float frame_duration_;
+    float frame_interval_seconds_;
 
     /// <summary>
     /// プレイヤーが左を向いているか
@@ -172,7 +172,7 @@ private:
     /// <summary>
     /// 指定したポーズに対応するテクスチャを取得
     /// </summary>
-    std::shared_ptr<Texture> GetTextureForPose(Pose pose) const;
+    const Array<std::shared_ptr<Texture>>* FindPoseFrames(Pose pose) const;
 
     /// <summary>
     /// 現在のポーズに応じてテクスチャとスケールを更新
@@ -182,7 +182,7 @@ private:
     /// <summary>
     /// ポーズごとのテクスチャキャッシュ
     /// </summary>
-    HashTable<Pose, std::shared_ptr<Texture>> pose_textures_;
+    HashTable<Pose, Array<std::shared_ptr<Texture>>> pose_textures_;
 
     /// <summary>
     /// 移動フラグから算出される基本ポーズを取得

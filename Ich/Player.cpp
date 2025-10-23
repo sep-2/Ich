@@ -6,23 +6,23 @@
 #include <cmath>
 
 namespace PlayerConstants {
-  struct PoseTextureEntry
+  struct PoseAnimationResource
   {
     Player::Pose pose;
-    FilePath path;
+    Array<FilePath> frames;
   };
 
   // ポーズ毎に使用するテクスチャの対応表。
-  // 右向き専用素材が無い場合は「左右反転で流用する」想定で Left1.png を割り当てている。
-  // （反転処理は後段の UpdateTextureForPose 内で行う）
-  const Array<PoseTextureEntry> kPoseTextures = {
-    { Player::Pose::kIdle,             U"Assets/Image/Player/Idle1.png" },
-    { Player::Pose::kStrafeLeft,       U"Assets/Image/Player/Left1.png" },
-    { Player::Pose::kStrafeRight,      U"Assets/Image/Player/Left1.png" }, // 右向きは水平反転で対応
-    { Player::Pose::kWalkForwardLeft,  U"Assets/Image/Player/WalkA1.png" },
-    { Player::Pose::kWalkForwardRight, U"Assets/Image/Player/WalkB1.png" },
-    { Player::Pose::kFall,             U"Assets/Image/Player/Fall1.png" },
-    { Player::Pose::kGameOver,         U"Assets/Image/Player/GameOver1.png" },
+  // 右向き専用素材が無いものは、左向き素材を読み込みつつ UpdateTextureForPose で左右反転する。
+  // 各配列の順番はアニメーションの周期（0.2秒単位）で順番に再生される。
+  const Array<PoseAnimationResource> kPoseAnimationResources = {
+    { Player::Pose::kIdle,             { U"Assets/Image/Player/Idle1.png",    U"Assets/Image/Player/Idle2.png" } },
+    { Player::Pose::kStrafeLeft,       { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/Left2.png" } },
+    { Player::Pose::kStrafeRight,      { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/Left2.png" } }, // 右は左右反転
+    { Player::Pose::kWalkForwardLeft,  { U"Assets/Image/Player/WalkA1.png",   U"Assets/Image/Player/WalkA2.png" } },
+    { Player::Pose::kWalkForwardRight, { U"Assets/Image/Player/WalkA1.png",   U"Assets/Image/Player/WalkA2.png" } }, // 右は左右反転
+    { Player::Pose::kFall,             { U"Assets/Image/Player/Fall1.png",    U"Assets/Image/Player/Fall2.png" } },
+    { Player::Pose::kGameOver,         { U"Assets/Image/Player/GameOver1.png",U"Assets/Image/Player/GameOver2.png" } },
   };
 }
 
@@ -33,9 +33,9 @@ Player::Player()
   : Task()
   , position_(100.0f, 200.0f)  // 画面中央に配置
   , move_speed_(200.0f)        // 200ピクセル/秒
-  , current_frame_(0)
+  , current_pose_frame_(0)
   , animation_timer_(0.0f)
-  , frame_duration_(8.0f / 60.0f)  // 8フレーム = 8/60秒 ≈ 0.133秒
+  , frame_interval_seconds_(0.2f)  // 正式版素材は0.2秒感覚で切り替える想定
   , facing_left_(false)
   , is_moving_(false)
   , pose_(Pose::kIdle)
@@ -46,10 +46,10 @@ Player::Player()
   // 2) 初期ポーズに応じたテクスチャをTextureWrapperへ設定する
   LoadPoseTextures();
 
-  const auto initialTexture = GetTextureForPose(pose_);
-  if (initialTexture)
+  const auto* initialFrames = FindPoseFrames(pose_);
+  if (initialFrames && !initialFrames->isEmpty())
   {
-    player_wrapper_ = std::make_shared<TextureWrapper>(initialTexture,
+    player_wrapper_ = std::make_shared<TextureWrapper>(initialFrames->front(),
       static_cast<int>(position_.x), static_cast<int>(position_.y));
     player_wrapper_->SetIsCenter(true);
   }
@@ -73,15 +73,7 @@ Player::~Player()
 /// <param name="delta_time">前回実行フレームからの経過時間（秒）</param>
 void Player::Update(float delta_time)
 {
-  // 移動処理
-  if (is_moving_) {
-    // アニメーション更新
-    UpdateAnimation(delta_time);
-  } else {
-    // 停止時は最初のフレームに戻す
-    current_frame_ = 0;
-    animation_timer_ = 0.0f;
-  }
+  UpdateAnimation(delta_time);
 
   // TextureWrapperの位置とUV座標を更新
   if (player_wrapper_) {
@@ -209,6 +201,8 @@ void Player::SetPose(const Pose pose)
     return;
   }
 
+  current_pose_frame_ = 0;
+  animation_timer_ = 0.0f;
   pose_ = pose;
   UpdateTextureForPose();
 }
@@ -236,12 +230,29 @@ void Player::HandleInput()
 /// <param name="delta_time">デルタタイム</param>
 void Player::UpdateAnimation(float delta_time)
 {
-  animation_timer_ += delta_time;
-
-  // 指定フレーム数（8フレーム）経過したら次のアニメーションフレームに進む
-  if (animation_timer_ >= frame_duration_) {
-    //current_frame_ = (current_frame_ + 1) % kAnimationFrames;
+  const auto* frames = FindPoseFrames(pose_);
+  if (!frames || frames->isEmpty())
+  {
     animation_timer_ = 0.0f;
+    current_pose_frame_ = 0;
+    return;
+  }
+
+  const size_t frameCount = frames->size();
+  if (frameCount <= 1)
+  {
+    // 単一フレームの場合はループさせず、初期フレームのまま維持する
+    animation_timer_ = 0.0f;
+    current_pose_frame_ = 0;
+    return;
+  }
+
+  animation_timer_ += delta_time;
+  while (animation_timer_ >= frame_interval_seconds_)
+  {
+    animation_timer_ -= frame_interval_seconds_;
+    current_pose_frame_ = (current_pose_frame_ + 1) % static_cast<int>(frameCount);
+    UpdateTextureForPose();
   }
 }
 
@@ -267,6 +278,8 @@ void Player::ApplyPoseFromMovement(const bool force)
   const Pose newPose = CalculateMovementPose();
   if (force || pose_ != newPose)
   {
+    current_pose_frame_ = 0;
+    animation_timer_ = 0.0f;
     pose_ = newPose;
     UpdateTextureForPose(); // 画像・スケール・反転を即時更新
   }
@@ -275,18 +288,28 @@ void Player::ApplyPoseFromMovement(const bool force)
 void Player::LoadPoseTextures()
 {
   // 起動時にまとめてPNGを読み込む。HashTable に保持しておけばポーズ切替時に都度読み直さなくて済む。
-  for (const auto& entry : PlayerConstants::kPoseTextures)
+  pose_textures_.clear();
+
+  for (const auto& entry : PlayerConstants::kPoseAnimationResources)
   {
-    pose_textures_.emplace(entry.pose, std::make_shared<Texture>(entry.path));
+    Array<std::shared_ptr<Texture>> frames;
+    frames.reserve(entry.frames.size());
+
+    for (const auto& path : entry.frames)
+    {
+      frames << std::make_shared<Texture>(path);
+    }
+
+    pose_textures_.emplace(entry.pose, std::move(frames));
   }
 }
 
-std::shared_ptr<Texture> Player::GetTextureForPose(const Pose pose) const
+const Array<std::shared_ptr<Texture>>* Player::FindPoseFrames(const Pose pose) const
 {
   // 存在しないポーズが指定される可能性もあるので find で安全に探索する
   if (const auto it = pose_textures_.find(pose); it != pose_textures_.end())
   {
-    return it->second;
+    return &(it->second);
   }
 
   return nullptr;
@@ -294,10 +317,22 @@ std::shared_ptr<Texture> Player::GetTextureForPose(const Pose pose) const
 
 void Player::UpdateTextureForPose()
 {
-  const auto texture = GetTextureForPose(pose_);
-  if (!texture)
+  const auto* frames = FindPoseFrames(pose_);
+  if (!frames || frames->isEmpty())
   {
     // 想定外だが読み込み失敗などでテクスチャが取れなかった場合は何もせず早期リターン
+    return;
+  }
+
+  const size_t frameCount = frames->size();
+  size_t frameIndex = 0;
+  if (frameCount > 0) {
+    frameIndex = static_cast<size_t>(current_pose_frame_) % frameCount;
+  }
+
+  const auto texture = (*frames)[frameIndex];
+  if (!texture)
+  {
     return;
   }
 
@@ -341,4 +376,5 @@ void Player::UpdateTextureForPose()
   // TextureWrapper へ反映。左右反転した場合もCollider計算のため絶対値を保持している。
   player_wrapper_->SetScale(scaleX, scaleY);
 }
+
 
