@@ -317,6 +317,9 @@ void Player::UpdateTextureForPose()
   case Pose::kStrafeRight:
     scaleX = -scaleY;
     break;
+  case Pose::kWalkForwardRight:
+    scaleX = -scaleY;
+    break;
   default:
     scaleX = scaleY;
     break;

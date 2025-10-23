@@ -184,7 +184,7 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   if (walkForwardLeft || walkForwardRight) {
     player_->SetMoving(false);
-    player_->SetPose(walkForwardLeft ? Player::Pose::kWalkForwardLeft : Player::Pose::kWalkForwardRight);
+    player_->SetPose(Player::Pose::kIdle);
     return;
   }
   
