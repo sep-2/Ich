@@ -144,7 +144,7 @@ float Player::GetWidth() const
 /// <returns>プレイヤーの高さ</returns>
 float Player::GetHeight() const
 {
-  return kSpriteHeight * kScale;
+  return kSpriteHeight * kScale / 2;
 }
 
 /// <summary>
@@ -178,4 +178,17 @@ void Player::UpdateAnimation(float delta_time)
 Rect Player::GetCurrentSpriteFrame() const
 {
   return Rect(current_frame_ * kSpriteWidth, 0, kSpriteWidth, kSpriteHeight);
+}
+
+Vec2 Player::GetLeftTop() const {
+  return Vec2(position_.x - GetWidth() / 2.0f, position_.y - GetHeight() / 2.0f);
+}
+Vec2 Player::GetRightBottom() const {
+  return Vec2(position_.x + GetWidth() / 2.0f, position_.y + GetHeight() / 2.0f);
+}
+Vec2 Player::GetRightTop() const {
+  return Vec2(position_.x + GetWidth() / 2.0f, position_.y - GetHeight() / 2.0f);
+}
+Vec2 Player::GetLeftBottom() const {
+  return Vec2(position_.x - GetWidth() / 2.0f, position_.y + GetHeight() / 2.0f);
 }

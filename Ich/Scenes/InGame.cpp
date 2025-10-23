@@ -6,7 +6,11 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/GameSettings.h"
 #include "System/System/BlockManager.h"
+#include "Keywords.cpp"
 
+namespace InGammeConstants {
+  const Vec2 kStartBlock{ 200, 200 };
+}
 
 Game::Game(const InitData& init)
   : IScene{ init }
@@ -37,47 +41,50 @@ Game::Game(const InitData& init)
   // UIの初期設定（1280x720対応）
   ui_->SetAirGaugePosition(900, 50);   // 画面左上にエアゲージを配置
   ui_->SetAirGauge(air_amount_);
-  
+
   // サイドボックスを画面右下に配置（1280x720対応）
   ui_->SetSideBoxPosition(880, 120);  // 画面右下（720-300=420）
   ui_->SetSideBoxVisible(true);
 
-  // 辞書の初期化（サンプル辞書）
-  dictionary_ = {
-    U"あい", U"うえお", U"かきく", U"けこ", U"さしす", U"せそ",
-    U"たちつ", U"てと", U"なにぬ", U"ねの", U"はひふ", U"へほ",
-    U"まみむ", U"めも", U"やゆよ", U"らりる", U"れろ", U"わをん"
-  };
+  // ブロックグリッドを生成（10行x10列、バッチサイズ20）
+  const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(10, 10, 20, keywords);
 
-  // ブロックグリッドを生成（10行x20列、バッチサイズ20）
-  block_grid_ = block_manager_.GenerateBlockGrid(10, 10, 20, dictionary_);
+  // String配列をBlock配列に変換
+  block_grid_.resize(stringGrid.size());
+  for (size_t row = 0; row < stringGrid.size(); ++row) {
+    block_grid_[row].resize(stringGrid[row].size());
+    for (size_t col = 0; col < stringGrid[row].size(); ++col) {
+      block_grid_[row][col] = Block(stringGrid[row][col]);
+      const float gridX = InGammeConstants::kStartBlock.x + row * kBlockSize;
+      const float gridY = InGammeConstants::kStartBlock.y + col * kBlockSize;
+      //block_grid_[row][col].position = Vec2(static_cast<int32>(gridX), static_cast<int32>(gridY));
+      block_grid_[row][col].position = GetGridTopLeft(row, col);
+    }
+  }
 
   // プレイヤーの初期設定（グリッドの一番上の中央に配置）
   const int32 initialCol = 5;  // 中央
   const int32 initialRow = 0;  // 一番上
-  const float playerX = kStartX + initialCol * kBlockSize + kBlockSize / 2.0f;
-  const float playerY = kStartY + initialRow * kBlockSize + kBlockSize / 2.0f;
-  
-  player_->SetPosition(100, 10);
+  const Vec2 initialPos = GridToPixel(initialRow, initialCol);
+
+  //player_->SetPosition(initialPos.x, initialPos.y);
+  player_->SetPosition(100, 20);
   player_->SetMoveSpeed(200.0f);  // 移動速度を200ピクセル/秒に設定
 }
-
 Game::~Game()
 {
   //PRINT << U"Game::~Game()";
 }
 
-bool Game::GetPlayerGridPosition(int32& gridRow, int32& gridCol) const
+bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) const
 {
-  const Vec2 playerPos = player_->GetPosition();
-  
-  // プレイヤーの中心位置からグリッド座標を計算
-  const float relativeX = playerPos.x - kStartX;
-  const float relativeY = playerPos.y - kStartY;
-  
+  // ピクセル座標からグリッド座標を計算
+  const float relativeX = pixelPos.x - kStartX;
+  const float relativeY = pixelPos.y - kStartY;
+
   gridCol = static_cast<int32>(relativeX / kBlockSize);
   gridRow = static_cast<int32>(relativeY / kBlockSize);
-  
+
   // グリッドの範囲内かチェック
   if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
     return false;
@@ -85,7 +92,43 @@ bool Game::GetPlayerGridPosition(int32& gridRow, int32& gridCol) const
   if (gridCol < 0 || gridCol >= static_cast<int32>(block_grid_[0].size())) {
     return false;
   }
-  
+
+  return true;
+}
+
+Vec2 Game::GridToPixel(int32 gridRow, int32 gridCol) const
+{
+  // グリッド座標からピクセル座標（中心）を計算
+  const float pixelX = kStartX + gridCol * kBlockSize + kBlockSize / 2.0f;
+  const float pixelY = kStartY + gridRow * kBlockSize + kBlockSize / 2.0f;
+  return Vec2{ pixelX, pixelY };
+}
+
+Vec2 Game::GetGridTopLeft(int32 gridRow, int32 gridCol) const
+{
+  // グリッドの左上座標を取得
+  const float pixelX = kStartX + gridCol * kBlockSize;
+  const float pixelY = kStartY + gridRow * kBlockSize;
+  return Vec2{ pixelX, pixelY };
+}
+
+bool Game::GetPlayerGridPosition(int32& gridRow, int32& gridCol) const
+{
+  //// ピクセル座標からグリッド座標を計算
+  //const float relativeX = pixelPos.x - kStartX;
+  //const float relativeY = pixelPos.y - kStartY;
+
+  //gridCol = static_cast<int32>(relativeX / kBlockSize);
+  //gridRow = static_cast<int32>(relativeY / kBlockSize);
+
+  //// グリッドの範囲内かチェック
+  //if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
+  //  return false;
+  //}
+  //if (gridCol < 0 || gridCol >= static_cast<int32>(block_grid_[0].size())) {
+  //  return false;
+  //}
+
   return true;
 }
 
@@ -95,16 +138,17 @@ void Game::DestroyBlockUnderPlayer()
   if (!GetPlayerGridPosition(gridRow, gridCol)) {
     return;
   }
-  
+
   // プレイヤーの足元のブロック（1つ下）を破壊
   const int32 belowRow = gridRow + 1;
-  
+
   if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
-      gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
-    
+    gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
+
     // ブロックが存在する場合のみ破壊
-    if (!block_grid_[belowRow][gridCol].isEmpty()) {
-      block_grid_[belowRow][gridCol] = U"";  // ブロックを空にする
+    Block& block = block_grid_[belowRow][gridCol];
+    if (!block.isEmpty()) {
+      block.is_destroyed = true;  // ブロックを破壊状態にする
       PRINT << U"Block destroyed at row: " << belowRow << U", col: " << gridCol;
     }
   }
@@ -116,38 +160,68 @@ void Game::UpdatePlayerFall(float delta_time)
   if (!GetPlayerGridPosition(gridRow, gridCol)) {
     return;
   }
-  
-  // プレイヤーの下のブロックをチェック
-  const int32 belowRow = gridRow + 1;
-  bool hasBlockBelow = false;
-  
-  if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
-      gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
-    hasBlockBelow = !block_grid_[belowRow][gridCol].isEmpty();
-  }
-  
-  // 下にブロックがない場合は落下
-  if (!hasBlockBelow && belowRow < static_cast<int32>(block_grid_.size())) {
-    player_fall_velocity_ += kGravity * delta_time;
-    player_fall_velocity_ = Min(player_fall_velocity_, kMaxFallSpeed);
-    
-    Vec2 playerPos = player_->GetPosition();
-    playerPos.y += player_fall_velocity_ * delta_time;
-    
-    // 次のブロックの位置を計算
-    const float nextBlockY = kStartY + belowRow * kBlockSize + kBlockSize / 2.0f;
-    
-    // ブロックの位置に到達したら停止
-    if (playerPos.y >= nextBlockY) {
-      playerPos.y = nextBlockY;
-      player_fall_velocity_ = 0.0f;
-    }
-    
-    player_->SetPosition(playerPos.x, playerPos.y);
-  } else {
-    // ブロックがある場合は落下速度をリセット
-    player_fall_velocity_ = 0.0f;
-  }
+
+  //// プレイヤーの現在位置のブロックをチェック
+  const bool isOnBlock = HasBlockAt(gridRow, gridCol);
+
+  //// プレイヤーの下のブロックをチェック
+  //const int32 belowRow = gridRow + 1;
+  //bool hasBlockBelow = false;
+
+  //if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
+  //  gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
+  //  hasBlockBelow = !block_grid_[belowRow][gridCol].isEmpty();
+  //}
+
+  //// 下にブロックがない場合、または現在のブロックがない場合は落下
+  //const bool shouldFall = (!hasBlockBelow || !isOnBlock) && belowRow < static_cast<int32>(block_grid_.size());
+
+  //if (shouldFall) {
+  //  player_fall_velocity_ += kGravity * delta_time;
+  //  player_fall_velocity_ = Min(player_fall_velocity_, kMaxFallSpeed);
+
+  //  Vec2 playerPos = player_->GetPosition();
+  //  playerPos.y += player_fall_velocity_ * delta_time;
+
+  //  // 落下中に次のブロックに到達する可能性をチェック
+  //  bool foundBlock = false;
+
+  //  // 現在の行から下方向にブロックを探す
+  //  for (int32 checkRow = gridRow + 1; checkRow < static_cast<int32>(block_grid_.size()); ++checkRow) {
+  //    if (HasBlockAt(checkRow, gridCol)) {
+  //      // ブロックの上端の位置を取得
+  //      const Vec2 blockTopLeft = GetGridTopLeft(checkRow, gridCol);
+
+  //      // プレイヤーの下端がブロックの上端に到達または超えた場合
+  //      const float playerBottom = playerPos.y + player_->GetHeight() / 2.0f;
+
+  //      if (playerBottom >= blockTopLeft.y) {
+  //        // ブロックの中心位置に配置
+  //        playerPos = GridToPixel(checkRow, gridCol);
+  //        player_fall_velocity_ = 0.0f;
+  //        foundBlock = true;
+  //        break;
+  //      }
+  //    }
+  //  }
+
+  //  player_->SetPosition(playerPos.x, playerPos.y);
+  //} else {
+  //  // ブロックがある場合は落下速度をリセット
+  //  player_fall_velocity_ = 0.0f;
+
+  //  // プレイヤーを現在のブロックの中心に調整
+  //  if (isOnBlock) {
+  //    Vec2 playerPos = player_->GetPosition();
+  //    const Vec2 targetPos = GridToPixel(gridRow, gridCol);
+
+  //    // Y座標がずれている場合は徐々に補正
+  //    if (std::abs(playerPos.y - targetPos.y) > 1.0f) {
+  //      playerPos.y = targetPos.y;
+  //      player_->SetPosition(playerPos.x, playerPos.y);
+  //    }
+  //  }
+  //}
 }
 
 bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
@@ -160,7 +234,7 @@ bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
     return false;
   }
 
-  // ブロックが存在するかチェック
+  // ブロックが存在するかチェック（空でない、かつ破壊されていない）
   return !block_grid_[gridRow][gridCol].isEmpty();
 }
 
@@ -170,13 +244,12 @@ void Game::UpdatePlayerMovement(float delta_time)
   Vec2 moveInput = Vec2::Zero();
   bool isMoving = false;
   bool facingLeft = false;
-  
+
   if (KeyLeft.pressed() || KeyA.pressed()) {
     moveInput.x = -1.0f;
     isMoving = true;
     facingLeft = true;
-  }
-  else if (KeyRight.pressed() || KeyD.pressed()) {
+  } else if (KeyRight.pressed() || KeyD.pressed()) {
     moveInput.x = 1.0f;
     isMoving = true;
     facingLeft = false;
@@ -188,10 +261,85 @@ void Game::UpdatePlayerMovement(float delta_time)
     player_->SetFacingLeft(facingLeft);
   }
 
+  //int y = player_->GetPosition().y + 4;
+  //player_->SetPosition(player_->GetPosition().x, y);
+  // プレイヤーの現在位置を取得
+  Vec2 playerPos = player_->GetPosition();
+  const float gravity = 4.0f;
+  Vec2 nextPos = playerPos;
+  nextPos.y += gravity;
+
+  const float playerBottomY = nextPos.y + player_->GetHeight() / 2.0f;
+  bool isOnBlock = false;
+
+
+  for (int i = 0; i < block_grid_.size(); i++) {
+    for (int j = 0; j < block_grid_[i].size(); j++) {
+      const Block& block = block_grid_[i][j];
+
+      // 空または破壊されたブロックはスキップ
+      if (block.isEmpty()) {
+        continue;
+      }
+
+      const Vec2 blockPos = block.position;
+      const float blockLeft = blockPos.x - 0;
+      const float blockRight = blockPos.x + kBlockSize + 0;
+      const float blockTop = blockPos.y;
+      const float blockBottom = blockPos.y + kBlockSize;
+
+      // 左端の線（青色）
+      //Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
+
+      // 右端の線（オレンジ色）
+      Line{ blockRight, blockTop, blockRight, blockBottom }.draw(2.0, Palette::Orange);
+
+      // プレイヤーの中心がブロックのX範囲内にあるかチェック
+      if (nextPos.x >= blockLeft && nextPos.x <= blockRight) {
+        // プレイヤーの下端がブロックの上面付近にあるかチェック
+        if (playerBottomY >= blockTop) {
+          // プレイヤーをブロックの上に配置
+          nextPos.y = blockTop - player_->GetHeight() / 2.0f;
+          isOnBlock = true;
+          break;
+        }
+      }
+
+
+      //const Vec2 blockPos = block_grid_[i][j].position;
+      //// プレイヤーの位置を取得
+      //const Vec2 playerPos = player_->GetPosition();
+      //const double distance = playerPos.distanceFrom(blockPos);
+      ////if (player_->GetHeight() + 500 < distance) {
+      ////  continue;
+      ////}
+      //PRINT << U"Skip: " << distance;
+      //PRINT << U"Player: " << playerPos.x << U"," << playerPos.y;
+      //PRINT << blockPos.x << U"," << blockPos.x + kBlockSize;
+
+      //if (playerPos.x > blockPos.x && playerPos.x <= blockPos.x + kBlockSize &&
+      //  player_->GetLeftBottom().y > blockPos.y) {
+
+      //  float correction_y = blockPos.y - player_->GetLeftBottom().y;
+      //  player_->SetPosition(playerPos.x, playerPos.y + correction_y);
+      //  PRINT << U"Corrected Y by " << correction_y;
+      //  break;
+
+      //}
+      //block_grid_[i][j].position.y
+    }
+    if (isOnBlock) {
+      break;
+    }
+  }
+  player_->SetPosition(nextPos.x, nextPos.y);
+
+
   // 移動がない場合は早期リターン
   if (moveInput.x == 0.0f) {
     return;
   }
+
 
   // プレイヤーの現在位置とグリッド座標を取得
   int32 currentRow, currentCol;
@@ -199,68 +347,71 @@ void Game::UpdatePlayerMovement(float delta_time)
     return;
   }
 
-  Vec2 playerPos = player_->GetPosition();
-  const float moveSpeed = 200.0f;  // ピクセル/秒
+  //Vec2 playerPos = player_->GetPosition();
+  const float moveSpeed = player_->move_speed_;
   const float moveDistance = moveSpeed * delta_time;
 
-  // 次の位置を計算
-  Vec2 nextPos = playerPos;
-  nextPos.x += moveInput.x * moveDistance;
+  //// 次の位置を計算
+  //Vec2 nextPos = playerPos;
+  //nextPos.x += moveInput.x * moveDistance;
 
-  // 左右のブロック衝突判定
-  bool canMove = true;
+  //// 左右のブロック衝突判定
+  //bool canMove = true;
 
-  // 左に移動する場合
-  if (moveInput.x < 0) {
-    const int32 leftCol = currentCol - 1;
-    
-    // 現在のグリッドの中心位置
-    const float currentGridCenterX = kStartX + currentCol * kBlockSize + kBlockSize / 2.0f;
-    // 左のグリッドとの境界（2つのグリッドの中心の中間点）
-    const float leftBoundary = currentGridCenterX - kBlockSize / 2.0f;
-    
-    // 次の位置が左の境界を超える場合
-    if (nextPos.x < leftBoundary) {
-      // 左隣のブロックが存在するかチェック
-      if (HasBlockAt(currentRow, leftCol)) {
-        canMove = false;
-        // ブロックの境界ぴったりに位置を固定
-        nextPos.x = leftBoundary;
-      }
-    }
-  }
-  // 右に移動する場合
-  else if (moveInput.x > 0) {
-    const int32 rightCol = currentCol + 1;
-    
-    // 現在のグリッドの中心位置
-    const float currentGridCenterX = kStartX + currentCol * kBlockSize + kBlockSize / 2.0f;
-    // 右のグリッドとの境界（2つのグリッドの中心の中間点）
-    const float rightBoundary = currentGridCenterX + kBlockSize / 2.0f;
-    
-    // 次の位置が右の境界を超える場合
-    if (nextPos.x > rightBoundary) {
-      // 右隣のブロックが存在するかチェック
-      if (HasBlockAt(currentRow, rightCol)) {
-        canMove = false;
-        // ブロックの境界ぴったりに位置を固定
-        nextPos.x = rightBoundary;
-      }
-    }
-  }
+  //// 左に移動する場合
+  //if (moveInput.x < 0) {
+  //  const int32 leftCol = currentCol - 1;
 
-  // グリッドの範囲外チェック
-  const int32 nextCol = static_cast<int32>((nextPos.x - kStartX) / kBlockSize);
-  if (nextCol < 0) {
-    canMove = false;
-    nextPos.x = kStartX + kBlockSize / 2.0f;  // 左端の中心
-  } else if (nextCol >= static_cast<int32>(block_grid_[0].size())) {
-    canMove = false;
-    nextPos.x = kStartX + (block_grid_[0].size() - 1) * kBlockSize + kBlockSize / 2.0f;  // 右端の中心
-  }
+  //  // 現在のグリッドの中心位置
+  //  const Vec2 currentGridCenter = GridToPixel(currentRow, currentCol);
+  //  // 左のグリッドとの境界（2つのグリッドの中心の中間点）
+  //  const float leftBoundary = currentGridCenter.x - kBlockSize / 2.0f;
 
-  // 位置を更新（衝突していても境界までは移動する）
-  player_->SetPosition(nextPos.x, playerPos.y);
+  //  // 次の位置が左の境界を超える場合
+  //  if (nextPos.x < leftBoundary) {
+  //    // 左隣のブロックが存在するかチェック
+  //    if (HasBlockAt(currentRow, leftCol)) {
+  //      canMove = false;
+  //      // ブロックの境界ぴったりに位置を固定
+  //      nextPos.x = leftBoundary;
+  //    }
+  //  }
+  //}
+  //// 右に移動する場合
+  //else if (moveInput.x > 0) {
+  //  const int32 rightCol = currentCol + 1;
+
+  //  // 現在のグリッドの中心位置
+  //  const Vec2 currentGridCenter = GridToPixel(currentRow, currentCol);
+  //  // 右のグリッドとの境界（2つのグリッドの中心の中間点）
+  //  const float rightBoundary = currentGridCenter.x + kBlockSize / 2.0f;
+
+  //  // 次の位置が右の境界を超える場合
+  //  if (nextPos.x > rightBoundary) {
+  //    // 右隣のブロックが存在するかチェック
+  //    if (HasBlockAt(currentRow, rightCol)) {
+  //      canMove = false;
+  //      // ブロックの境界ぴったりに位置を固定
+  //      nextPos.x = rightBoundary;
+  //    }
+  //  }
+  //}
+
+  //// グリッドの範囲外チェック
+  //int32 nextRow, nextCol;
+  //if (PixelToGrid(nextPos, nextRow, nextCol)) {
+  //  // 範囲内なら移動可能
+  //} else {
+  //  // 範囲外の場合は端に制限
+  //  if (nextPos.x < kStartX) {
+  //    nextPos.x = GridToPixel(currentRow, 0).x;  // 左端
+  //  } else if (nextCol >= static_cast<int32>(block_grid_[0].size())) {
+  //    nextPos.x = GridToPixel(currentRow, block_grid_[0].size() - 1).x;  // 右端
+  //  }
+  //}
+
+  //// 位置を更新（衝突していても境界までは移動する）
+  //player_->SetPosition(nextPos.x, playerPos.y);
 }
 
 void Game::update()
@@ -272,8 +423,7 @@ void Game::update()
       menu_->Close();
       is_paused_ = false;
       PRINT << U"Close";
-    }
-    else {
+    } else {
       menu_->Open();
       is_paused_ = true;
       PRINT << U"Open";
@@ -304,13 +454,13 @@ void Game::update()
   // UIの更新（メニューが閉じている時のみ）
   if (ui_) {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
-    
+
     // デモ用：時間経過でエアが減少
     air_amount_ -= static_cast<float>(Scene::DeltaTime() * 0.1);  // 10秒で空になる
     if (air_amount_ < 0.0f) {
       air_amount_ = 0.0f;
     }
-    
+
     // スペースキーでエア回復（デモ用）
     if (KeySpace.pressed()) {
       air_amount_ += static_cast<float>(Scene::DeltaTime() * 0.5);  // 2秒で満タン
@@ -318,7 +468,7 @@ void Game::update()
         air_amount_ = 1.0f;
       }
     }
-    
+
     ui_->SetAirGauge(air_amount_);
   }
 
@@ -336,70 +486,6 @@ void Game::update()
 
   // 以下、通常のゲームロジック
   accumulatedTime += Scene::DeltaTime();
-
-  //while (StepTime <= accumulatedTime) {
-  //  // 2D 物理演算のワールドを更新する
-  //  world.update(StepTime);
-
-  //  accumulatedTime -= StepTime;
-  //}
-
-  //// 地面より下に落ちた物体は削除する
-  //for (auto it = bodies.begin(); it != bodies.end();) {
-  //  if (100 < it->getPos().y) {
-  //    // 対応テーブルからも削除
-  //    table.erase(it->id());
-
-  //    it = bodies.erase(it);
-
-  //    AudioManager::GetInstance()->PlaySe(SeKind::kDecideSe);
-  //    changeScene(EnumScene::kTitle);
-  //  } else {
-  //    ++it;
-  //  }
-  //}
-
-  //// 2D カメラを更新する
-  //camera.update();
-  //{
-  //  // 2D カメラから Transformer2D を作成する
-  //  const auto t = camera.createTransformer();
-
-  //  // 左クリックされたら
-  //  if (MouseL.down()) {
-  //    // ボディを追加する
-  //    bodies << world.createPolygons(P2Dynamic, Cursor::PosF(), polygons[index], P2Material{ 0.1, 0.0, 1.0 });
-
-  //    // ボディ ID と絵文字のインデックスの組を対応テーブルに追加する
-  //    table.emplace(bodies.back().id(), std::exchange(index, Random(polygons.size() - 1)));
-
-  //    auto& data = getData<SaveData>();
-  //    data.click_count_++;
-
-  //    // メインループの後、終了時にゲームをセーブ
-  //    {
-  //      // バイナリファイルをオープン
-  //      Serializer<BinaryWriter> writer{ U"game.save" };
-
-  //      // シリアライズに対応したデータを書き出す
-  //      writer(data);
-  //    }
-  //  }
-
-  //  // すべてのボディを描画する
-  //  for (const auto& body : bodies) {
-  //    textures[table[body.id()]].rotated(body.getAngle()).drawAt(body.getPos());
-  //  }
-
-    // 地面を描画する
-    ground.draw(Palette::Green);
-
-  //  // 現在操作できる絵文字を描画する
-  //  textures[index].drawAt(Cursor::PosF(), ColorF{ 1.0, (0.5 + Periodic::Sine0_1(1s) * 0.5) });
-  //}
-
-  //// 2D カメラの操作を描画する
-  //camera.draw(Palette::Orange);
 }
 
 void Game::DrawDebugInfo() const
@@ -410,11 +496,11 @@ void Game::DrawDebugInfo() const
 
   // プレイヤーの位置を取得
   const Vec2 playerPos = player_->GetPosition();
-  
+
   // プレイヤーのサイズを取得（スケール適用後）
   const float playerWidth = player_->GetWidth();
   const float playerHeight = player_->GetHeight();
-  
+
   // プレイヤーの当たり判定を赤色の枠で描画
   const RectF playerHitBox{
     playerPos.x - playerWidth / 2.0f,
@@ -422,24 +508,25 @@ void Game::DrawDebugInfo() const
     playerWidth,
     playerHeight
   };
-  
+
   playerHitBox.drawFrame(2.0, Palette::Red);
-  
+
   // プレイヤーの中心点を描画
   Circle{ playerPos, 3 }.draw(Palette::Red);
-  
+
   // グリッド位置を取得
   int32 gridRow, gridCol;
   if (GetPlayerGridPosition(gridRow, gridCol)) {
     // 現在のグリッドを緑色の枠で描画
+    const Vec2 gridTopLeft = GetGridTopLeft(gridRow, gridCol);
     const RectF currentGrid{
-      kStartX + gridCol * kBlockSize,
-      kStartY + gridRow * kBlockSize,
+      gridTopLeft.x,
+      gridTopLeft.y,
       kBlockSize,
       kBlockSize
     };
-    currentGrid.drawFrame(3.0, Palette::Green);
-    
+    //currentGrid.drawFrame(3.0, Palette::Green);
+
     // グリッド座標を表示（メンバー変数のフォントを使用）
     debug_font_(U"Grid: ({}, {})"_fmt(gridCol, gridRow))
       .draw(20, 20, Palette::White);
@@ -456,8 +543,6 @@ void Game::draw() const
 
   // ブロックグリッドの描画
   const int32 blockSize = kBlockSize;
-  const int32 startX = kStartX;
-  const int32 startY = kStartY;
 
   // カラフルな色のパレット
   const Array<ColorF> blockColors = {
@@ -475,29 +560,29 @@ void Game::draw() const
 
   for (size_t row = 0; row < block_grid_.size(); ++row) {
     for (size_t col = 0; col < block_grid_[row].size(); ++col) {
-      const String& blockText = block_grid_[row][col];
-      
-      if (blockText.isEmpty()) {
+      const Block& block = block_grid_[row][col];
+
+      // 空のブロックまたは破壊されたブロックはスキップ
+      if (block.isEmpty()) {
         continue;
       }
 
-      // ブロックの位置を計算
-      const int32 x = startX + static_cast<int32>(col) * blockSize;
-      const int32 y = startY + static_cast<int32>(row) * blockSize;
+      // ブロックの位置をグリッド座標から取得
+      const Vec2 blockTopLeft = GetGridTopLeft(static_cast<int32>(row), static_cast<int32>(col));
+      const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
 
       // ブロックの色をランダムに選択（位置に基づいた擬似ランダム）
-      // 位置を使ったハッシュ値でシード化し、ランダムに見えるようにする
       const size_t seed = (row * 982451653ULL + col * 1572869ULL) % blockColors.size();
       const ColorF blockColor = blockColors[seed];
 
       // 角丸の矩形を描画
-      RoundRect{ x, y, blockSize, blockSize, 15 }.draw(blockColor);
+      //RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.draw(blockColor);
 
       // ブロックの枠線を描画
-      RoundRect{ x, y, blockSize, blockSize, 15 }.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
+      //RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
 
-      // ブロック内のテキストを中央に描画（メンバー変数のフォントを使用）
-      block_font_(blockText).drawAt(x + blockSize / 2, y + blockSize / 2, ColorF{ 1.0 });
+      // ブロック内のテキストを中央に描画
+      block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
     }
   }
 
@@ -523,15 +608,15 @@ void Game::draw() const
   GameSettings::GetInstance()->ApplyBrightness();
 }
 
-//void Game::drawFadeIn(double t) const
-//{
-//  draw();
-//
-//  // 1280x720対応のフェードイン効果
-//  for (int32 y = 0; y < 8; ++y) {
-//    RectF{ (1280 + y * 120 - (1 + t) * 2560), (y * 90), 2560, 90 }.draw(HSV{ (y * 20), 0.2, 1.0 });
-//  }
-//}
+void Game::drawFadeIn(double t) const
+{
+  //draw();
+
+  //// 1280x720対応のフェードイン効果
+  //for (int32 y = 0; y < 8; ++y) {
+  //  RectF{ (1280 + y * 120 - (1 + t) * 2560), (y * 90), 2560, 90 }.draw(HSV{ (y * 20), 0.2, 1.0 });
+  //}
+}
 
 void Game::drawFadeOut(double t) const
 {

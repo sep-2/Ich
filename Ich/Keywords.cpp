@@ -2,7 +2,7 @@
 #include <Siv3D.hpp>
 #include <utility>
 
-Array<String> keywords = {
+const Array<String> keywords = {
 U"あいこくしん",
 U"あいさつ",
 U"あいだ",

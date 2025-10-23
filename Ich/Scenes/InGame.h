@@ -19,7 +19,7 @@ public:
 
   void draw() const override;
 
-  //void drawFadeIn(double t) const override;
+  void drawFadeIn(double t) const override;
 
   void drawFadeOut(double t) const override;
 
@@ -38,7 +38,7 @@ private:
           e << s;
         }
       };
-
+  
     // 主な絵文字ブロック
     addRange(0x1F600, 0x1F64F);  // Emoticons
 
@@ -57,6 +57,31 @@ private:
   /// <param name="gridCol">グリッド列</param>
   /// <returns>有効な位置の場合true</returns>
   bool GetPlayerGridPosition(int32& gridRow, int32& gridCol) const;
+
+  /// <summary>
+  /// ピクセル座標をグリッド座標に変換
+  /// </summary>
+  /// <param name="pixelPos">ピクセル座標</param>
+  /// <param name="gridRow">グリッド行（出力）</param>
+  /// <param name="gridCol">グリッド列（出力）</param>
+  /// <returns>有効な範囲内の場合true</returns>
+  bool PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) const;
+
+  /// <summary>
+  /// グリッド座標をピクセル座標（中心）に変換
+  /// </summary>
+  /// <param name="gridRow">グリッド行</param>
+  /// <param name="gridCol">グリッド列</param>
+  /// <returns>グリッドの中心のピクセル座標</returns>
+  Vec2 GridToPixel(int32 gridRow, int32 gridCol) const;
+
+  /// <summary>
+  /// グリッドの境界ピクセル座標を取得
+  /// </summary>
+  /// <param name="gridRow">グリッド行</param>
+  /// <param name="gridCol">グリッド列</param>
+  /// <returns>グリッドの左上座標</returns>
+  Vec2 GetGridTopLeft(int32 gridRow, int32 gridCol) const;
 
   /// <summary>
   /// プレイヤーを落下させる
@@ -136,11 +161,32 @@ private:
   // ブロックマネージャー
   BlockManager block_manager_;
 
-  // ブロックグリッド
-  Array<Array<String>> block_grid_;
+  // ブロック構造体
+  struct Block
+  {
+    String value;           // ブロックに表示される文字列
+    bool is_destroyed;      // ブロックが破壊されているか
+    Vec2 position;      // ブロックのピクセル位置（左上）
+    
+    Block() 
+      : value(U"")
+      , is_destroyed(false)
+    {}
+    
+    Block(const String& val) 
+      : value(val)
+      , is_destroyed(false)
+    {}
+    
+    // ブロックが空かどうか
+    bool isEmpty() const
+    {
+      return value.isEmpty() || is_destroyed;
+    }
+  };
 
-  // 辞書
-  Array<String> dictionary_;
+  // ブロックグリッド
+  Array<Array<Block>> block_grid_;
 
   // ブロック描画用フォント
   Font block_font_;
