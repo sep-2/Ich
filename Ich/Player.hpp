@@ -12,6 +12,20 @@ class Player : public Task
 {
 public:
     /// <summary>
+    /// プレイヤーのポーズを表す列挙体
+    /// </summary>
+    enum class Pose
+    {
+        kIdle,               ///< 待機
+        kStrafeLeft,         ///< 左向き移動（横移動）
+        kStrafeRight,        ///< 右向き移動（横移動）
+        kWalkForwardLeft,    ///< 前向き歩行（左側リード）
+        kWalkForwardRight,   ///< 前向き歩行（右側リード）
+        kFall,               ///< 落下
+        kGameOver            ///< ゲームオーバー演出
+    };
+
+    /// <summary>
     /// コンストラクタ
     /// </summary>
     Player();
@@ -75,6 +89,24 @@ public:
     /// <returns>プレイヤーの高さ</returns>
     float GetHeight() const;
 
+    /// <summary>
+    /// 現在のポーズを取得
+    /// </summary>
+    /// <returns>プレイヤーのポーズ</returns>
+    Pose GetPose() const;
+
+    /// <summary>
+    /// 現在のポーズを設定
+    /// </summary>
+    /// <param name="pose">設定するポーズ</param>
+    void SetPose(Pose pose);
+
+    /// <summary>
+    /// 移動フラグと向き情報からポーズを再評価する
+    /// （落下・ゲームオーバーなどの特別ポーズ解除時に利用）
+    /// </summary>
+    void RefreshPoseFromMovement();
+
 private:
     /// <summary>
     /// 入力処理（現在は使用しない）
@@ -137,6 +169,22 @@ private:
     /// プレイヤーが移動中か
     /// </summary>
     bool is_moving_;
+
+    /// <summary>
+    /// プレイヤーのポーズ
+    /// </summary>
+    Pose pose_;
+
+    /// <summary>
+    /// 移動フラグから算出される基本ポーズを取得
+    /// </summary>
+    Pose CalculateMovementPose() const;
+
+    /// <summary>
+    /// 移動フラグ由来のポーズを適用
+    /// </summary>
+    /// <param name="force">特殊ポーズ中でも更新するか</param>
+    void ApplyPoseFromMovement(bool force);
 
     /// <summary>
     /// スプライトの1フレームのサイズ

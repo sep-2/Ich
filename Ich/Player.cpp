@@ -20,6 +20,7 @@ Player::Player()
   , frame_duration_(8.0f / 60.0f)  // 8フレーム = 8/60秒 ≈ 0.133秒
   , facing_left_(false)
   , is_moving_(false)
+  , pose_(Pose::kIdle)
 {
   // プレイヤーのスプライトテクスチャを読み込み
   player_texture_ = std::make_shared<Texture>(PlayerConstants::kPlayerWalkImagePath);
@@ -118,6 +119,7 @@ void Player::SetMoveSpeed(float speed)
 void Player::SetMoving(bool isMoving)
 {
   is_moving_ = isMoving;
+  ApplyPoseFromMovement(false);
 }
 
 /// <summary>
@@ -127,6 +129,7 @@ void Player::SetMoving(bool isMoving)
 void Player::SetFacingLeft(bool facingLeft)
 {
   facing_left_ = facingLeft;
+  ApplyPoseFromMovement(false);
 }
 
 /// <summary>
@@ -145,6 +148,31 @@ float Player::GetWidth() const
 float Player::GetHeight() const
 {
   return kSpriteHeight * kScale;
+}
+
+/// <summary>
+/// 現在のポーズを取得
+/// </summary>
+Player::Pose Player::GetPose() const
+{
+  return pose_;
+}
+
+/// <summary>
+/// 現在のポーズを設定
+/// </summary>
+/// <param name="pose">設定するポーズ</param>
+void Player::SetPose(const Pose pose)
+{
+  pose_ = pose;
+}
+
+/// <summary>
+/// 移動フラグと向きからポーズを再計算
+/// </summary>
+void Player::RefreshPoseFromMovement()
+{
+  ApplyPoseFromMovement(true);
 }
 
 /// <summary>
@@ -178,4 +206,24 @@ void Player::UpdateAnimation(float delta_time)
 Rect Player::GetCurrentSpriteFrame() const
 {
   return Rect(current_frame_ * kSpriteWidth, 0, kSpriteWidth, kSpriteHeight);
+}
+
+Player::Pose Player::CalculateMovementPose() const
+{
+  if (is_moving_) {
+    return facing_left_ ? Pose::kStrafeLeft : Pose::kStrafeRight;
+  }
+
+  return Pose::kIdle;
+}
+
+void Player::ApplyPoseFromMovement(const bool force)
+{
+  if (!force) {
+    if (pose_ == Pose::kFall || pose_ == Pose::kGameOver) {
+      return;
+    }
+  }
+
+  pose_ = CalculateMovementPose();
 }

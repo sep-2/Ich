@@ -138,15 +138,24 @@ void Game::UpdatePlayerFall(float delta_time)
     const float nextBlockY = kStartY + belowRow * kBlockSize + kBlockSize / 2.0f;
     
     // ブロックの位置に到達したら停止
+    bool landed = false;
     if (playerPos.y >= nextBlockY) {
       playerPos.y = nextBlockY;
       player_fall_velocity_ = 0.0f;
+      landed = true;
     }
     
     player_->SetPosition(playerPos.x, playerPos.y);
+
+    if (landed) {
+      player_->RefreshPoseFromMovement();
+    } else {
+      player_->SetPose(Player::Pose::kFall);
+    }
   } else {
     // ブロックがある場合は落下速度をリセット
     player_fall_velocity_ = 0.0f;
+    player_->RefreshPoseFromMovement();
   }
 }
 
