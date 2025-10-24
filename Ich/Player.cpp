@@ -79,13 +79,6 @@ void Player::Update(float delta_time)
   if (player_wrapper_) {
     player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
     //player_wrapper_->SetUVRect(GetCurrentSpriteFrame());
-
-    // 左右反転（左を向く場合は-1.0でスケール）
-    if (facing_left_) {
-      player_wrapper_->SetScale(-kScale, kScale);
-    } else {
-      player_wrapper_->SetScale(kScale, kScale);
-    }
   }
 }
 
