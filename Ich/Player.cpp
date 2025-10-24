@@ -82,6 +82,7 @@ Player::Player()
   , weapon_base_position_(position_)
   , weapon_position_(position_)
   , weapon_angle_(0.0)
+  , weapon_render_rotation_(kWeaponBaseRotation)
   , weapon_active_(false)
   , weapon_render_task_(std::make_shared<WeaponRenderTask>())
   , weapon_color_(ColorF{ 0.9, 0.25, 0.25, 0.85 })
@@ -147,18 +148,10 @@ void Player::Render()
 
   if (weapon_render_task_ && weapon_active_)
   {
-    Vec2 direction = weapon_forward_dir_;
-    if (direction.x == 0.0 && direction.y == 0.0)
-    {
-      direction = Vec2{ 1.0, 0.0 };
-    }
-
-    const Vec2 normalizedDirection = direction.normalized();
-    const double directionAngle = std::atan2(normalizedDirection.y, normalizedDirection.x);
     weapon_render_task_->SetState(
       weapon_position_,
       SizeF{ kWeaponLength, kWeaponWidth },
-      directionAngle,
+      weapon_render_rotation_,
       weapon_color_,
       true);
 
@@ -217,7 +210,7 @@ void Player::SetFacingLeft(bool facingLeft)
 {
   facing_left_ = facingLeft;
   weapon_forward_dir_ = facing_left_ ? Vec2{ -1.0, 0.0 } : Vec2{ 1.0, 0.0 };
-  ApplyPoseFromMovement(false); // �E���̌������ς�����u�Ԃɉ摜�����]��������
+  ApplyPoseFromMovement(false); // 右左の向きが変わった瞬間に画像も反転させたい
 }
 
 /// <summary>
@@ -295,7 +288,7 @@ void Player::RefreshPoseFromMovement()
 /// </summary>
 void Player::HandleInput()
 {
-  // ���͏����� InGame �N���X�ōs�����߁A�����ł͉������Ȃ�
+  //  入力処理は InGame クラスで行うため、ここでは何もしない
   is_moving_ = false;
 }
 
@@ -306,14 +299,41 @@ void Player::UpdateWeapon(float delta_time)
     return;
   }
 
-  Vec2 direction = weapon_forward_dir_;
-  if (direction.x == 0.0 && direction.y == 0.0)
+  Vec2 direction{ 0.0, 1.0 };
+
+  switch (pose_)
   {
+  case Pose::kStrafeLeft:
+    direction = Vec2{ -1.0, 0.0 };
+    break;
+  case Pose::kStrafeRight:
     direction = Vec2{ 1.0, 0.0 };
+    break;
+  case Pose::kWalkForwardLeft:
+    direction = Vec2{ -1.0, 1.0 };
+    break;
+  case Pose::kWalkForwardRight:
+    direction = Vec2{ 1.0, 1.0 };
+    break;
+  case Pose::kFall:
+  case Pose::kGameOver:
+  default:
+    direction = Vec2{ 0.0, 1.0 };
+    break;
   }
 
-  const Vec2 normalizedDirection = direction.normalized();
-  weapon_base_position_ = position_ + normalizedDirection * kWeaponForwardOffset;
+  const double directionLength = direction.length();
+  if (directionLength <= 0.0)
+  {
+    weapon_forward_dir_ = Vec2{ 0.0, 1.0 };
+  }
+  else
+  {
+    weapon_forward_dir_ = direction / directionLength;
+  }
+
+  weapon_base_position_ = position_ + weapon_forward_dir_ * kWeaponForwardOffset;
+  weapon_render_rotation_ = std::atan2(weapon_forward_dir_.y, weapon_forward_dir_.x);
 
   if (KeyZ.pressed())
   {

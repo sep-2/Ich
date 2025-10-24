@@ -143,7 +143,7 @@ private:
   void UpdateAnimation(float delta_time);
 
   /// <summary>
-  /// �Z�L���O�A�b�v���ʃ|�W�^�𑦎��X�V
+  /// 武器を更新
   /// </summary>
   void UpdateWeapon(float delta_time);
 
@@ -245,21 +245,23 @@ private:
     static constexpr float kTargetHeight = 90.0f;
 
     /// <summary>
-    /// �Z�L���O�A�b�v�̑O�Ή����p�����[�^
+    /// 武器の基準位置
     /// </summary>
     static constexpr double kWeaponForwardOffset = 50.0;
     static constexpr double kWeaponOrbitRadius = 32.0;
     static constexpr double kWeaponLength = 96.0;
     static constexpr double kWeaponWidth = 18.0;
     static constexpr double kWeaponAngularSpeed = Math::TwoPi * 1.2;
+    static constexpr double kWeaponBaseRotation = Math::HalfPi;
 
     /// <summary>
-    /// �Z�L���O�A�b�v�̗��ʃf�[�^
+    /// 武器の進行方向
     /// </summary>
     Vec2 weapon_forward_dir_;
     Vec2 weapon_base_position_;
     Vec2 weapon_position_;
     double weapon_angle_;
+    double weapon_render_rotation_;
     bool weapon_active_;
     std::shared_ptr<WeaponRenderTask> weapon_render_task_;
     ColorF weapon_color_;
