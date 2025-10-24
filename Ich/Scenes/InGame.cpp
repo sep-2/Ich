@@ -263,8 +263,6 @@ void Game::UpdatePlayerMovement(float delta_time)
     player_->SetFacingLeft(facingLeft);
   }
 
-  //int y = player_->GetPosition().y + 4;
-  //player_->SetPosition(player_->GetPosition().x, y);
   // プレイヤーの現在位置を取得
   Vec2 playerPos = player_->GetPosition();
   const float gravity = 4.0f;
@@ -274,7 +272,7 @@ void Game::UpdatePlayerMovement(float delta_time)
   const float playerBottomY = nextPos.y + player_->GetHeight() / 2.0f;
   bool isOnBlock = false;
 
-
+  // 重力による落下とブロック衝突判定
   for (int i = 0; i < block_grid_.size(); i++) {
     for (int j = 0; j < block_grid_[i].size(); j++) {
       const Block& block = block_grid_[i][j];
@@ -285,136 +283,118 @@ void Game::UpdatePlayerMovement(float delta_time)
       }
 
       const Vec2 blockPos = block.position;
-      const float blockLeft = blockPos.x - 0;
-      const float blockRight = blockPos.x + kBlockSize + 0;
+      const float blockLeft = blockPos.x;
+      const float blockRight = blockPos.x + kBlockSize;
       const float blockTop = blockPos.y;
       const float blockBottom = blockPos.y + kBlockSize;
 
-      // 左端の線（青色）
-      Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
-
-      // 右端の線（オレンジ色）
-      Line{ blockRight, blockTop, blockRight, blockBottom }.draw(2.0, Palette::Orange);
+      // デバッグ用の線描画
+      if (kDebugMode) {
+        Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
+        Line{ blockRight, blockTop, blockRight, blockBottom }.draw(2.0, Palette::Orange);
+      }
 
       // プレイヤーの中心がブロックのX範囲内にあるかチェック
       if (nextPos.x >= blockLeft && nextPos.x <= blockRight) {
         // プレイヤーの下端がブロックの上面付近にあるかチェック
-        if (playerBottomY >= blockTop) {
+        if (playerBottomY >= blockTop && playerBottomY <= blockTop + gravity + 5.0f) {
           // プレイヤーをブロックの上に配置
           nextPos.y = blockTop - player_->GetHeight() / 2.0f;
           isOnBlock = true;
           break;
         }
       }
-
-
-      //const Vec2 blockPos = block_grid_[i][j].position;
-      //// プレイヤーの位置を取得
-      //const Vec2 playerPos = player_->GetPosition();
-      //const double distance = playerPos.distanceFrom(blockPos);
-      ////if (player_->GetHeight() + 500 < distance) {
-      ////  continue;
-      ////}
-      //PRINT << U"Skip: " << distance;
-      //PRINT << U"Player: " << playerPos.x << U"," << playerPos.y;
-      //PRINT << blockPos.x << U"," << blockPos.x + kBlockSize;
-
-      //if (playerPos.x > blockPos.x && playerPos.x <= blockPos.x + kBlockSize &&
-      //  player_->GetLeftBottom().y > blockPos.y) {
-
-      //  float correction_y = blockPos.y - player_->GetLeftBottom().y;
-      //  player_->SetPosition(playerPos.x, playerPos.y + correction_y);
-      //  PRINT << U"Corrected Y by " << correction_y;
-      //  break;
-
-      //}
-      //block_grid_[i][j].position.y
     }
+    
     if (isOnBlock) {
       break;
     }
   }
+  
   player_->SetPosition(nextPos.x, nextPos.y);
 
-
-  // 移動がない場合は早期リターン
+  // 横移動がない場合は早期リターン
   if (moveInput.x == 0.0f) {
     return;
   }
 
-
-  // プレイヤーの現在位置とグリッド座標を取得
-  int32 currentRow, currentCol;
-  if (!GetPlayerGridPosition(currentRow, currentCol)) {
-    return;
-  }
-
-  //Vec2 playerPos = player_->GetPosition();
+  // プレイヤーの現在位置を更新
+  playerPos = player_->GetPosition();
   const float moveSpeed = player_->move_speed_;
   const float moveDistance = moveSpeed * delta_time;
 
-  //// 次の位置を計算
-  //Vec2 nextPos = playerPos;
-  nextPos = playerPos;
-  nextPos.x += moveInput.x * moveDistance;
+  // 次の位置を計算
+  Vec2 horizontalNextPos = playerPos;
+  horizontalNextPos.x += moveInput.x * moveDistance;
 
-  //// 左右のブロック衝突判定
-  //bool canMove = true;
+  // プレイヤーの左右端を計算
+  const float playerHalfWidth = player_->GetWidth() / 2.0f;
+  const float playerLeft = horizontalNextPos.x - playerHalfWidth;
+  const float playerRight = horizontalNextPos.x + playerHalfWidth;
+  const float playerTop = horizontalNextPos.y - player_->GetHeight() / 2.0f;
+  const float playerBottom = horizontalNextPos.y + player_->GetHeight() / 2.0f;
 
-  //// 左に移動する場合
-  //if (moveInput.x < 0) {
-  //  const int32 leftCol = currentCol - 1;
+  // ブロックとの左右衝突判定
+  bool canMove = true;
 
-  //  // 現在のグリッドの中心位置
-  //  const Vec2 currentGridCenter = GridToPixel(currentRow, currentCol);
-  //  // 左のグリッドとの境界（2つのグリッドの中心の中間点）
-  //  const float leftBoundary = currentGridCenter.x - kBlockSize / 2.0f;
+  for (size_t i = 0; i < block_grid_.size(); i++) {
+    for (size_t j = 0; j < block_grid_[i].size(); j++) {
+      const Block& block = block_grid_[i][j];
 
-  //  // 次の位置が左の境界を超える場合
-  //  if (nextPos.x < leftBoundary) {
-  //    // 左隣のブロックが存在するかチェック
-  //    if (HasBlockAt(currentRow, leftCol)) {
-  //      canMove = false;
-  //      // ブロックの境界ぴったりに位置を固定
-  //      nextPos.x = leftBoundary;
-  //    }
-  //  }
-  //}
-  //// 右に移動する場合
-  //else if (moveInput.x > 0) {
-  //  const int32 rightCol = currentCol + 1;
+      // 空または破壊されたブロックはスキップ
+      if (block.isEmpty()) {
+        continue;
+      }
 
-  //  // 現在のグリッドの中心位置
-  //  const Vec2 currentGridCenter = GridToPixel(currentRow, currentCol);
-  //  // 右のグリッドとの境界（2つのグリッドの中心の中間点）
-  //  const float rightBoundary = currentGridCenter.x + kBlockSize / 2.0f;
+      const Vec2 blockPos = block.position;
+      const float blockLeft = blockPos.x;
+      const float blockRight = blockPos.x + kBlockSize;
+      const float blockTop = blockPos.y;
+      const float blockBottom = blockPos.y + kBlockSize;
 
-  //  // 次の位置が右の境界を超える場合
-  //  if (nextPos.x > rightBoundary) {
-  //    // 右隣のブロックが存在するかチェック
-  //    if (HasBlockAt(currentRow, rightCol)) {
-  //      canMove = false;
-  //      // ブロックの境界ぴったりに位置を固定
-  //      nextPos.x = rightBoundary;
-  //    }
-  //  }
-  //}
+      // プレイヤーとブロックのY座標が重なっているかチェック
+      const bool yOverlap = !(playerBottom <= blockTop || playerTop >= blockBottom);
+      
+      if (!yOverlap) {
+        continue;
+      }
 
-  //// グリッドの範囲外チェック
-  //int32 nextRow, nextCol;
-  //if (PixelToGrid(nextPos, nextRow, nextCol)) {
-  //  // 範囲内なら移動可能
-  //} else {
-  //  // 範囲外の場合は端に制限
-  //  if (nextPos.x < kStartX) {
-  //    nextPos.x = GridToPixel(currentRow, 0).x;  // 左端
-  //  } else if (nextCol >= static_cast<int32>(block_grid_[0].size())) {
-  //    nextPos.x = GridToPixel(currentRow, block_grid_[0].size() - 1).x;  // 右端
-  //  }
-  //}
+      // 左に移動する場合
+      if (moveInput.x < 0) {
+        // プレイヤーの左端がブロックの右端より左にあり、かつ衝突する場合
+        if (playerLeft < blockRight && playerRight > blockRight) {
+          // ブロックの右端にプレイヤーの左端を配置
+          horizontalNextPos.x = blockRight + playerHalfWidth;
+          canMove = false;
+          break;
+        }
+      }
+      // 右に移動する場合
+      else if (moveInput.x > 0) {
+        // プレイヤーの右端がブロックの左端より右にあり、かつ衝突する場合
+        if (playerRight > blockLeft && playerLeft < blockLeft) {
+          // ブロックの左端にプレイヤーの右端を配置
+          horizontalNextPos.x = blockLeft - playerHalfWidth;
+          canMove = false;
+          break;
+        }
+      }
+    }
+    
+    if (!canMove) {
+      break;
+    }
+  }
 
-  //// 位置を更新（衝突していても境界までは移動する）
-  player_->SetPosition(nextPos.x, playerPos.y);
+  // 画面端チェック
+  if (horizontalNextPos.x - playerHalfWidth < 0) {
+    horizontalNextPos.x = playerHalfWidth;
+  } else if (horizontalNextPos.x + playerHalfWidth > 1280) {
+    horizontalNextPos.x = 1280 - playerHalfWidth;
+  }
+
+  // 位置を更新
+  player_->SetPosition(horizontalNextPos.x, playerPos.y);
 }
 
 void Game::update()
