@@ -14,6 +14,7 @@ namespace InGammeConstants {
 
 Game::Game(const InitData& init)
   : IScene{ init }
+  , block_bg_texture_(U"Assets/Image/block_bg.png")
   , m_emoji{ U"🐥"_emoji }
   , menu_(std::make_unique<Menu>())
   , ui_(std::make_shared<Ui>())
@@ -610,6 +611,11 @@ void Game::draw() const
 {
   Scene::SetBackground(ColorF{ 0.6, 0.8, 0.7 });
 
+  if (!block_bg_texture_.isEmpty())
+  {
+    block_bg_texture_.resized(Scene::Size()).draw(0, 0);
+  }
+
   // ブロックグリッドの描画
   const int32 blockSize = kBlockSize;
 
@@ -695,3 +701,4 @@ void Game::drawFadeOut(double t) const
   Circle{ 640, 360, 640 }
   .drawFrame((t * 640), 0, ColorF{ 0.2, 0.3, 0.4 });
 }
+

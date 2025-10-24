@@ -106,6 +106,11 @@ private:
   /// </summary>
   void DrawDebugInfo() const;
 
+  /// <summary>
+  /// �w�i�摜
+  /// </summary>
+  Texture block_bg_texture_;
+
   Texture m_emoji;
 
   Stopwatch m_stopwatch_;

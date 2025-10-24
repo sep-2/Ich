@@ -78,13 +78,14 @@ void Main()
 
   while (System::Update()) {
     task_manager->UpdateTask(static_cast<float>(Scene::DeltaTime()));
-    task_manager->RenderTask();
 
     // 現在のシーンを実行する
     // シーンに実装した .update() と .draw() が実行される
     if (not manager.update()) {
       break;
     }
+
+    task_manager->RenderTask();
 
     // フレームレートを描画（デバッグモードのみ）
     DrawFrameRate();
@@ -97,3 +98,4 @@ void Main()
 
   task_manager->Destroy();
 }
+
