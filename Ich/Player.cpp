@@ -5,6 +5,45 @@
 #include "System/Renderer/Priority.h"
 #include <cmath>
 
+class WeaponRenderTask : public Task
+{
+public:
+  WeaponRenderTask()
+    : visible_(false)
+    , center_(Vec2{ 0.0, 0.0 })
+    , size_(SizeF{ 0.0, 0.0 })
+    , rotation_(0.0)
+    , color_(Palette::White)
+  {
+  }
+
+  void SetState(const Vec2& center, const SizeF& size, double rotation, const ColorF& color, bool visible)
+  {
+    center_ = center;
+    size_ = size;
+    rotation_ = rotation;
+    color_ = color;
+    visible_ = visible;
+  }
+
+  void Render() override
+  {
+    if (!visible_)
+    {
+      return;
+    }
+
+    RectF{ Arg::center(center_), size_ }.rotated(rotation_).draw(color_);
+  }
+
+private:
+  bool visible_;
+  Vec2 center_;
+  SizeF size_;
+  double rotation_;
+  ColorF color_;
+};
+
 namespace PlayerConstants {
   struct PoseAnimationResource
   {
@@ -39,6 +78,13 @@ Player::Player()
   , facing_left_(false)
   , is_moving_(false)
   , pose_(Pose::kIdle)
+  , weapon_forward_dir_(Vec2{ 1.0, 0.0 })
+  , weapon_base_position_(position_)
+  , weapon_position_(position_)
+  , weapon_angle_(0.0)
+  , weapon_active_(false)
+  , weapon_render_task_(std::make_shared<WeaponRenderTask>())
+  , weapon_color_(ColorF{ 0.9, 0.25, 0.25, 0.85 })
 {
   // ★フェーズ3要件★
   // ここからは歩行/待機などポーズ単位で正式版画像を差し替える準備を行う。
@@ -73,6 +119,7 @@ Player::~Player()
 /// <param name="delta_time">前回実行フレームからの経過時間（秒）</param>
 void Player::Update(float delta_time)
 {
+  UpdateWeapon(delta_time);
   UpdateAnimation(delta_time);
 
   // TextureWrapperの位置とUV座標を更新
@@ -89,11 +136,35 @@ void Player::Render()
 {
   Renderer* renderer = Renderer::GetInstance();
 
-  if (renderer && player_wrapper_) {
+  if (!renderer)
+  {
+    return;
+  }
+
+  if (player_wrapper_) {
     renderer->Push(Priority::kPlayerPriority, std::static_pointer_cast<Task>(player_wrapper_));
   }
-}
 
+  if (weapon_render_task_ && weapon_active_)
+  {
+    Vec2 direction = weapon_forward_dir_;
+    if (direction.x == 0.0 && direction.y == 0.0)
+    {
+      direction = Vec2{ 1.0, 0.0 };
+    }
+
+    const Vec2 normalizedDirection = direction.normalized();
+    const double directionAngle = std::atan2(normalizedDirection.y, normalizedDirection.x);
+    weapon_render_task_->SetState(
+      weapon_position_,
+      SizeF{ kWeaponLength, kWeaponWidth },
+      directionAngle,
+      weapon_color_,
+      true);
+
+    renderer->Push(Priority::kPlayerBomPriority, weapon_render_task_);
+  }
+}
 /// <summary>
 /// プレイヤーの位置を取得
 /// </summary>
@@ -145,7 +216,8 @@ void Player::SetMoving(bool isMoving)
 void Player::SetFacingLeft(bool facingLeft)
 {
   facing_left_ = facingLeft;
-  ApplyPoseFromMovement(false); // 右左の向きが変わった瞬間に画像も反転させたい
+  weapon_forward_dir_ = facing_left_ ? Vec2{ -1.0, 0.0 } : Vec2{ 1.0, 0.0 };
+  ApplyPoseFromMovement(false); // �E���̌������ς�����u�Ԃɉ摜�����]��������
 }
 
 /// <summary>
@@ -223,8 +295,47 @@ void Player::RefreshPoseFromMovement()
 /// </summary>
 void Player::HandleInput()
 {
-  // 入力処理は InGame クラスで行うため、ここでは何もしない
+  // ���͏����� InGame �N���X�ōs�����߁A�����ł͉������Ȃ�
   is_moving_ = false;
+}
+
+void Player::UpdateWeapon(float delta_time)
+{
+  if (!weapon_render_task_)
+  {
+    return;
+  }
+
+  Vec2 direction = weapon_forward_dir_;
+  if (direction.x == 0.0 && direction.y == 0.0)
+  {
+    direction = Vec2{ 1.0, 0.0 };
+  }
+
+  const Vec2 normalizedDirection = direction.normalized();
+  weapon_base_position_ = position_ + normalizedDirection * kWeaponForwardOffset;
+
+  if (KeyZ.pressed())
+  {
+    weapon_active_ = true;
+    weapon_angle_ += kWeaponAngularSpeed * delta_time;
+    weapon_angle_ = std::fmod(weapon_angle_, Math::TwoPi);
+    if (weapon_angle_ < 0.0)
+    {
+      weapon_angle_ += Math::TwoPi;
+    }
+
+    const Vec2 offset{
+      std::cos(weapon_angle_) * kWeaponOrbitRadius,
+      std::sin(weapon_angle_) * kWeaponOrbitRadius
+    };
+    weapon_position_ = weapon_base_position_ + offset;
+  }
+  else
+  {
+    weapon_active_ = false;
+    weapon_position_ = weapon_base_position_;
+  }
 }
 
 /// <summary>

@@ -4,6 +4,7 @@
 #include <Siv3D.hpp>
 
 class TextureWrapper;
+class WeaponRenderTask;
 
 /// <summary>
 /// プレイヤークラス - 歩行アニメーション付きキャラクター
@@ -142,6 +143,11 @@ private:
   void UpdateAnimation(float delta_time);
 
   /// <summary>
+  /// �Z�L���O�A�b�v���ʃ|�W�^�𑦎��X�V
+  /// </summary>
+  void UpdateWeapon(float delta_time);
+
+  /// <summary>
   /// プレイヤーの歩行スプライトテクスチャ
   /// </summary>
   std::shared_ptr<Texture> player_texture_;
@@ -237,4 +243,26 @@ private:
     /// 最終的に描画したい概ねの高さ（ピクセル）。ポーズによって画像サイズが異なるので、ここを基準にリサイズする。
     /// </summary>
     static constexpr float kTargetHeight = 90.0f;
+
+    /// <summary>
+    /// �Z�L���O�A�b�v�̑O�Ή����p�����[�^
+    /// </summary>
+    static constexpr double kWeaponForwardOffset = 50.0;
+    static constexpr double kWeaponOrbitRadius = 32.0;
+    static constexpr double kWeaponLength = 96.0;
+    static constexpr double kWeaponWidth = 18.0;
+    static constexpr double kWeaponAngularSpeed = Math::TwoPi * 1.2;
+
+    /// <summary>
+    /// �Z�L���O�A�b�v�̗��ʃf�[�^
+    /// </summary>
+    Vec2 weapon_forward_dir_;
+    Vec2 weapon_base_position_;
+    Vec2 weapon_position_;
+    double weapon_angle_;
+    bool weapon_active_;
+    std::shared_ptr<WeaponRenderTask> weapon_render_task_;
+    ColorF weapon_color_;
 };
+
+
