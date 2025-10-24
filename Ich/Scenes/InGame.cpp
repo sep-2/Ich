@@ -47,7 +47,7 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x10列、バッチサイズ20）
-  const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(10, 10, 20, keywords);
+  const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(10, 6, 20, keywords);
 
   // String配列をBlock配列に変換
   block_grid_.resize(stringGrid.size());
