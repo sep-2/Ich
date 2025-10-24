@@ -122,8 +122,11 @@ void Game::DestroyBlockUnderPlayer()
 {
   const Vec2 playerPos = player_->GetPosition();
   const float playerBottomY = playerPos.y + player_->GetHeight() / 2.0f;
+  const float playerLeft = playerPos.x - player_->GetWidth() / 2.0f;
+  const float playerRight = playerPos.x + player_->GetWidth() / 2.0f;
+  const float playerTop = playerPos.y - player_->GetHeight() / 2.0f;
   
-  // プレイヤーの下にあるブロックを探す
+  // プレイヤーの周囲のブロックを探す
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       Block& block = block_grid_[i][j];
@@ -139,21 +142,51 @@ void Game::DestroyBlockUnderPlayer()
       const float blockTop = blockPos.y;
       const float blockBottom = blockPos.y + kBlockSize;
       
-      // プレイヤーのX座標がブロックの範囲内
+      bool canDestroy = false;
+      String direction;
+      
+      // 下のブロック（足元）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
-        // プレイヤーの下端がブロックの上面に接触している
         if (playerBottomY >= blockTop && playerBottomY <= blockTop + 10.0f) {
-          // ブロックを破壊
-          block.is_destroyed = true;
-          PRINT << U"Block destroyed at position: (" << blockPos.x << U", " << blockPos.y << U")";
-          PRINT << U"Block destroyed at row: " << i << U", col: " << j;
-          return;  // 1つだけ破壊して終了
+          canDestroy = true;
+          direction = U"下";
         }
+      }
+      
+      // 左のブロック
+      if (playerLeft >= blockLeft && playerLeft <= blockRight) {
+        if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
+          canDestroy = true;
+          direction = U"左";
+        }
+      }
+      
+      // 右のブロック
+      if (playerRight >= blockLeft && playerRight <= blockRight) {
+        if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
+          canDestroy = true;
+          direction = U"右";
+        }
+      }
+      
+      // 上のブロック（頭上）
+      if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
+        if (playerTop <= blockBottom && playerTop >= blockBottom - 10.0f) {
+          canDestroy = true;
+          direction = U"上";
+        }
+      }
+      
+      if (canDestroy) {
+        // ブロックを破壊
+        block.is_destroyed = true;
+        PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
+        return;  // 1つだけ破壊して終了
       }
     }
   }
   
-  PRINT << U"No block found to destroy at player position";
+  PRINT << U"No block found to destroy near player";
 }
 
 void Game::UpdatePlayerFall(float delta_time)

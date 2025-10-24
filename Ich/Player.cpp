@@ -63,9 +63,9 @@ void Player::Update(float delta_time)
 
     // 左右反転（左を向く場合は-1.0でスケール）
     if (facing_left_) {
-      player_wrapper_->SetScale(-0.5f, 0.5);
+      player_wrapper_->SetScale(-0.35f, 0.35);
     } else {
-      player_wrapper_->SetScale(0.5f, 0.5f);
+      player_wrapper_->SetScale(0.35f, 0.35f);
     }
   }
 }

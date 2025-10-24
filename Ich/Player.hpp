@@ -172,6 +172,6 @@ private:
   /// <summary>
   /// スケール（0.5倍に縮小）
   /// </summary>
-  static constexpr float kScale = 0.5f;
+  static constexpr float kScale = 0.35f;
 };
 
