@@ -195,7 +195,7 @@ private:
   Font debug_font_;
 
   // ブロック描画の定数
-  static constexpr int32 kBlockSize = 140;
+  static constexpr int32 kBlockSize = 100;
   static constexpr int32 kStartX = 50;
   static constexpr int32 kStartY = 100;
 
