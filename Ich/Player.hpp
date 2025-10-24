@@ -11,12 +11,20 @@ class TextureWrapper;
 class Player : public Task
 {
 public:
-  enum class State
-  {
-    kIdle,
-    kWalking,
-    kFalling,
-  };
+
+    /// <summary>
+    /// プレイヤーのポーズを表す列挙体
+    /// </summary>
+    enum class Pose
+    {
+        kIdle,               ///< 待機
+        kStrafeLeft,         ///< 左向き移動（横移動）
+        kStrafeRight,        ///< 右向き移動（横移動）
+        kWalkForwardLeft,    ///< 前向き歩行（左側リード）
+        kWalkForwardRight,   ///< 前向き歩行（右側リード）
+        kFall,               ///< 落下
+        kGameOver            ///< ゲームオーバー演出
+    };
 
   /// <summary>
   /// コンストラクタ
@@ -93,12 +101,33 @@ public:
   Vec2 GetRightTop() const;
   Vec2 GetLeftBottom() const;
 
-  State state_ = State::kFalling;
-
   /// <summary>
   /// プレイヤーの移動速度（ピクセル/秒）
   /// </summary>
   float move_speed_;
+
+    /// <summary>
+    /// 現在のポーズを取得
+    /// </summary>
+    /// <returns>プレイヤーのポーズ</returns>
+    Pose GetPose() const;
+
+    /// <summary>
+    /// 現在のポーズを設定
+    /// </summary>
+    /// <param name="pose">設定するポーズ</param>
+    void SetPose(Pose pose);
+
+    /// <summary>
+    /// 移動フラグと向き情報からポーズを再評価する
+    /// （落下・ゲームオーバーなどの特別ポーズ解除時に利用）
+    /// </summary>
+    void RefreshPoseFromMovement();
+
+    /// <summary>
+    /// スケール（0.5倍に縮小）
+    /// </summary>
+    static constexpr float kScale = 0.1f;
 
 private:
   /// <summary>
@@ -111,12 +140,6 @@ private:
   /// </summary>
   /// <param name="delta_time">デルタタイム</param>
   void UpdateAnimation(float delta_time);
-
-  /// <summary>
-  /// 現在のスプライトフレームを取得
-  /// </summary>
-  /// <returns>スプライトのUV座標</returns>
-  Rect GetCurrentSpriteFrame() const;
 
   /// <summary>
   /// プレイヤーの歩行スプライトテクスチャ
@@ -139,39 +162,79 @@ private:
   int current_frame_;
 
   /// <summary>
-  /// アニメーションタイマー
-  /// </summary>
-  float animation_timer_;
-
-  /// <summary>
-  /// 1フレーム当たりの時間（秒）
-  /// </summary>
-  float frame_duration_;
-
-  /// <summary>
   /// プレイヤーが左を向いているか
   /// </summary>
   bool facing_left_;
+
+    /// <summary>
+    /// 現在のポーズにおけるフレーム番号（0開始）
+    /// </summary>
+    int current_pose_frame_;
+
+    /// <summary>
+    /// アニメーションタイマー（経過時間の積算）
+    /// </summary>
+    float animation_timer_;
+
+    /// <summary>
+    /// フレームを切り替える間隔（秒）
+    /// </summary>
+    float frame_interval_seconds_;
 
   /// <summary>
   /// プレイヤーが移動中か
   /// </summary>
   bool is_moving_;
 
-  /// <summary>
-  /// スプライトの1フレームのサイズ
-  /// </summary>
-  static const int kSpriteWidth = 128;
-  static const int kSpriteHeight = 408;
+    /// <summary>
+    /// プレイヤーのポーズ
+    /// </summary>
+    Pose pose_;
 
-  /// <summary>
-  /// アニメーションフレーム数
-  /// </summary>
-  static const int kAnimationFrames = 5;
+    /// <summary>
+    /// ポーズごとのテクスチャを読み込む
+    /// </summary>
+    void LoadPoseTextures();
 
-  /// <summary>
-  /// スケール（0.5倍に縮小）
-  /// </summary>
-  static constexpr float kScale = 0.35f;
+    /// <summary>
+    /// 指定したポーズに対応するテクスチャを取得
+    /// </summary>
+    const Array<std::shared_ptr<Texture>>* FindPoseFrames(Pose pose) const;
+
+    /// <summary>
+    /// 現在のポーズに応じてテクスチャとスケールを更新
+    /// </summary>
+    void UpdateTextureForPose();
+
+    /// <summary>
+    /// ポーズごとのテクスチャキャッシュ
+    /// </summary>
+    HashTable<Pose, Array<std::shared_ptr<Texture>>> pose_textures_;
+
+    /// <summary>
+    /// 移動フラグから算出される基本ポーズを取得
+    /// </summary>
+    Pose CalculateMovementPose() const;
+
+    /// <summary>
+    /// 移動フラグ由来のポーズを適用
+    /// </summary>
+    /// <param name="force">特殊ポーズ中でも更新するか</param>
+    void ApplyPoseFromMovement(bool force);
+
+    /// <summary>
+    /// スプライトの1フレームのサイズ
+    /// </summary>
+    static const int kSpriteWidth = 128;
+    static const int kSpriteHeight = 408;
+    
+    /// <summary>
+    /// アニメーションフレーム数
+    /// </summary>
+    static const int kAnimationFrames = 5;
+
+    /// <summary>
+    /// 最終的に描画したい概ねの高さ（ピクセル）。ポーズによって画像サイズが異なるので、ここを基準にリサイズする。
+    /// </summary>
+    static constexpr float kTargetHeight = 90.0f;
 };
-
