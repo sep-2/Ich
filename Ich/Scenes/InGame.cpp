@@ -257,6 +257,47 @@ void Game::UpdatePlayerFall(float delta_time)
   //    }
   //  }
   //}
+  
+  // プレイヤーの下のブロックをチェック
+  const int32 belowRow = gridRow + 1;
+  bool hasBlockBelow = false;
+  
+  if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
+      gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
+    hasBlockBelow = !block_grid_[belowRow][gridCol].isEmpty();
+  }
+  
+  // 下にブロックがない場合は落下
+  if (!hasBlockBelow && belowRow < static_cast<int32>(block_grid_.size())) {
+    player_fall_velocity_ += kGravity * delta_time;
+    player_fall_velocity_ = Min(player_fall_velocity_, kMaxFallSpeed);
+    
+    Vec2 playerPos = player_->GetPosition();
+    playerPos.y += player_fall_velocity_ * delta_time;
+    
+    // 次のブロックの位置を計算
+    const float nextBlockY = kStartY + belowRow * kBlockSize + kBlockSize / 2.0f;
+    
+    // ブロックの位置に到達したら停止
+    bool landed = false;
+    if (playerPos.y >= nextBlockY) {
+      playerPos.y = nextBlockY;
+      player_fall_velocity_ = 0.0f;
+      landed = true;
+    }
+    
+    player_->SetPosition(playerPos.x, playerPos.y);
+
+    if (landed) {
+      player_->RefreshPoseFromMovement();
+    } else {
+      player_->SetPose(Player::Pose::kFall);
+    }
+  } else {
+    // ブロックがある場合は落下速度をリセット
+    player_fall_velocity_ = 0.0f;
+    player_->RefreshPoseFromMovement();
+  }
 }
 
 bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
@@ -279,6 +320,16 @@ void Game::UpdatePlayerMovement(float delta_time)
   Vec2 moveInput = Vec2::Zero();
   bool isMoving = false;
   bool facingLeft = false;
+  const bool walkForwardLeft = KeyUp.pressed() || KeyW.pressed();
+  const bool walkForwardRight = KeyDown.pressed() || KeyS.pressed();
+
+  // 上下入力は「その場で向きを変えるだけ」なので歩行アニメーションには移行させず、待機ポーズを使用する。
+  if (walkForwardLeft || walkForwardRight) {
+    player_->SetMoving(false);
+    player_->SetPose(Player::Pose::kIdle);
+    return;
+  }
+  
 
   if (KeyLeft.pressed() || KeyA.pressed()) {
     moveInput.x = -1.0f;

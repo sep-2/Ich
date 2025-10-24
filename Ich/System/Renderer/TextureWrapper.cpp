@@ -68,6 +68,15 @@ std::shared_ptr<Texture> TextureWrapper::GetTexture() const {
 }
 
 /// <summary>
+/// テクスチャを差し替える
+/// </summary>
+/// <param name="texture">新しいテクスチャ</param>
+void TextureWrapper::SetTexture(std::shared_ptr<Texture> texture) {
+  texture_ = std::move(texture);
+  uv_rect_ = Rect{ 0, 0, 0, 0 };
+}
+
+/// <summary>
 /// 毎フレーム更新処理
 /// </summary>
 /// <param name="delta_time">前回実行フレームからの経過時間（秒）</param>
@@ -122,8 +131,25 @@ void TextureWrapper::SetScale(float scale_x, float scale_y) {
   scale_ = scale_x; // 互換性のため
 }
 
+/// <summary>
+/// 旧API互換用のスカラー値。内部的にはX軸スケールを代表値として返す。
+/// </summary>
 float TextureWrapper::GetScale() const {
   return scale_;
+}
+
+/// <summary>
+/// 実際に描画へ適用されるX軸スケール。左右反転すると負値になる点に注意。
+/// </summary>
+float TextureWrapper::GetScaleX() const {
+  return scale_x_;
+}
+
+/// <summary>
+/// 実際に描画へ適用されるY軸スケール。上下反転などを行った場合はこちらが負値になる。
+/// </summary>
+float TextureWrapper::GetScaleY() const {
+  return scale_y_;
 }
 
 void TextureWrapper::SetIsCenter(bool is_center) {
