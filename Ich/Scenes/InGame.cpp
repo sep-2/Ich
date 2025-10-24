@@ -148,8 +148,10 @@ void Game::DestroyBlockUnderPlayer()
       // 下のブロック（足元）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
         if (playerBottomY >= blockTop && playerBottomY <= blockTop + 10.0f) {
-          canDestroy = true;
-          direction = U"下";
+          if (!KeyLeft.pressed() && !KeyRight.pressed()) {
+            canDestroy = true;  
+            direction = U"下";
+          }
         }
       }
 
