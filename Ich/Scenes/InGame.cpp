@@ -125,26 +125,26 @@ void Game::DestroyBlockUnderPlayer()
   const float playerLeft = playerPos.x - player_->GetWidth() / 2.0f;
   const float playerRight = playerPos.x + player_->GetWidth() / 2.0f;
   const float playerTop = playerPos.y - player_->GetHeight() / 2.0f;
-  
+
   // プレイヤーの周囲のブロックを探す
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       Block& block = block_grid_[i][j];
-      
+
       // 空または破壊されたブロックはスキップ
       if (block.isEmpty()) {
         continue;
       }
-      
+
       const Vec2 blockPos = block.position;
       const float blockLeft = blockPos.x;
       const float blockRight = blockPos.x + kBlockSize;
       const float blockTop = blockPos.y;
       const float blockBottom = blockPos.y + kBlockSize;
-      
+
       bool canDestroy = false;
       String direction;
-      
+
       // 下のブロック（足元）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
         if (playerBottomY >= blockTop && playerBottomY <= blockTop + 10.0f) {
@@ -152,23 +152,23 @@ void Game::DestroyBlockUnderPlayer()
           direction = U"下";
         }
       }
-      
+
       // 左のブロック
-      if (playerLeft >= blockLeft && playerLeft <= blockRight) {
+      if (KeyLeft.pressed() && playerLeft >= blockLeft && playerLeft <= blockRight) {
         if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
           canDestroy = true;
           direction = U"左";
         }
       }
-      
+
       // 右のブロック
-      if (playerRight >= blockLeft && playerRight <= blockRight) {
+      if (KeyRight.pressed() && playerRight >= blockLeft && playerRight <= blockRight) {
         if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
           canDestroy = true;
           direction = U"右";
         }
       }
-      
+
       // 上のブロック（頭上）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
         if (playerTop <= blockBottom && playerTop >= blockBottom - 10.0f) {
@@ -176,7 +176,7 @@ void Game::DestroyBlockUnderPlayer()
           direction = U"上";
         }
       }
-      
+
       if (canDestroy) {
         // ブロックを破壊
         block.is_destroyed = true;
@@ -185,7 +185,7 @@ void Game::DestroyBlockUnderPlayer()
       }
     }
   }
-  
+
   PRINT << U"No block found to destroy near player";
 }
 
@@ -257,27 +257,27 @@ void Game::UpdatePlayerFall(float delta_time)
   //    }
   //  }
   //}
-  
+
   // プレイヤーの下のブロックをチェック
   const int32 belowRow = gridRow + 1;
   bool hasBlockBelow = false;
-  
+
   if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
-      gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
+    gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
     hasBlockBelow = !block_grid_[belowRow][gridCol].isEmpty();
   }
-  
+
   // 下にブロックがない場合は落下
   if (!hasBlockBelow && belowRow < static_cast<int32>(block_grid_.size())) {
     player_fall_velocity_ += kGravity * delta_time;
     player_fall_velocity_ = Min(player_fall_velocity_, kMaxFallSpeed);
-    
+
     Vec2 playerPos = player_->GetPosition();
     playerPos.y += player_fall_velocity_ * delta_time;
-    
+
     // 次のブロックの位置を計算
     const float nextBlockY = kStartY + belowRow * kBlockSize + kBlockSize / 2.0f;
-    
+
     // ブロックの位置に到達したら停止
     bool landed = false;
     if (playerPos.y >= nextBlockY) {
@@ -285,7 +285,7 @@ void Game::UpdatePlayerFall(float delta_time)
       player_fall_velocity_ = 0.0f;
       landed = true;
     }
-    
+
     player_->SetPosition(playerPos.x, playerPos.y);
 
     if (landed) {
@@ -330,7 +330,7 @@ void Game::UpdatePlayerMovement(float delta_time)
     player_->SetPose(Player::Pose::kIdle);
     return;
   }
-  
+
   if (KeyLeft.pressed() || KeyA.pressed()) {
     moveInput.x = -1.0f;
     isMoving = true;
@@ -389,12 +389,12 @@ void Game::UpdatePlayerMovement(float delta_time)
         }
       }
     }
-    
+
     if (isOnBlock) {
       break;
     }
   }
-  
+
   player_->SetPosition(nextPos.x, nextPos.y);
 
   // 横移動がない場合は早期リターン
@@ -438,7 +438,7 @@ void Game::UpdatePlayerMovement(float delta_time)
 
       // プレイヤーとブロックのY座標が重なっているかチェック
       const bool yOverlap = !(playerBottom <= blockTop || playerTop >= blockBottom);
-      
+
       if (!yOverlap) {
         continue;
       }
@@ -464,7 +464,7 @@ void Game::UpdatePlayerMovement(float delta_time)
         }
       }
     }
-    
+
     if (!canMove) {
       break;
     }
