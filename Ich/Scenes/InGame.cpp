@@ -114,44 +114,46 @@ Vec2 Game::GetGridTopLeft(int32 gridRow, int32 gridCol) const
 
 bool Game::GetPlayerGridPosition(int32& gridRow, int32& gridCol) const
 {
-  //// ピクセル座標からグリッド座標を計算
-  //const float relativeX = pixelPos.x - kStartX;
-  //const float relativeY = pixelPos.y - kStartY;
-
-  //gridCol = static_cast<int32>(relativeX / kBlockSize);
-  //gridRow = static_cast<int32>(relativeY / kBlockSize);
-
-  //// グリッドの範囲内かチェック
-  //if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
-  //  return false;
-  //}
-  //if (gridCol < 0 || gridCol >= static_cast<int32>(block_grid_[0].size())) {
-  //  return false;
-  //}
-
-  return true;
+  const Vec2 playerPos = player_->GetPosition();
+  return PixelToGrid(playerPos, gridRow, gridCol);
 }
 
 void Game::DestroyBlockUnderPlayer()
 {
-  int32 gridRow, gridCol;
-  if (!GetPlayerGridPosition(gridRow, gridCol)) {
-    return;
-  }
-
-  // プレイヤーの足元のブロック（1つ下）を破壊
-  const int32 belowRow = gridRow + 1;
-
-  if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
-    gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
-
-    // ブロックが存在する場合のみ破壊
-    Block& block = block_grid_[belowRow][gridCol];
-    if (!block.isEmpty()) {
-      block.is_destroyed = true;  // ブロックを破壊状態にする
-      PRINT << U"Block destroyed at row: " << belowRow << U", col: " << gridCol;
+  const Vec2 playerPos = player_->GetPosition();
+  const float playerBottomY = playerPos.y + player_->GetHeight() / 2.0f;
+  
+  // プレイヤーの下にあるブロックを探す
+  for (size_t i = 0; i < block_grid_.size(); i++) {
+    for (size_t j = 0; j < block_grid_[i].size(); j++) {
+      Block& block = block_grid_[i][j];
+      
+      // 空または破壊されたブロックはスキップ
+      if (block.isEmpty()) {
+        continue;
+      }
+      
+      const Vec2 blockPos = block.position;
+      const float blockLeft = blockPos.x;
+      const float blockRight = blockPos.x + kBlockSize;
+      const float blockTop = blockPos.y;
+      const float blockBottom = blockPos.y + kBlockSize;
+      
+      // プレイヤーのX座標がブロックの範囲内
+      if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
+        // プレイヤーの下端がブロックの上面に接触している
+        if (playerBottomY >= blockTop && playerBottomY <= blockTop + 10.0f) {
+          // ブロックを破壊
+          block.is_destroyed = true;
+          PRINT << U"Block destroyed at position: (" << blockPos.x << U", " << blockPos.y << U")";
+          PRINT << U"Block destroyed at row: " << i << U", col: " << j;
+          return;  // 1つだけ破壊して終了
+        }
+      }
     }
   }
+  
+  PRINT << U"No block found to destroy at player position";
 }
 
 void Game::UpdatePlayerFall(float delta_time)
@@ -289,7 +291,7 @@ void Game::UpdatePlayerMovement(float delta_time)
       const float blockBottom = blockPos.y + kBlockSize;
 
       // 左端の線（青色）
-      //Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
+      Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
 
       // 右端の線（オレンジ色）
       Line{ blockRight, blockTop, blockRight, blockBottom }.draw(2.0, Palette::Orange);
@@ -353,7 +355,8 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   //// 次の位置を計算
   //Vec2 nextPos = playerPos;
-  //nextPos.x += moveInput.x * moveDistance;
+  nextPos = playerPos;
+  nextPos.x += moveInput.x * moveDistance;
 
   //// 左右のブロック衝突判定
   //bool canMove = true;
@@ -411,7 +414,7 @@ void Game::UpdatePlayerMovement(float delta_time)
   //}
 
   //// 位置を更新（衝突していても境界までは移動する）
-  //player_->SetPosition(nextPos.x, playerPos.y);
+  player_->SetPosition(nextPos.x, playerPos.y);
 }
 
 void Game::update()
@@ -576,10 +579,10 @@ void Game::draw() const
       const ColorF blockColor = blockColors[seed];
 
       // 角丸の矩形を描画
-      //RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.draw(blockColor);
+      RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.draw(blockColor);
 
       // ブロックの枠線を描画
-      //RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
+      RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
 
       // ブロック内のテキストを中央に描画
       block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
