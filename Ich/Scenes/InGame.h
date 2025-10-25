@@ -106,6 +106,11 @@ private:
   void UpdatePlayerMovement(float delta_time);
 
   /// <summary>
+  /// カメラ位置を更新（プレイヤーの位置に追従）
+  /// </summary>
+  void UpdateCamera();
+
+  /// <summary>
   /// デバッグ情報を描画
   /// </summary>
   void DrawDebugInfo() const;
@@ -228,6 +233,12 @@ private:
 
   // 完成した単語の最大保存数（デフォルト10）
   size_t max_completed_words_ = 10;
+
+  // カメラオフセット（ワールド座標からスクリーン座標への変換）
+  Vec2 camera_offset_ = Vec2::Zero();
+
+  // カメラが追従する際のスムーズさ（0.0～1.0、1.0で即座に追従）
+  static constexpr float kCameraFollowSpeed = 0.1f;
 
   // デバッグモード
 #if _DEBUG

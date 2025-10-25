@@ -605,6 +605,9 @@ void Game::update()
     player_->Update(static_cast<float>(Scene::DeltaTime()));
   }
 
+  // カメラ位置を更新（プレイヤーに追従）
+  UpdateCamera();
+
   // 以下、通常のゲームロジック
   accumulatedTime += Scene::DeltaTime();
 }
@@ -667,76 +670,90 @@ void Game::draw() const
     block_bg_texture_.resized(Scene::Size()).draw(0, 0);
   }
 
-  // ブロックグリッドの描画
-  const int32 blockSize = kBlockSize;
+  // カメラオフセットを適用した変換を開始
+  {
+    const Transformer2D transformer{ Mat3x2::Translate(-camera_offset_) };
 
-  // カラフルな色のパレット
-  const Array<ColorF> blockColors = {
-    ColorF{ 1.0, 0.3, 0.3 },  // 赤
-    ColorF{ 0.3, 1.0, 0.3 },  // 緑
-    ColorF{ 0.3, 0.3, 1.0 },  // 青
-    ColorF{ 1.0, 1.0, 0.3 },  // 黄
-    ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
-    ColorF{ 0.3, 1.0, 1.0 },  // シアン
-    ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
-    ColorF{ 0.6, 0.3, 1.0 },  // 紫
-    ColorF{ 0.3, 1.0, 0.6 },  // 緑青
-    ColorF{ 1.0, 0.8, 0.3 },  // 金色
-  };
-  const size_t textureCount = block_textures_.size();
-  const bool hasBlockTextures = (textureCount > 0);
-  const size_t colorCount = blockColors.size();
+    // ブロックグリッドの描画
+    const int32 blockSize = kBlockSize;
 
-  for (size_t row = 0; row < block_grid_.size(); ++row) {
-    for (size_t col = 0; col < block_grid_[row].size(); ++col) {
-      const Block& block = block_grid_[row][col];
+    // カラフルな色のパレット
+    const Array<ColorF> blockColors = {
+      ColorF{ 1.0, 0.3, 0.3 },  // 赤
+      ColorF{ 0.3, 1.0, 0.3 },  // 緑
+      ColorF{ 0.3, 0.3, 1.0 },  // 青
+      ColorF{ 1.0, 1.0, 0.3 },  // 黄
+      ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
+      ColorF{ 0.3, 1.0, 1.0 },  // シアン
+      ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
+      ColorF{ 0.6, 0.3, 1.0 },  // 紫
+      ColorF{ 0.3, 1.0, 0.6 },  // 緑青
+      ColorF{ 1.0, 0.8, 0.3 },  // 金色
+    };
+    const size_t textureCount = block_textures_.size();
+    const bool hasBlockTextures = (textureCount > 0);
+    const size_t colorCount = blockColors.size();
 
-      // 空のブロックまたは破壊されたブロックはスキップ
-      if (block.isEmpty()) {
-        continue;
+    for (size_t row = 0; row < block_grid_.size(); ++row) {
+      for (size_t col = 0; col < block_grid_[row].size(); ++col) {
+        const Block& block = block_grid_[row][col];
+
+        // 空のブロックまたは破壊されたブロックはスキップ
+        if (block.isEmpty()) {
+          continue;
+        }
+
+        // ブロックの位置をグリッド座標から取得
+        const Vec2 blockTopLeft = GetGridTopLeft(static_cast<int32>(row), static_cast<int32>(col));
+        const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
+
+        // ブロックの見た目を位置依存のシードで決定
+        const size_t seed = (row * 982451653ULL + col * 1572869ULL);
+        const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 };
+
+        if (hasBlockTextures) {
+          const Texture& blockTexture = block_textures_[seed % textureCount];
+          const TextureRegion blockRegion = blockTexture.resized(blockSize, blockSize);
+          blockShape(blockRegion).draw();
+        }
+        else {
+          const ColorF blockColor = blockColors[seed % colorCount];
+          blockShape.draw(blockColor);
+        }
+
+        // ブロックの枠線を描画
+        blockShape.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
+
+        // ブロック内のテキストを中央に描画
+        constexpr Vec2 shadowOffset{ 3.0, 3.0 };
+        const Vec2 shadowPos = blockCenter + shadowOffset;
+        block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, ColorF{ 0.0, 0.0, 0.0, 0.9 });
+        block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
       }
-
-      // ブロックの位置をグリッド座標から取得
-      const Vec2 blockTopLeft = GetGridTopLeft(static_cast<int32>(row), static_cast<int32>(col));
-      const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
-
-      // ブロックの見た目を位置依存のシードで決定
-      const size_t seed = (row * 982451653ULL + col * 1572869ULL);
-      const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 };
-
-      if (hasBlockTextures) {
-        const Texture& blockTexture = block_textures_[seed % textureCount];
-        const TextureRegion blockRegion = blockTexture.resized(blockSize, blockSize);
-        blockShape(blockRegion).draw();
-      }
-      else {
-        const ColorF blockColor = blockColors[seed % colorCount];
-        blockShape.draw(blockColor);
-      }
-
-      // ブロックの枠線を描画
-      blockShape.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
-
-      // ブロック内のテキストを中央に描画
-      constexpr Vec2 shadowOffset{ 3.0, 3.0 };
-      const Vec2 shadowPos = blockCenter + shadowOffset;
-      block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, ColorF{ 0.0, 0.0, 0.0, 0.9 });
-      block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
     }
-  }
 
-  // UIの描画（メニューより先に描画）
+    // プレイヤーの描画（カメラオフセット適用範囲内）
+    // Rendererシステムを使わずに直接描画してカメラに追従させる
+    if (player_) {
+      const Vec2 playerPos = player_->GetPosition();
+      const auto texture = player_->GetTexture();
+      
+      if (texture) {
+        const float scaleX = player_->GetScaleX();
+        const float scaleY = player_->GetScaleY();
+        texture->scaled(scaleX, scaleY).drawAt(playerPos.x, playerPos.y);
+      }
+    }
+
+    // デバッグ情報の描画（カメラオフセット適用範囲内）
+    DrawDebugInfo();
+  }
+  // カメラオフセット適用範囲ここまで
+
+  // UI の描画（カメラの影響を受けない、画面固定）
   if (ui_) {
     ui_->Render();
   }
-
-  // プレイヤーの描画
-  if (player_) {
-    player_->Render();
-  }
-
-  // デバッグ情報の描画
-  DrawDebugInfo();
 
   // メニューが開いている場合は描画
   if (menu_->IsOpen()) {
@@ -746,7 +763,7 @@ void Game::draw() const
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
 
-  //------- 文字表示（上部：現在収集中の文字）
+  //------- 文字表示（上部：現在収集中の文字）- 画面固定
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   
   // have_words_を連結して文字列を作成
@@ -782,7 +799,7 @@ void Game::draw() const
     block_font_(word).drawAt(200 + 40 * i, 60, textColor);
   }
 
-  //------- 右側のボード：完成した単語を表示
+  //------- 右側のボード：完成した単語を表示 - 画面固定
   const int32 boardX = 1000;  // 右側の位置
   const int32 boardY = 200;   // 上からの位置
   const int32 boardWidth = 250;
@@ -830,5 +847,45 @@ void Game::drawFadeOut(double t) const
   // 1280x720対応のフェードアウト効果
   Circle{ 640, 360, 640 }
   .drawFrame((t * 640), 0, ColorF{ 0.2, 0.3, 0.4 });
+}
+
+void Game::UpdateCamera()
+{
+  // プレイヤーの位置を取得
+  const Vec2 playerPos = player_->GetPosition();
+
+  // カメラの目標位置を計算（プレイヤーを画面中央に配置）
+  const Vec2 targetCameraPos = Vec2{ 
+    playerPos.x - Scene::Width() / 2.0f, 
+    playerPos.y - Scene::Height() / 2.0f 
+  };
+
+  // カメラ位置をスムーズに更新（線形補間）
+  camera_offset_ += (targetCameraPos - camera_offset_) * kCameraFollowSpeed;
+
+  // カメラの移動範囲を制限（必要に応じて）
+  // 例：左端より左には移動しない
+  if (camera_offset_.x < 0) {
+    camera_offset_.x = 0;
+  }
+
+  // 上端より上には移動しない
+  if (camera_offset_.y < 0) {
+    camera_offset_.y = 0;
+  }
+
+  // 右端の制限（ブロックグリッドのサイズに応じて）
+  const float worldWidth = kStartX + block_grid_[0].size() * kBlockSize;
+  const float maxCameraX = worldWidth - Scene::Width();
+  if (camera_offset_.x > maxCameraX && maxCameraX > 0) {
+    camera_offset_.x = maxCameraX;
+  }
+
+  // 下端の制限（ブロックグリッドのサイズに応じて）
+  const float worldHeight = kStartY + block_grid_.size() * kBlockSize;
+  const float maxCameraY = worldHeight - Scene::Height();
+  if (camera_offset_.y > maxCameraY && maxCameraY > 0) {
+    camera_offset_.y = maxCameraY;
+  }
 }
 

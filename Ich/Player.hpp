@@ -97,6 +97,24 @@ public:
   /// <returns>プレイヤーの高さ</returns>
   float GetHeight() const;
 
+  /// <summary>
+  /// プレイヤーのテクスチャを取得
+  /// </summary>
+  /// <returns>テクスチャ</returns>
+  std::shared_ptr<Texture> GetTexture() const;
+
+  /// <summary>
+  /// X軸のスケールを取得
+  /// </summary>
+  /// <returns>スケール</returns>
+  float GetScaleX() const;
+
+  /// <summary>
+  /// Y軸のスケールを取得
+  /// </summary>
+  /// <returns>スケール</returns>
+  float GetScaleY() const;
+
   Vec2 GetLeftTop() const;
   Vec2 GetRightBottom() const;
   Vec2 GetRightTop() const;
