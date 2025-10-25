@@ -35,7 +35,7 @@ namespace InGameConstants {
   // ブロックグリッドパラメータ
   constexpr int32 kGridRows = 36;                 // グリッド行数
   constexpr int32 kGridColumns = 6;               // グリッド列数
-  constexpr int32 kBatchSize = 18;                // バッチサイズ
+  constexpr int32 kBatchSize = 36;                // バッチサイズ
 
   // プレイヤー初期位置
   constexpr int32 kPlayerInitialX = 100;
@@ -155,11 +155,10 @@ Game::Game(const InitData& init)
   //player_->SetPosition(initialPos.x, initialPos.y);
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
   player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // 移動速度を200ピクセル/秒に設定
-
-  // デバッグ用
-  have_words_.push_back(U"あ");
-  have_words_.push_back(U"い");
-  have_words_.push_back(U"だ");
+  
+  for (size_t i = 0; i < max_string_; i++) {
+    have_words_.push_back(U"");
+  }
 }
 Game::~Game()
 {
