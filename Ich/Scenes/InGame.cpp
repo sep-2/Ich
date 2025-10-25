@@ -95,6 +95,7 @@ Game::Game(const InitData& init)
   , player_(std::make_shared<Player>())
   , air_amount_(1.0f)
   , block_font_{ 40, Typeface::Bold }
+  , completed_word_font_{ 24 }
   , debug_font_{ 16 }
 {
   //PRINT << U"Game::Game()";
@@ -821,7 +822,7 @@ void Game::draw() const
   int32 yOffset = InGameConstants::kCompletedBoardY + 80;
 
   for (const auto& word : completed_words_) {
-    block_font_(word).drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, yOffset, ColorF{ 0.0, 1.0, 0.0 });
+    completed_word_font_(word).drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, yOffset, ColorF{ 0.0, 1.0, 0.0 });
     yOffset += InGameConstants::kCompletedBoardLineHeight;
 
     // ボードからはみ出さないようにする

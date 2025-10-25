@@ -179,6 +179,9 @@ private:
   // ブロック描画用フォント
   Font block_font_;
 
+  // 完成単語リスト用フォント
+  Font completed_word_font_;
+
   // デバッグ用フォント
   Font debug_font_;
 
@@ -209,4 +212,6 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
+
+
 
