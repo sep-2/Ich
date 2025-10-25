@@ -116,11 +116,9 @@ private:
   void DrawDebugInfo() const;
 
   /// <summary>
-  /// �w�i�摜
+  /// ブロックのテクスチャ
   /// </summary>
   Texture block_bg_texture_;
-
-  Texture m_emoji;
 
   Stopwatch m_stopwatch_;
 
@@ -144,32 +142,6 @@ private:
   Array<Texture> textures;
 
   Array<Texture> block_textures_;
-
-  // 2D 物理演算のシミュレーションステップ（秒）
-  // constexpr を外して const に変更
-  const double StepTime = (1.0 / 200.0);
-
-  // 2D 物理演算のシミュレーション蓄積時間（秒）
-  double accumulatedTime = 0.0;
-
-  // 2D 物理演算のワールド
-  P2World world;
-
-  // [_] 地面
-  const P2Body ground = world.createLine(P2Static, Vec2{ 0, 0 }, Line{ -300, 0, 300, 0 });
-
-  // 動物の物体
-  Array<P2Body> bodies;
-
-  // 物体の ID と絵文字のインデックスの対応テーブル
-  HashTable<P2BodyID, size_t> table;
-
-  // 絵文字のインデックス
-  size_t index = 1;
-  //size_t index = Random(polygons.size() - 1);
-
-  // 2D カメラ
-  Camera2D camera{ Vec2{ 0, -200 } };
 
   // エア残量（デモ用）
   float air_amount_ = 1.0f;
@@ -210,35 +182,25 @@ private:
   // デバッグ用フォント
   Font debug_font_;
 
-  // ブロック描画の定数
-  static constexpr int32 kBlockSize = 100;
-  static constexpr int32 kStartX = 100;
-  static constexpr int32 kStartY = 250;
-
   // プレイヤーの落下速度
   float player_fall_velocity_ = 0.0f;
-  static constexpr float kGravity = 800.0f;  // ピクセル/秒^2
-  static constexpr float kMaxFallSpeed = 600.0f;  // 最大落下速度
 
   // プレイヤーの移動入力
   Vec2 player_move_input_ = Vec2::Zero();
 
   Array<String> have_words_;
 
-  // 最大文字数（デフォルト5）
+  // 最大文字数
   size_t max_string_ = 5;
 
   // 完成した単語のリスト
   Array<String> completed_words_;
 
-  // 完成した単語の最大保存数（デフォルト10）
+  // 完成した単語の最大保存数
   size_t max_completed_words_ = 10;
 
   // カメラオフセット（ワールド座標からスクリーン座標への変換）
   Vec2 camera_offset_ = Vec2::Zero();
-
-  // カメラが追従する際のスムーズさ（0.0～1.0、1.0で即座に追従）
-  static constexpr float kCameraFollowSpeed = 0.1f;
 
   // デバッグモード
 #if _DEBUG
