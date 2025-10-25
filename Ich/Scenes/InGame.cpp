@@ -25,6 +25,23 @@ Game::Game(const InitData& init)
 {
   //PRINT << U"Game::Game()";
 
+  // �u���b�N�`����p�Ƀe�N�X�`���o��
+  const Array<String> blockTexturePaths = {
+    U"Assets/Image/block_blue.jpg",
+    U"Assets/Image/block_green.jpg",
+    U"Assets/Image/block_orange.jpg",
+    U"Assets/Image/block_purple.jpg",
+    U"Assets/Image/block_yellow.jpg"
+  };
+
+  for (const auto& path : blockTexturePaths) {
+    Texture texture{ path };
+    if (texture.isEmpty()) {
+      PRINT << U"Failed to load block texture: " << path;
+      continue;
+    }
+    block_textures_ << texture;
+  }
   for (const auto& emoji : emojis) {
     // 絵文字の画像から形状情報を作成する
     polygons << Emoji::CreateImage(emoji).alphaToPolygonsCentered().simplified(2.0);
@@ -666,6 +683,9 @@ void Game::draw() const
     ColorF{ 0.3, 1.0, 0.6 },  // 緑青
     ColorF{ 1.0, 0.8, 0.3 },  // 金色
   };
+  const size_t textureCount = block_textures_.size();
+  const bool hasBlockTextures = (textureCount > 0);
+  const size_t colorCount = blockColors.size();
 
   for (size_t row = 0; row < block_grid_.size(); ++row) {
     for (size_t col = 0; col < block_grid_[row].size(); ++col) {
@@ -680,15 +700,22 @@ void Game::draw() const
       const Vec2 blockTopLeft = GetGridTopLeft(static_cast<int32>(row), static_cast<int32>(col));
       const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
 
-      // ブロックの色をランダムに選択（位置に基づいた擬似ランダム）
-      const size_t seed = (row * 982451653ULL + col * 1572869ULL) % blockColors.size();
-      const ColorF blockColor = blockColors[seed];
+      // ブロックの見た目を位置依存のシードで決定
+      const size_t seed = (row * 982451653ULL + col * 1572869ULL);
+      const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 };
 
-      // 角丸の矩形を描画
-      RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.draw(blockColor);
+      if (hasBlockTextures) {
+        const Texture& blockTexture = block_textures_[seed % textureCount];
+        const TextureRegion blockRegion = blockTexture.resized(blockSize, blockSize);
+        blockShape(blockRegion).draw();
+      }
+      else {
+        const ColorF blockColor = blockColors[seed % colorCount];
+        blockShape.draw(blockColor);
+      }
 
       // ブロックの枠線を描画
-      RoundRect{ blockTopLeft.x, blockTopLeft.y, blockSize, blockSize, 15 }.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
+      blockShape.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
 
       // ブロック内のテキストを中央に描画
       block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
