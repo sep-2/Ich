@@ -370,7 +370,6 @@ void Game::UpdatePlayerMovement(float delta_time)
   if (walkForwardLeft || walkForwardRight) {
     player_->SetMoving(false);
     player_->SetPose(Player::Pose::kIdle);
-    return;
   }
 
   if (KeyLeft.pressed() || KeyA.pressed()) {
@@ -576,7 +575,7 @@ void Game::update()
   }
 
   // Zキーでブロック破壊
-  if (KeyZ.down()) {
+  if (KeyZ.pressed()) {
     DestroyBlockUnderPlayer();
   }
 
