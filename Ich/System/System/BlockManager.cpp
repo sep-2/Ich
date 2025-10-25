@@ -271,7 +271,10 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     {
       for (const char32 ch : word)
       {
-        charBatch << String(1, ch);
+        if (const auto normalized = NormalizeKanaChar(ch))
+        {
+          charBatch << String(1, *normalized);
+        }
       }
     }
 

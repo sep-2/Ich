@@ -194,7 +194,7 @@ private:
   Array<String> have_words_;
 
   // 最大文字数
-  size_t max_string_ = 5;
+  size_t max_string_ = 7;
 
   // 完成した単語のリスト
   Array<String> completed_words_;
