@@ -749,7 +749,7 @@ void Game::draw() const
     
     // 合致する場合は赤色、それ以外は白色で描画
     const ColorF textColor = isHit ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 1.0 };
-    block_font_(word).drawAt(200 + 40 * i, 30, textColor);
+    block_font_(word).drawAt(200 + 40 * i, 60, textColor);
   }
 
   //------- 右側のボード：完成した単語を表示
