@@ -6,7 +6,7 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/GameSettings.h"
 #include "System/System/BlockManager.h"
-#include "Keywords.cpp"
+#include "Keywords.hpp"
 
 namespace InGammeConstants {
   const Vec2 kStartBlock{ 200, 200 };

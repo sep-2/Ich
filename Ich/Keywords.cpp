@@ -1,8 +1,7 @@
-﻿#pragma once
-#include <Siv3D.hpp>
+﻿#include "Keywords.hpp"
 #include <utility>
 
-const Array<String> keywords = {
+extern const Array<String> keywords = {
 U"あいこくしん",
 U"あいさつ",
 U"あいだ",
