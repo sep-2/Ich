@@ -141,25 +141,27 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   Array<String> result;
   result.reserve(dictionary.size());
 
-  // ブロック全体の保有文字数を先に算出し、辞書語ごとの照合に使い回す。
-  const FrequencyTable blockFrequency = BuildFrequency(blocks);
+  // blocksを連結して1つの文字列にする
+  String concatenated;
+  for (const auto& block : blocks)
+  {
+    concatenated += block;
+  }
 
+  // 各辞書語について、連結文字列内に順番通りに含まれているかチェック
   for (const auto& word : dictionary)
   {
-    const FrequencyTable wordFrequency = BuildFrequency(word);
-
-    bool canBuild = true;
-
-    for (const auto& [kana, required] : wordFrequency)
+    // 辞書語が空の場合はスキップ
+    if (word.isEmpty())
     {
-      if (GetAvailableCount(blockFrequency, kana) < required)
-      {
-        canBuild = false;
-        break;
-      }
+      continue;
     }
 
-    if (canBuild)
+    // 連結文字列内で辞書語を検索
+    size_t pos = concatenated.indexOf(word);
+    
+    // 見つかった場合は結果に追加
+    if (pos != String::npos)
     {
       result << word;
     }
