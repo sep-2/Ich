@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <deque>
 #include <algorithm>
@@ -115,6 +115,8 @@ private:
   /// </summary>
   void DrawDebugInfo() const;
 
+  void UpdateHint();
+
   /// <summary>
   /// ブロックのテクスチャ
   /// </summary>
@@ -181,6 +183,7 @@ private:
 
   // 完成単語リスト用フォント
   Font completed_word_font_;
+  Font hint_font_;
 
   // デバッグ用フォント
   Font debug_font_;
@@ -198,6 +201,8 @@ private:
 
   // 完成した単語のリスト
   Array<String> completed_words_;
+  double hint_timer_ = 0.0;
+  String current_hint_;
 
   // カメラオフセット（ワールド座標からスクリーン座標への変換）
   Vec2 camera_offset_ = Vec2::Zero();
