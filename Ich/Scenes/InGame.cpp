@@ -50,11 +50,11 @@ namespace InGameConstants {
   constexpr int32 kCharBoxStartY = 20;            // 開始Y位置
 
   // 完成した単語ボードパラメータ
-  constexpr int32 kCompletedBoardX = 1000;        // 右側の位置
-  constexpr int32 kCompletedBoardY = 200;         // 上からの位置
-  constexpr int32 kCompletedBoardWidth = 250;     // ボード幅
-  constexpr int32 kCompletedBoardHeight = 500;    // ボード高さ
-  constexpr int32 kCompletedBoardLineHeight = 50; // 行の高さ
+  constexpr int32 kCompletedBoardX = 750;
+  constexpr int32 kCompletedBoardY = 100;
+  constexpr int32 kCompletedBoardWidth = 500;
+  constexpr int32 kCompletedBoardHeight = 600;
+  constexpr int32 kCompletedBoardLineHeight = 20; // 行の高さ
 
   // ブロックのイメージパス
   const Array<String> kBlockTexturePaths = {
@@ -95,7 +95,7 @@ Game::Game(const InitData& init)
   , player_(std::make_shared<Player>())
   , air_amount_(1.0f)
   , block_font_{ 40, Typeface::Bold }
-  , completed_word_font_{ 24 }
+  , completed_word_font_{ 18 }
   , debug_font_{ 16 }
 {
   //PRINT << U"Game::Game()";
