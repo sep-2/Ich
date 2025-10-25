@@ -251,6 +251,42 @@ float Player::GetHeight() const
 }
 
 /// <summary>
+/// プレイヤーのテクスチャを取得
+/// </summary>
+std::shared_ptr<Texture> Player::GetTexture() const
+{
+  if (player_wrapper_)
+  {
+    return player_wrapper_->GetTexture();
+  }
+  return nullptr;
+}
+
+/// <summary>
+/// X軸のスケールを取得
+/// </summary>
+float Player::GetScaleX() const
+{
+  if (player_wrapper_)
+  {
+    return player_wrapper_->GetScaleX();
+  }
+  return 1.0f;
+}
+
+/// <summary>
+/// Y軸のスケールを取得
+/// </summary>
+float Player::GetScaleY() const
+{
+  if (player_wrapper_)
+  {
+    return player_wrapper_->GetScaleY();
+  }
+  return 1.0f;
+}
+
+/// <summary>
 /// 現在のポーズを取得
 /// </summary>
 Player::Pose Player::GetPose() const
