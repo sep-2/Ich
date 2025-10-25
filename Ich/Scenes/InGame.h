@@ -1,4 +1,8 @@
 ﻿#pragma once
+#include <iostream>
+#include <deque>
+#include <algorithm>
+
 #include "Scenes/Enum.h"
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/Menu.h"
@@ -211,6 +215,8 @@ private:
 
   // プレイヤーの移動入力
   Vec2 player_move_input_ = Vec2::Zero();
+
+  Array<String> have_words_;
 
   // デバッグモード
 #if _DEBUG

@@ -71,6 +71,10 @@ Game::Game(const InitData& init)
   //player_->SetPosition(initialPos.x, initialPos.y);
   player_->SetPosition(100, 20);
   player_->SetMoveSpeed(200.0f);  // 移動速度を200ピクセル/秒に設定
+
+  have_words_.push_back(U"あ");
+  have_words_.push_back(U"い");
+  have_words_.push_back(U"だ");
 }
 Game::~Game()
 {
@@ -184,6 +188,10 @@ void Game::DestroyBlockUnderPlayer()
         // ブロックを破壊
         block.is_destroyed = true;
         PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
+        have_words_.push_back(block.value);
+        //for (const auto& word : have_words_) {
+        //  PRINT << U"  Have word: " << word;
+        //}
         return;  // 1つだけ破壊して終了
       }
     }
@@ -681,6 +689,42 @@ void Game::draw() const
 
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
+
+  //------- 文字表示
+  Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
+  
+  // have_words_を連結して文字列を作成
+  String concatenated;
+  for (const auto& word : have_words_) {
+    concatenated += word;
+  }
+  
+  for (int i = 0; i < have_words_.size(); i++) {
+    const String& word = have_words_[i];
+    
+    // この文字がresultのいずれかの単語に含まれているかチェック
+    bool isHit = false;
+    
+    // i番目の文字がresultの単語の一部かどうかを確認
+    for (const auto& hitWord : result) {
+      // concatenatedの中でhitWordの位置を探す
+      size_t pos = concatenated.indexOf(hitWord);
+      if (pos != String::npos) {
+        // hitWordの範囲内にi番目の文字が含まれているか
+        size_t hitStart = pos;
+        size_t hitEnd = pos + hitWord.length();
+        
+        if (i >= hitStart && i < hitEnd) {
+          isHit = true;
+          break;
+        }
+      }
+    }
+    
+    // 合致する場合は赤色、それ以外は白色で描画
+    const ColorF textColor = isHit ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 1.0 };
+    block_font_(word).drawAt(200 + 40 * i, 30, textColor);
+  }
 }
 
 void Game::drawFadeIn(double t) const
