@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "CppUnitTest.h"
 #include "../Ich/System/System/BlockManager.h"
+#include "../Ich/Keywords.hpp"
 #include <algorithm>
 #include <utility>
 #include <stdexcept>
@@ -9,8 +10,6 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 // Forward declaration for the function implemented in Sample.cpp.
 int Add(int left, int right);
-extern Array<String> keywords;
-
 namespace UnitTest
 {
   TEST_CLASS(SampleTests)
