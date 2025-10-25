@@ -199,9 +199,6 @@ private:
   // 完成した単語のリスト
   Array<String> completed_words_;
 
-  // 完成した単語の最大保存数
-  size_t max_completed_words_ = 10;
-
   // カメラオフセット（ワールド座標からスクリーン座標への変換）
   Vec2 camera_offset_ = Vec2::Zero();
 
