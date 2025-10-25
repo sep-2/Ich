@@ -718,6 +718,9 @@ void Game::draw() const
       blockShape.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
 
       // ブロック内のテキストを中央に描画
+      constexpr Vec2 shadowOffset{ 3.0, 3.0 };
+      const Vec2 shadowPos = blockCenter + shadowOffset;
+      block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, ColorF{ 0.0, 0.0, 0.0, 0.9 });
       block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
     }
   }
