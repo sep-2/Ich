@@ -188,10 +188,16 @@ void Game::DestroyBlockUnderPlayer()
         // ブロックを破壊
         block.is_destroyed = true;
         PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
+        
+        // 文字を追加
         have_words_.push_back(block.value);
-        //for (const auto& word : have_words_) {
-        //  PRINT << U"  Have word: " << word;
-        //}
+        
+        // max_string_を超えたら先頭から削除
+        while (have_words_.size() > max_string_) {
+          have_words_.erase(have_words_.begin());
+          PRINT << U"Removed oldest character. Current size: " << have_words_.size();
+        }
+        
         return;  // 1つだけ破壊して終了
       }
     }
@@ -524,6 +530,26 @@ void Game::update()
     return;  // ゲームロジックは更新しない
   }
 
+  // 単語が完成したかチェック
+  Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
+  if (!result.isEmpty()) {
+    // resultの各単語について処理
+    for (const auto& hitWord : result) {
+      // 完成した単語をcompleted_words_に追加（重複チェック）
+      if (!completed_words_.includes(hitWord)) {
+        completed_words_.push_back(hitWord);
+        PRINT << U"Completed word: " << hitWord;
+        
+        // max_completed_words_を超えたら先頭から削除
+        while (completed_words_.size() > max_completed_words_) {
+          String removed = completed_words_.front();
+          completed_words_.erase(completed_words_.begin());
+          PRINT << U"Removed oldest completed word: " << removed << U". Current count: " << completed_words_.size();
+        }
+      }
+    }
+  }
+
   // Zキーでブロック破壊
   if (KeyZ.down()) {
     DestroyBlockUnderPlayer();
@@ -690,7 +716,7 @@ void Game::draw() const
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
 
-  //------- 文字表示
+  //------- 文字表示（上部：現在収集中の文字）
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   
   // have_words_を連結して文字列を作成
@@ -725,6 +751,36 @@ void Game::draw() const
     const ColorF textColor = isHit ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 1.0 };
     block_font_(word).drawAt(200 + 40 * i, 30, textColor);
   }
+
+  //------- 右側のボード：完成した単語を表示
+  const int32 boardX = 1000;  // 右側の位置
+  const int32 boardY = 200;   // 上からの位置
+  const int32 boardWidth = 250;
+  const int32 boardHeight = 500;
+  
+  // ボードの背景を描画
+  RoundRect{ boardX, boardY, boardWidth, boardHeight, 10 }.draw(ColorF{ 0.1, 0.1, 0.1, 0.8 });
+  RoundRect{ boardX, boardY, boardWidth, boardHeight, 10 }.drawFrame(3, ColorF{ 0.8, 0.8, 0.8 });
+  
+  // タイトルを描画
+  block_font_(U"完成した単語").drawAt(boardX + boardWidth / 2, boardY + 30, ColorF{ 1.0, 1.0, 0.0 });
+  
+  // 完成した単語を縦に並べて描画
+  int32 yOffset = boardY + 80;
+  const int32 lineHeight = 50;
+  
+  for (const auto& word : completed_words_) {
+    block_font_(word).drawAt(boardX + boardWidth / 2, yOffset, ColorF{ 0.0, 1.0, 0.0 });
+    yOffset += lineHeight;
+    
+    // ボードからはみ出さないようにする
+    if (yOffset > boardY + boardHeight - 30) {
+      break;
+    }
+  }
+  
+  // 完成した単語の数を表示
+  debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(boardX + 10, boardY + boardHeight - 25, ColorF{ 1.0 });
 }
 
 void Game::drawFadeIn(double t) const

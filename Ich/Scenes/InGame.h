@@ -218,6 +218,15 @@ private:
 
   Array<String> have_words_;
 
+  // 最大文字数（デフォルト5）
+  size_t max_string_ = 5;
+
+  // 完成した単語のリスト
+  Array<String> completed_words_;
+
+  // 完成した単語の最大保存数（デフォルト10）
+  size_t max_completed_words_ = 10;
+
   // デバッグモード
 #if _DEBUG
   static constexpr bool kDebugMode = true;
