@@ -286,6 +286,31 @@ float Player::GetScaleY() const
   return 1.0f;
 }
 
+bool Player::IsWeaponVisible() const
+{
+  return weapon_active_;
+}
+
+Vec2 Player::GetWeaponPosition() const
+{
+  return weapon_position_;
+}
+
+SizeF Player::GetWeaponSize() const
+{
+  return SizeF{ kWeaponLength, kWeaponWidth };
+}
+
+double Player::GetWeaponRotation() const
+{
+  return weapon_render_rotation_;
+}
+
+ColorF Player::GetWeaponColor() const
+{
+  return weapon_color_;
+}
+
 /// <summary>
 /// 現在のポーズを取得
 /// </summary>

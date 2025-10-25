@@ -740,6 +740,16 @@ void Game::draw() const
         const float scaleY = player_->GetScaleY();
         texture->scaled(scaleX, scaleY).drawAt(playerPos.x, playerPos.y);
       }
+
+      if (player_->IsWeaponVisible()) {
+        const Vec2 weaponPos = player_->GetWeaponPosition();
+        const SizeF weaponSize = player_->GetWeaponSize();
+        const double weaponRotation = player_->GetWeaponRotation();
+        const ColorF weaponColor = player_->GetWeaponColor();
+
+        const Transformer2D weaponTransform{ Mat3x2::Rotate(weaponRotation, weaponPos), TransformCursor::No };
+        RoundRect{ Arg::center(weaponPos), weaponSize, 10.0 }.draw(weaponColor);
+      }
     }
 
     // デバッグ情報の描画（カメラオフセット適用範囲内）
