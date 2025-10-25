@@ -266,23 +266,33 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     wordCandidates.shuffle();
 
     // 各候補語の文字を 1 文字ずつ取り出して候補文字リストに格納。
+    Array<String> charBatch;
+    charBatch.reserve(accumulated);
+
     for (const auto& word : wordCandidates)
     {
       for (const char32 ch : word)
       {
-        candidateChars << String(1, ch);
-
-        if (candidateChars.size() >= requiredSize)
-        {
-          // 必要数を満たしたら即座に外側のループへ抜ける。
-          break;
-        }
+        charBatch << String(1, ch);
       }
+    }
+
+    charBatch.shuffle();
+
+    for (const auto& ch : charBatch)
+    {
+      candidateChars << ch;
 
       if (candidateChars.size() >= requiredSize)
       {
+        // 必要数を満たしたら即座に外側のループへ抜ける。
         break;
       }
+    }
+
+    if (candidateChars.size() >= requiredSize)
+    {
+      break;
     }
   }
 
