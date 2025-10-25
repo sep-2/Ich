@@ -138,6 +138,8 @@ private:
 
   Array<Texture> textures;
 
+  Array<Texture> block_textures_;
+
   // 2D 物理演算のシミュレーションステップ（秒）
   // constexpr を外して const に変更
   const double StepTime = (1.0 / 200.0);
