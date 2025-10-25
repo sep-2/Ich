@@ -115,6 +115,31 @@ public:
   /// <returns>スケール</returns>
   float GetScaleY() const;
 
+  /// <summary>
+  /// 武器を描画するかどうか
+  /// </summary>
+  bool IsWeaponVisible() const;
+
+  /// <summary>
+  /// 武器の描画中心座標
+  /// </summary>
+  Vec2 GetWeaponPosition() const;
+
+  /// <summary>
+  /// 武器の描画サイズ
+  /// </summary>
+  SizeF GetWeaponSize() const;
+
+  /// <summary>
+  /// 武器の回転値（ラジアン）
+  /// </summary>
+  double GetWeaponRotation() const;
+
+  /// <summary>
+  /// 武器の描画色
+  /// </summary>
+  ColorF GetWeaponColor() const;
+
   Vec2 GetLeftTop() const;
   Vec2 GetRightBottom() const;
   Vec2 GetRightTop() const;
