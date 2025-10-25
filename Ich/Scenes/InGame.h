@@ -212,7 +212,7 @@ private:
 
   // ブロック描画の定数
   static constexpr int32 kBlockSize = 100;
-  static constexpr int32 kStartX = 50;
+  static constexpr int32 kStartX = 100;
   static constexpr int32 kStartY = 250;
 
   // プレイヤーの落下速度

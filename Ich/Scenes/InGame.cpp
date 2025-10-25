@@ -763,40 +763,49 @@ void Game::draw() const
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
 
-  //------- 文字表示（上部：現在収集中の文字）- 画面固定
+  //------- 文字表示（上部：現在収集中の文字）- もじぴったん風のボックス表示
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   
-  // have_words_を連結して文字列を作成
-  String concatenated;
-  for (const auto& word : have_words_) {
-    concatenated += word;
-  }
+  // もじぴったん風のパラメータ
+  constexpr int32 charBoxSize = 50;      // 各文字ボックスのサイズ
+  constexpr int32 charBoxSpacing = 5;    // ボックス間の隙間
+  constexpr int32 startX = 50;           // 開始X位置
+  constexpr int32 startY = 20;           // 開始Y位置
   
   for (int i = 0; i < have_words_.size(); i++) {
     const String& word = have_words_[i];
     
-    // この文字がresultのいずれかの単語に含まれているかチェック
-    bool isHit = false;
+    // この文字が完成した単語に含まれているかチェック
+    bool isInCompletedWord = false;
     
-    // i番目の文字がresultの単語の一部かどうかを確認
-    for (const auto& hitWord : result) {
-      // concatenatedの中でhitWordの位置を探す
-      size_t pos = concatenated.indexOf(hitWord);
-      if (pos != String::npos) {
-        // hitWordの範囲内にi番目の文字が含まれているか
-        size_t hitStart = pos;
-        size_t hitEnd = pos + hitWord.length();
-        
-        if (i >= hitStart && i < hitEnd) {
-          isHit = true;
-          break;
-        }
+    for (const auto& completedWord : completed_words_) {
+      if (completedWord.includes(word)) {
+        isInCompletedWord = true;
+        break;
       }
     }
     
-    // 合致する場合は赤色、それ以外は白色で描画
-    const ColorF textColor = isHit ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 1.0 };
-    block_font_(word).drawAt(200 + 40 * i, 60, textColor);
+    // ボックスの位置を計算
+    const int32 boxX = startX + i * (charBoxSize + charBoxSpacing);
+    const int32 boxY = startY;
+    
+    // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
+    const ColorF boxColor = isInCompletedWord ? ColorF{ 1.0, 0.8, 0.8 } : ColorF{ 1.0, 1.0, 1.0 };
+    const ColorF borderColor = isInCompletedWord ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 0.3, 0.3, 0.3 };
+    
+    // ボックスを描画（角丸四角形）
+    RoundRect{ boxX, boxY, charBoxSize, charBoxSize, 5 }.draw(boxColor);
+    RoundRect{ boxX, boxY, charBoxSize, charBoxSize, 5 }.drawFrame(3, borderColor);
+    
+    // 文字を中央に描画（影付き）
+    const Vec2 textCenter{ boxX + charBoxSize / 2.0, boxY + charBoxSize / 2.0 };
+    constexpr Vec2 shadowOffset{ 2.0, 2.0 };
+    
+    // 影
+    block_font_(word).drawAt(textCenter + shadowOffset, ColorF{ 0.0, 0.0, 0.0, 0.3 });
+    // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
+    const ColorF textColor = isInCompletedWord ? ColorF{ 0.8, 0.0, 0.0 } : ColorF{ 0.0, 0.0, 0.0 };
+    block_font_(word).drawAt(textCenter, textColor);
   }
 
   //------- 右側のボード：完成した単語を表示 - 画面固定
