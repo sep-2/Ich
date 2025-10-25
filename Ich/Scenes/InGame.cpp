@@ -54,6 +54,8 @@ namespace InGameConstants {
   constexpr int32 kCompletedBoardHeight = 550;
   constexpr int32 kCompletedBoardLineHeight = 18;
 
+  constexpr double kHintUpdateInterval = 3.0;
+
   // ブロックのイメージパス
   const Array<String> kBlockTexturePaths = {
     U"Assets/Image/block_blue.jpg",
@@ -94,6 +96,7 @@ Game::Game(const InitData& init)
   , air_amount_(1.0f)
   , block_font_{ 40, Typeface::Bold }
   , completed_word_font_{ 16 }
+  , hint_font_{ 20 }
   , debug_font_{ 16 }
 {
   //PRINT << U"Game::Game()";
@@ -159,6 +162,8 @@ Game::Game(const InitData& init)
   for (size_t i = 0; i < max_string_; i++) {
     have_words_.push_back(U"");
   }
+
+  UpdateHint();
 }
 Game::~Game()
 {
@@ -281,6 +286,9 @@ void Game::DestroyBlockUnderPlayer()
           have_words_.erase(have_words_.begin());
           PRINT << U"Removed oldest character. Current size: " << have_words_.size();
         }
+
+        hint_timer_ = 0.0;
+        UpdateHint();
 
         return;  // 1つだけ破壊して終了
       }
@@ -579,6 +587,14 @@ void Game::update()
     DestroyBlockUnderPlayer();
   }
 
+
+  if (!is_paused_) {
+    hint_timer_ += Scene::DeltaTime();
+    if (hint_timer_ >= InGameConstants::kHintUpdateInterval) {
+      hint_timer_ = 0.0;
+      UpdateHint();
+    }
+  }
   // UIの更新（メニューが閉じている時のみ）
   if (ui_) {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
@@ -740,6 +756,16 @@ void Game::draw() const
         const Transformer2D weaponTransform{ Mat3x2::Rotate(weaponRotation, weaponPos), TransformCursor::No };
         RoundRect{ Arg::center(weaponPos), weaponSize, 10.0 }.draw(weaponColor);
       }
+
+      if (!current_hint_.isEmpty()) {
+        const Vec2 hintCenter = playerPos + Vec2{ -80.0, -130.0 };
+        const double padding = 12.0;
+        const RectF textRegion = hint_font_(current_hint_).region();
+        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + padding * 2, textRegion.h + padding * 2, 12 };
+        hintRect.draw(ColorF{ 1.0, 1.0, 1.0, 0.9 });
+        hintRect.drawFrame(2, ColorF{ 0.2, 0.3, 0.5, 0.9 });
+        hint_font_(current_hint_).drawAt(hintCenter, ColorF{ 0.1, 0.1, 0.1 });
+      }
     }
 
     // デバッグ情報の描画（カメラオフセット適用範囲内）
@@ -884,3 +910,40 @@ void Game::UpdateCamera()
   }
 }
 
+void Game::UpdateHint()
+{
+  const Array<std::pair<String, String>> reachWords = block_manager_.GetReachWords(have_words_, keywords);
+
+  if (reachWords.isEmpty()) {
+    current_hint_.clear();
+    return;
+  }
+
+  Array<String> candidates;
+  candidates.reserve(reachWords.size());
+  for (const auto& entry : reachWords) {
+    if (entry.first.isEmpty()) {
+      continue;
+    }
+    if (!entry.second.isEmpty()) {
+      String masked = entry.first;
+      for (char32& ch : masked) {
+        if (ch == entry.second.front()) {
+          ch = U'〇';
+        }
+      }
+      candidates << masked;
+    }
+    else {
+      candidates << entry.first;
+    }
+  }
+
+  if (candidates.isEmpty()) {
+    current_hint_.clear();
+    return;
+  }
+
+  const size_t index = static_cast<size_t>(Random(0, static_cast<int32>(candidates.size() - 1)));
+  current_hint_ = candidates[index];
+}
