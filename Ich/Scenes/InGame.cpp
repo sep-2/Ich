@@ -758,13 +758,17 @@ void Game::draw() const
       }
 
       if (!current_hint_.isEmpty()) {
-        const Vec2 hintCenter = playerPos + Vec2{ -80.0, -130.0 };
-        const double padding = 12.0;
+        const Vec2 hintCenter = playerPos + Vec2{ -80.0, -150.0 };
+        const double padding = 18.0;
         const RectF textRegion = hint_font_(current_hint_).region();
-        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + padding * 2, textRegion.h + padding * 2, 12 };
-        hintRect.draw(ColorF{ 1.0, 1.0, 1.0, 0.9 });
+        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + padding * 2, textRegion.h + padding * 2, 18 };
+        hintRect.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 });
         hintRect.drawFrame(2, ColorF{ 0.2, 0.3, 0.5, 0.9 });
         hint_font_(current_hint_).drawAt(hintCenter, ColorF{ 0.1, 0.1, 0.1 });
+
+        const Vec2 bubbleAnchor = playerPos + Vec2{ -40.0, -100.0 };
+        Circle{ bubbleAnchor, 8.0 }.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 }).drawFrame(1.5, ColorF{ 0.2, 0.3, 0.5, 0.9 });
+        Circle{ bubbleAnchor + Vec2{ 15.0, 15.0 }, 5.0 }.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 }).drawFrame(1.2, ColorF{ 0.2, 0.3, 0.5, 0.9 });
       }
     }
 
