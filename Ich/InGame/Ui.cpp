@@ -209,20 +209,20 @@ void Ui::Render()
     }
 
     // Nine-Patchサイドボックスを描画（インフォメーション表示用）
-    if (side_box_visible_) {
-      // 9つの部分を順番に描画
-      if (side_box_top_left_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_left_wrapper_));
-      if (side_box_top_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_center_wrapper_));
-      if (side_box_top_right_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_right_wrapper_));
-      
-      if (side_box_left_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_left_center_wrapper_));
-      if (side_box_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_center_wrapper_));
-      if (side_box_right_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_right_center_wrapper_));
-      
-      if (side_box_bottom_left_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_left_wrapper_));
-      if (side_box_bottom_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_center_wrapper_));
-      if (side_box_bottom_right_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_right_wrapper_));
-    }
+    //if (side_box_visible_) {
+    //  // 9つの部分を順番に描画
+    //  if (side_box_top_left_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_left_wrapper_));
+    //  if (side_box_top_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_center_wrapper_));
+    //  if (side_box_top_right_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_top_right_wrapper_));
+    //  
+    //  if (side_box_left_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_left_center_wrapper_));
+    //  if (side_box_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_center_wrapper_));
+    //  if (side_box_right_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_right_center_wrapper_));
+    //  
+    //  if (side_box_bottom_left_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_left_wrapper_));
+    //  if (side_box_bottom_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_center_wrapper_));
+    //  if (side_box_bottom_right_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_right_wrapper_));
+    //}
   }
 }
 
