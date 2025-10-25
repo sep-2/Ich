@@ -50,11 +50,11 @@ namespace InGameConstants {
   constexpr int32 kCharBoxStartY = 20;            // 開始Y位置
 
   // 完成した単語ボードパラメータ
-  constexpr int32 kCompletedBoardX = 750;
-  constexpr int32 kCompletedBoardY = 100;
+  constexpr int32 kCompletedBoardX = 720;
+  constexpr int32 kCompletedBoardY = 120;
   constexpr int32 kCompletedBoardWidth = 500;
-  constexpr int32 kCompletedBoardHeight = 600;
-  constexpr int32 kCompletedBoardLineHeight = 20; // 行の高さ
+  constexpr int32 kCompletedBoardHeight = 500;
+  constexpr int32 kCompletedBoardLineHeight = 40;
 
   // ブロックのイメージパス
   const Array<String> kBlockTexturePaths = {
@@ -818,17 +818,18 @@ void Game::draw() const
   // タイトルを描画
   block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + 30, ColorF{ 1.0, 1.0, 0.0 });
 
-  // 完成した単語を縦に並べて描画
-  int32 yOffset = InGameConstants::kCompletedBoardY + 80;
+  // 完成した単語を4列グリッドで配置
+  const double columnWidth = InGameConstants::kCompletedBoardWidth / 4.0;
+  const double columnPadding = 12.0;
+  const double rowStartY = InGameConstants::kCompletedBoardY + 60.0;
+  const double rowHeight = InGameConstants::kCompletedBoardLineHeight;
 
-  for (const auto& word : completed_words_) {
-    completed_word_font_(word).drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, yOffset, ColorF{ 0.0, 1.0, 0.0 });
-    yOffset += InGameConstants::kCompletedBoardLineHeight;
-
-    // ボードからはみ出さないようにする
-    if (yOffset > InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - 30) {
-      break;
-    }
+  for (size_t index = 0; index < completed_words_.size(); ++index) {
+    const size_t column = index % 4;
+    const size_t row = index / 4;
+    const double textX = InGameConstants::kCompletedBoardX + column * columnWidth + columnPadding;
+    const double textY = rowStartY + row * rowHeight;
+    completed_word_font_(completed_words_[index]).draw(textX, textY, ColorF{ 0.0, 1.0, 0.0 });
   }
 
   // 完成した単語の数を表示
