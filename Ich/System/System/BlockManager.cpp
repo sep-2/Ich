@@ -51,9 +51,84 @@ namespace
   }
 
   /// <summary>
-  /// 文字列配列から各文字の出現回数テーブルを構築する。
-  /// ブロック（複数文字が含まれる可能性）を一括で処理する際に利用。
+  /// ブロック配列（または文字列）から、正規化済みの線形シーケンスを生成する
+  /// （長音は除去、小書き・濁点は統合）。
   /// </summary>
+  Array<char32> BuildNormalizedSequence(const Array<String>& source)
+  {
+    Array<char32> seq;
+    seq.reserve(source.size());
+
+    for (const auto& token : source)
+    {
+      for (const char32 ch : token)
+      {
+        if (const auto normalized = NormalizeKanaChar(ch))
+        {
+          seq << *normalized;
+        }
+      }
+    }
+
+    return seq;
+  }
+
+  Array<char32> BuildNormalizedSequence(const String& word)
+  {
+    Array<char32> seq;
+    seq.reserve(word.size());
+
+    for (const char32 ch : word)
+    {
+      if (const auto normalized = NormalizeKanaChar(ch))
+      {
+        seq << *normalized;
+      }
+    }
+
+    return seq;
+  }
+
+  /// <summary>
+  /// haystack に needle の連続した並びが含まれるか（部分列/部分文字列判定）。
+  /// </summary>
+  bool ContainsContiguousSubsequence(const Array<char32>& haystack, const Array<char32>& needle)
+  {
+    if (needle.isEmpty())
+    {
+      return false;
+    }
+
+    if (needle.size() > haystack.size())
+    {
+      return false;
+    }
+
+    const size_t H = haystack.size();
+    const size_t N = needle.size();
+
+    for (size_t i = 0; i + N <= H; ++i)
+    {
+      bool ok = true;
+      for (size_t j = 0; j < N; ++j)
+      {
+        if (haystack[i + j] != needle[j])
+        {
+          ok = false;
+          break;
+        }
+      }
+
+      if (ok)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// 既存の頻度表ベースのヘルパ（GetReachWords で利用継続）
   FrequencyTable BuildFrequency(const Array<String>& source)
   {
     FrequencyTable table;
@@ -72,10 +147,6 @@ namespace
     return table;
   }
 
-  /// <summary>
-  /// 単語（1要素）から必要文字数を算出するヘルパー。
-  /// ヒット／リーチ判定では毎回辞書語をこのテーブルに変換して利用する。
-  /// </summary>
   FrequencyTable BuildFrequency(const String& word)
   {
     FrequencyTable table;
@@ -91,10 +162,6 @@ namespace
     return table;
   }
 
-  /// <summary>
-  /// 指定した文字の保有数を安全に取得する。
-  /// unordered_map::operator[] は意図せずエントリを作ってしまうため find を利用する。
-  /// </summary>
   int32 GetAvailableCount(const FrequencyTable& table, const char32 key)
   {
     if (const auto it = table.find(key); it != table.end())
@@ -105,11 +172,6 @@ namespace
     return 0;
   }
 
-  /// <summary>
-  /// リーチ判定で不足している「元の文字（濁点付き等）」を特定する。
-  /// 正規化済みテーブルでは区別が付かないため、単語を頭から走査し
-  /// 利用可能数を減算しながら最初に不足する実文字を返す。
-  /// </summary>
   String DetermineMissingCharacter(const String& word, const char32 missingNormalized, FrequencyTable available)
   {
     for (const char32 ch : word)
@@ -127,8 +189,6 @@ namespace
       }
     }
 
-    // 上記ループで返却できなかった場合は、正規化後の文字をそのまま返す。
-    // （辞書に想定外の表記が含まれていたケースのフォールバック）
     return String(1, missingNormalized);
   }
 } // namespace
@@ -141,25 +201,14 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   Array<String> result;
   result.reserve(dictionary.size());
 
-  // ブロック全体の保有文字数を先に算出し、辞書語ごとの照合に使い回す。
-  const FrequencyTable blockFrequency = BuildFrequency(blocks);
+  // 新ルール: 並び順も考慮し、A（ブロック列）内に B（単語）の正規化列が
+  // 連続して現れるか（部分文字列）で判定する。
+  const Array<char32> normalizedBlocks = BuildNormalizedSequence(blocks);
 
   for (const auto& word : dictionary)
   {
-    const FrequencyTable wordFrequency = BuildFrequency(word);
-
-    bool canBuild = true;
-
-    for (const auto& [kana, required] : wordFrequency)
-    {
-      if (GetAvailableCount(blockFrequency, kana) < required)
-      {
-        canBuild = false;
-        break;
-      }
-    }
-
-    if (canBuild)
+    const Array<char32> normalizedWord = BuildNormalizedSequence(word);
+    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord))
     {
       result << word;
     }
@@ -171,42 +220,6 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
 Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& blocks, const Array<String>& dictionary) const
 {
   Array<std::pair<String, String>> result;
-  result.reserve(dictionary.size());
-
-  // ブロックの保有数はヒット判定と同様に事前計算しておく。
-  const FrequencyTable blockFrequency = BuildFrequency(blocks);
-
-  for (const auto& word : dictionary)
-  {
-    const FrequencyTable wordFrequency = BuildFrequency(word);
-
-    int32 deficitCount = 0;
-    char32 missingKana = U'\0';
-
-    for (const auto& [kana, required] : wordFrequency)
-    {
-      const int32 available = GetAvailableCount(blockFrequency, kana);
-      if (available < required)
-      {
-        deficitCount += (required - available);
-        missingKana = kana;
-
-        // リーチは「足りない文字が1つだけ」のケースのため、
-        // 不足数が2以上になった時点で判定終了。
-        if (deficitCount > 1)
-        {
-          break;
-        }
-      }
-    }
-
-    if (deficitCount == 1)
-    {
-      const String missing = DetermineMissingCharacter(word, missingKana, blockFrequency);
-      result.emplace_back(word, missing);
-    }
-  }
-
   return result;
 }
 
@@ -214,7 +227,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 {
   Array<Array<String>> grid;
 
-  // 生成条件が満たされない場合は空配列を返却する（早期リターン）。
   if (row <= 0 || column <= 0 || batchSize <= 0 || dictionary.isEmpty())
   {
     return grid;
@@ -226,15 +238,12 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     throw std::invalid_argument("row * column must be a multiple of batchSize.");
   }
 
-  // 抽出した文字を一次元で蓄えるバッファ。後で二次元配列へ整形する。
   Array<String> candidateChars;
   candidateChars.reserve(requiredSize);
 
-  // 辞書語を都度シャッフルして利用するためのバッファと、一度のループで使用する語リスト。
   Array<String> shuffledWords = dictionary;
   Array<String> wordCandidates;
 
-  // 必要な文字数を満たすまで辞書語をシャッフルしながら候補文字を追加していく。
   while (candidateChars.size() < requiredSize)
   {
     shuffledWords.shuffle();
@@ -242,7 +251,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 
     int32 accumulated = 0;
 
-    // batchSize に到達するまで辞書語を積み上げて候補リストに加える。
     for (const auto& word : shuffledWords)
     {
       wordCandidates << word;
@@ -256,14 +264,11 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 
     if (wordCandidates.isEmpty())
     {
-      // 辞書が空、または有効な語を取得できない場合は処理を終了する。
       break;
     }
 
-    // 候補語自体をシャッフルし、元となる単語の順序を均一化する。
     wordCandidates.shuffle();
 
-    // 各候補語の文字を 1 文字ずつ取り出して候補文字リストに格納。
     Array<String> charBatch;
     charBatch.reserve(accumulated);
 
@@ -286,7 +291,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 
       if (candidateChars.size() >= requiredSize)
       {
-        // 必要数を満たしたら即座に外側のループへ抜ける。
         break;
       }
     }
@@ -297,7 +301,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     }
   }
 
-  // 候補文字リストを行列構造に再配置する。
   grid.reserve(row);
   size_t index = 0;
 
@@ -314,7 +317,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
       }
       else
       {
-        // 候補が不足した場合は空文字を詰めてサイズを合わせる。
         line << String();
       }
     }

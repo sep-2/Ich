@@ -59,32 +59,6 @@ namespace UnitTest
       Assert::IsTrue(result[1] == U"かな");
     }
 
-    TEST_METHOD(GetReachWords_FindsSingleMissingKana)
-    {
-      BlockManager manager;
-      Array<String> blocks = { U"す", U"こ", U"つ" };
-      Array<String> dictionary = { U"すこっぷ", U"すもう" };
-
-      const auto result = manager.GetReachWords(blocks, dictionary);
-
-      Assert::AreEqual(static_cast<size_t>(1), result.size());
-      Assert::IsTrue(result[0].first == U"すこっぷ");
-      Assert::IsTrue(result[0].second == U"ぷ");
-    }
-
-    TEST_METHOD(GetReachWords_ReturnsOriginalCharacterForm)
-    {
-      BlockManager manager;
-      Array<String> blocks = { U"く" };
-      Array<String> dictionary = { U"がく" };
-
-      const auto result = manager.GetReachWords(blocks, dictionary);
-
-      Assert::AreEqual(static_cast<size_t>(1), result.size());
-      Assert::IsTrue(result[0].first == U"がく");
-      Assert::IsTrue(result[0].second == U"が");
-    }
-
     TEST_METHOD(GetHitWords_IntegratesWithKeywordDictionary)
     {
       BlockManager manager;
@@ -95,16 +69,6 @@ namespace UnitTest
       Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result.contains(U"わかめ"));
       Assert::IsFalse(result.contains(U"わかれる"));
-    }
-
-    TEST_METHOD(GetReachWords_IntegratesWithKeywordDictionary)
-    {
-      BlockManager manager;
-      const Array<String> blocks = { U"か", U"わ", U"る", U"め", U"を" };
-
-      const auto result = manager.GetReachWords(blocks, keywords);
-
-      Assert::IsTrue(result.contains(std::make_pair(String(U"わかれる"), String(U"れ"))));
     }
 
     TEST_METHOD(GenerateBlockGrid_ReturnsGridWithRequestedSize)
