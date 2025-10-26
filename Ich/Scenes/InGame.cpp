@@ -120,8 +120,8 @@ namespace InGameConstants {
   constexpr double kHintBubbleFrameThickness2 = 1.2;
   
   // ヒントバブルパラメータ
-  const Vec2 kHintBoxOffset{ -80.0, -150.0 };
-  const Vec2 kHintBubbleAnchorOffset{ -40.0, -100.0 };
+  const Vec2 kHintBoxOffset{ -80.0, -70.0 }; // 20px 下へ
+  const Vec2 kHintBubbleAnchorOffset{ -50.0, -30.0 }; // 20px 下へ
   const Vec2 kHintBubble2Offset{ 15.0, 15.0 };
   constexpr double kHintBoxPadding = 18.0;
   constexpr double kHintBubble1Radius = 8.0;
