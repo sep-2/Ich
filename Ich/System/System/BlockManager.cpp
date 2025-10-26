@@ -128,7 +128,8 @@ namespace
     return false;
   }
 
-  /// 既存の頻度表ベースのヘルパ（GetReachWords で利用継続）
+  /// 既存の頻度表ベースのヘルパ（現状は GenerateBlockGrid のみで使用）
+  struct Dummy { };
   FrequencyTable BuildFrequency(const Array<String>& source)
   {
     FrequencyTable table;
@@ -162,35 +163,6 @@ namespace
     return table;
   }
 
-  int32 GetAvailableCount(const FrequencyTable& table, const char32 key)
-  {
-    if (const auto it = table.find(key); it != table.end())
-    {
-      return it->second;
-    }
-
-    return 0;
-  }
-
-  String DetermineMissingCharacter(const String& word, const char32 missingNormalized, FrequencyTable available)
-  {
-    for (const char32 ch : word)
-    {
-      if (const auto normalized = NormalizeKanaChar(ch))
-      {
-        if (const auto it = available.find(*normalized); it != available.end() && it->second > 0)
-        {
-          --(it->second);
-        }
-        else if (*normalized == missingNormalized)
-        {
-          return String(1, ch);
-        }
-      }
-    }
-
-    return String(1, missingNormalized);
-  }
 } // namespace
 
 BlockManager::BlockManager() = default;
@@ -217,10 +189,10 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   return result;
 }
 
-Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& blocks, const Array<String>& dictionary) const
+Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& /*blocks*/, const Array<String>& /*dictionary*/) const
 {
-  Array<std::pair<String, String>> result;
-  return result;
+  // いったんリーチ判定は未対応（空配列を返却）
+  return {};
 }
 
 Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 batchSize, const Array<String>& dictionary) const

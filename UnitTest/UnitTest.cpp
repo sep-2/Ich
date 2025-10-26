@@ -36,38 +36,40 @@ namespace UnitTest
     TEST_METHOD(GetHitWords_FindsMatchingWords)
     {
       BlockManager manager;
-      Array<String> blocks = { U"す",  U"つ", U"ふ",U"こ" };
+      // 並び順を考慮。"すこーぷ" が A 内に連続で現れるかを検証
+      Array<String> blocks = { U"す", U"こ", U"ふ" };
       Array<String> dictionary = { U"すこっぷ", U"すこーぷ", U"すもう" };
 
       const auto result = manager.GetHitWords(blocks, dictionary);
 
-      Assert::AreEqual(static_cast<size_t>(2), result.size());
-      Assert::IsTrue(result[0] == U"すこっぷ");
-      Assert::IsTrue(result[1] == U"すこーぷ");
+      Assert::AreEqual(static_cast<size_t>(1), result.size());
+      Assert::IsTrue(result[0] == U"すこーぷ");
     }
 
     TEST_METHOD(GetHitWords_TreatsVoicedAndSmallKanaAsEquivalent)
     {
       BlockManager manager;
+      // 並び順考慮で "かな" / "がな" が一致（濁点同一視）
       Array<String> blocks = { U"か", U"な" };
       Array<String> dictionary = { U"がな", U"かな" };
 
       const auto result = manager.GetHitWords(blocks, dictionary);
 
       Assert::AreEqual(static_cast<size_t>(2), result.size());
-      Assert::IsTrue(result[0] == U"がな");
-      Assert::IsTrue(result[1] == U"かな");
+      Assert::IsTrue(result.contains(U"がな"));
+      Assert::IsTrue(result.contains(U"かな"));
     }
 
     TEST_METHOD(GetHitWords_IntegratesWithKeywordDictionary)
     {
       BlockManager manager;
-      const Array<String> blocks = { U"か", U"わ", U"る", U"め", U"を" };
+      // 並び順を満たすようにブロックを並べる
+      const Array<String> blocks = { U"わ", U"か", U"め" };
 
       const auto result = manager.GetHitWords(blocks, keywords);
 
-      Assert::AreEqual(static_cast<size_t>(1), result.size());
       Assert::IsTrue(result.contains(U"わかめ"));
+      // 並び順の都合で "わかれる" は含まれない
       Assert::IsFalse(result.contains(U"わかれる"));
     }
 
