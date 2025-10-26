@@ -36,9 +36,8 @@ namespace InGameConstants {
   constexpr int32 kSideBoxY = 120;                // サイドボックスY座標
 
   // ブロックグリッドパラメータ
-  constexpr int32 kGridRows = 36;                 // グリッド行数
+  constexpr int32 kGridRows = 6;                 // グリッド行数
   constexpr int32 kGridColumns = 6;               // グリッド列数
-  constexpr int32 kBatchSize = 36;                // バッチサイズ
   constexpr int32 kWallThickness = 1;             // 壁の厚さ（ブロック数）
 
   // プレイヤー初期位置
@@ -241,8 +240,10 @@ Game::Game(const InitData& init)
   const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
-    InGameConstants::kBatchSize,
-    keywords
+    30,
+    10,
+    keywords,
+    3
   );
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）

@@ -2,38 +2,28 @@
 
 #include <unordered_map>
 #include <stdexcept>
+#include <algorithm>
 
 namespace
 {
   using FrequencyTable = std::unordered_map<char32, int32>;
 
-  /// <summary>
-  /// ひらがな1文字をゲーム内ルールに沿って正規化する。
-  /// ・濁点／半濁点付き文字は清音へ集約
-  /// ・小書き文字は通常サイズへ置換
-  /// ・長音記号は完全に無視（= none を返す）
-  /// </summary>
-  /// <param name="ch">入力された1文字</param>
-  /// <returns>正規化後の文字。長音記号の場合は none。</returns>
   Optional<char32> NormalizeKanaChar(const char32 ch)
   {
     switch (ch)
     {
-    case U'ー': // 一般的な長音符号
-    case U'－': // 全角ハイフン（長音として扱う）
-    case U'―': // ダッシュ（長音扱い）
+    case U'ー':
+    case U'－':
+    case U'―':
       return none;
     default:
       break;
     }
 
     static const std::unordered_map<char32, char32> kNormalizationMap = {
-      // 小書き文字 -> 通常字
       { U'ぁ', U'あ' }, { U'ぃ', U'い' }, { U'ぅ', U'う' }, { U'ぇ', U'え' }, { U'ぉ', U'お' },
       { U'っ', U'つ' }, { U'ゃ', U'や' }, { U'ゅ', U'ゆ' }, { U'ょ', U'よ' }, { U'ゎ', U'わ' },
       { U'ゕ', U'か' }, { U'ゖ', U'け' },
-
-      // 濁点・半濁点付き文字 -> 清音
       { U'が', U'か' }, { U'ぎ', U'き' }, { U'ぐ', U'く' }, { U'げ', U'け' }, { U'ご', U'こ' },
       { U'ざ', U'さ' }, { U'じ', U'し' }, { U'ず', U'す' }, { U'ぜ', U'せ' }, { U'ぞ', U'そ' },
       { U'だ', U'た' }, { U'ぢ', U'ち' }, { U'づ', U'つ' }, { U'で', U'て' }, { U'ど', U'と' },
@@ -50,13 +40,10 @@ namespace
     return ch;
   }
 
-  /// <summary>
-  /// 文字列配列から各文字の出現回数テーブルを構築する。
-  /// ブロック（複数文字が含まれる可能性）を一括で処理する際に利用。
-  /// </summary>
-  FrequencyTable BuildFrequency(const Array<String>& source)
+  Array<char32> BuildNormalizedSequence(const Array<String>& source)
   {
-    FrequencyTable table;
+    Array<char32> seq;
+    seq.reserve(source.size());
 
     for (const auto& token : source)
     {
@@ -64,74 +51,88 @@ namespace
       {
         if (const auto normalized = NormalizeKanaChar(ch))
         {
-          ++table[*normalized];
+          seq << *normalized;
         }
       }
     }
 
-    return table;
+    return seq;
   }
 
-  /// <summary>
-  /// 単語（1要素）から必要文字数を算出するヘルパー。
-  /// ヒット／リーチ判定では毎回辞書語をこのテーブルに変換して利用する。
-  /// </summary>
-  FrequencyTable BuildFrequency(const String& word)
+  Array<char32> BuildNormalizedSequence(const String& word)
   {
-    FrequencyTable table;
+    Array<char32> seq;
+    seq.reserve(word.size());
 
     for (const char32 ch : word)
     {
       if (const auto normalized = NormalizeKanaChar(ch))
       {
-        ++table[*normalized];
+        seq << *normalized;
       }
     }
 
-    return table;
+    return seq;
   }
 
-  /// <summary>
-  /// 指定した文字の保有数を安全に取得する。
-  /// unordered_map::operator[] は意図せずエントリを作ってしまうため find を利用する。
-  /// </summary>
-  int32 GetAvailableCount(const FrequencyTable& table, const char32 key)
+  bool ContainsContiguousSubsequence(const Array<char32>& haystack, const Array<char32>& needle)
   {
-    if (const auto it = table.find(key); it != table.end())
+    if (needle.isEmpty() || needle.size() > haystack.size())
     {
-      return it->second;
+      return false;
     }
 
-    return 0;
-  }
+    const size_t H = haystack.size();
+    const size_t N = needle.size();
 
-  /// <summary>
-  /// リーチ判定で不足している「元の文字（濁点付き等）」を特定する。
-  /// 正規化済みテーブルでは区別が付かないため、単語を頭から走査し
-  /// 利用可能数を減算しながら最初に不足する実文字を返す。
-  /// </summary>
-  String DetermineMissingCharacter(const String& word, const char32 missingNormalized, FrequencyTable available)
-  {
-    for (const char32 ch : word)
+    for (size_t i = 0; i + N <= H; ++i)
     {
-      if (const auto normalized = NormalizeKanaChar(ch))
+      bool ok = true;
+      for (size_t j = 0; j < N; ++j)
       {
-        if (const auto it = available.find(*normalized); it != available.end() && it->second > 0)
+        if (haystack[i + j] != needle[j])
         {
-          --(it->second);
-        }
-        else if (*normalized == missingNormalized)
-        {
-          return String(1, ch);
+          ok = false;
+          break;
         }
       }
+      if (ok) return true;
     }
-
-    // 上記ループで返却できなかった場合は、正規化後の文字をそのまま返す。
-    // （辞書に想定外の表記が含まれていたケースのフォールバック）
-    return String(1, missingNormalized);
+    return false;
   }
-} // namespace
+
+  String RandomHiragana()
+  {
+    static const Array<char32> hira = {
+      U'あ',U'い',U'う',U'え',U'お',
+      U'か',U'き',U'く',U'け',U'こ',
+      U'さ',U'し',U'す',U'せ',U'そ',
+      U'た',U'ち',U'つ',U'て',U'と',
+      U'な',U'に',U'ぬ',U'ね',U'の',
+      U'は',U'ひ',U'ふ',U'へ',U'ほ',
+      U'ま',U'み',U'む',U'め',U'も',
+      U'や',U'ゆ',U'よ',
+      U'ら',U'り',U'る',U'れ',U'ろ',
+      U'わ',U'を',U'ん'
+    };
+    const size_t idx = static_cast<size_t>(Random(0, static_cast<int32>(hira.size() - 1)));
+    return String(1, hira[idx]);
+  }
+
+  struct Vec2i { int32 y; int32 x; };
+
+  bool InBounds(int32 y, int32 x, int32 height, int32 width)
+  {
+    return (0 <= y && y < height && 0 <= x && x < width);
+  }
+
+  Array<Vec2i> NextSteps()
+  {
+    Array<Vec2i> dirs = { Vec2i{+1,0}, Vec2i{0,-1}, Vec2i{0,+1} };
+    dirs.shuffle();
+    return dirs;
+  }
+}
 
 BlockManager::BlockManager() = default;
 BlockManager::~BlockManager() = default;
@@ -141,25 +142,12 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   Array<String> result;
   result.reserve(dictionary.size());
 
-  // ブロック全体の保有文字数を先に算出し、辞書語ごとの照合に使い回す。
-  const FrequencyTable blockFrequency = BuildFrequency(blocks);
+  const Array<char32> normalizedBlocks = BuildNormalizedSequence(blocks);
 
   for (const auto& word : dictionary)
   {
-    const FrequencyTable wordFrequency = BuildFrequency(word);
-
-    bool canBuild = true;
-
-    for (const auto& [kana, required] : wordFrequency)
-    {
-      if (GetAvailableCount(blockFrequency, kana) < required)
-      {
-        canBuild = false;
-        break;
-      }
-    }
-
-    if (canBuild)
+    const Array<char32> normalizedWord = BuildNormalizedSequence(word);
+    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord))
     {
       result << word;
     }
@@ -168,158 +156,188 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   return result;
 }
 
-Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& blocks, const Array<String>& dictionary) const
+Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& /*blocks*/, const Array<String>& /*dictionary*/) const
 {
-  Array<std::pair<String, String>> result;
-  result.reserve(dictionary.size());
+  return {};
+}
 
-  // ブロックの保有数はヒット判定と同様に事前計算しておく。
-  const FrequencyTable blockFrequency = BuildFrequency(blocks);
-
-  for (const auto& word : dictionary)
+Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 prefetching) const
+{
+  if (row <= 0 || column <= 0 || requestedCount <= 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0)
   {
-    const FrequencyTable wordFrequency = BuildFrequency(word);
+    return {};
+  }
 
-    int32 deficitCount = 0;
-    char32 missingKana = U'\0';
+  // row は 1 セグメントあたりの行数として解釈し、総行数は row * prefetching
+  const int32 totalRows = row * prefetching;
+  const int32 totalColumns = column; // 列はセグメント幅のまま
 
-    for (const auto& [kana, required] : wordFrequency)
+  Array<Array<String>> grid(totalRows, Array<String>(totalColumns, U""));
+
+  // セグメントごとの配置結果を保持（縦方向に積む）
+  Array<Array<String>> segmentPlacedWords;
+  segmentPlacedWords.resize(prefetching);
+
+  // セグメントごとに TS 実装に準拠した配置ロジックを適用
+  for (int32 seg = 0; seg < prefetching; ++seg)
+  {
+    const int32 yOffset = seg * row;
+
+    // clampedCount: min(words, 空きマス) に 1..requestedCount でクランプ
+    const int32 upperBound = static_cast<int32>(Min(static_cast<size_t>(dictionary.size()), static_cast<size_t>(row * column)));
+    int32 remainingQuota = Max<int32>(1, Min<int32>(requestedCount, upperBound));
+    const int32 attemptLimit = Max<int32>(1, attemptsPerWord);
+
+    // 候補は一度 shuffle し、pop で一意に取り出す
+    Array<String> shuffledWords = dictionary;
+    shuffledWords.shuffle();
+
+    auto getEmptyCells = [&](Array<Vec2i>& out)
     {
-      const int32 available = GetAvailableCount(blockFrequency, kana);
-      if (available < required)
+      out.clear();
+      out.reserve(static_cast<size_t>(row * column));
+      for (int32 y = 0; y < row; ++y)
       {
-        deficitCount += (required - available);
-        missingKana = kana;
-
-        // リーチは「足りない文字が1つだけ」のケースのため、
-        // 不足数が2以上になった時点で判定終了。
-        if (deficitCount > 1)
+        for (int32 x = 0; x < column; ++x)
         {
+          const int32 gy = yOffset + y;
+          if (grid[gy][x].isEmpty())
+          {
+            out << Vec2i{ gy, x };
+          }
+        }
+      }
+    };
+
+    auto placeWordAlongPath = [&](const String& word) -> bool
+    {
+      if (word.isEmpty()) return false;
+
+      // 文字配列（正規化せず、そのまま配置）
+      Array<char32> letters;
+      letters.reserve(word.size());
+      for (const char32 ch : word)
+      {
+        letters << ch;
+      }
+
+      Array<Vec2i> empties;
+      getEmptyCells(empties);
+
+      if (letters.size() > empties.size() || empties.isEmpty())
+      {
+        return false;
+      }
+
+      const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
+      Array<Vec2i> placements;
+      placements << start;
+      grid[start.y][start.x] = String(1, letters[0]);
+
+      for (size_t i = 1; i < letters.size(); ++i)
+      {
+        const Vec2i prev = placements.back();
+
+        // 近傍（下・左右）をランダム順に走査し、最初の空きに置く
+        bool moved = false;
+        for (const auto dir : NextSteps())
+        {
+          const int32 ny = prev.y + dir.y;
+          const int32 nx = prev.x + dir.x;
+          if (InBounds(ny, nx, totalRows, totalColumns)
+            && ny >= yOffset && ny < yOffset + row
+            && grid[ny][nx].isEmpty())
+          {
+            grid[ny][nx] = String(1, letters[i]);
+            placements << Vec2i{ ny, nx };
+            moved = true;
+            break;
+          }
+        }
+
+        if (!moved)
+        {
+          // ロールバック
+          for (const auto& cell : placements)
+          {
+            grid[cell.y][cell.x].clear();
+          }
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    while (remainingQuota > 0 && !shuffledWords.isEmpty())
+    {
+      // セグメント内の空きが無ければ終了
+      Array<Vec2i> empties;
+      getEmptyCells(empties);
+      if (empties.isEmpty())
+      {
+        break;
+      }
+
+      const String candidate = shuffledWords.back();
+      shuffledWords.pop_back();
+
+      bool placed = false;
+      for (int32 attempt = 0; attempt < attemptLimit; ++attempt)
+      {
+        if (placeWordAlongPath(candidate))
+        {
+          placed = true;
+          segmentPlacedWords[seg] << candidate;
           break;
         }
       }
-    }
 
-    if (deficitCount == 1)
-    {
-      const String missing = DetermineMissingCharacter(word, missingKana, blockFrequency);
-      result.emplace_back(word, missing);
+      // 成功/失敗に関わらずクオータを減算
+      --remainingQuota;
     }
   }
 
-  return result;
-}
-
-Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 batchSize, const Array<String>& dictionary) const
-{
-  Array<Array<String>> grid;
-
-  // 生成条件が満たされない場合は空配列を返却する（早期リターン）。
-  if (row <= 0 || column <= 0 || batchSize <= 0 || dictionary.isEmpty())
+  // 未充填マスはランダムひらがな
+  for (int32 y = 0; y < totalRows; ++y)
   {
-    return grid;
-  }
-
-  const int32 requiredSize = row * column;
-  if (requiredSize % batchSize != 0)
-  {
-    throw std::invalid_argument("row * column must be a multiple of batchSize.");
-  }
-
-  // 抽出した文字を一次元で蓄えるバッファ。後で二次元配列へ整形する。
-  Array<String> candidateChars;
-  candidateChars.reserve(requiredSize);
-
-  // 辞書語を都度シャッフルして利用するためのバッファと、一度のループで使用する語リスト。
-  Array<String> shuffledWords = dictionary;
-  Array<String> wordCandidates;
-
-  // 必要な文字数を満たすまで辞書語をシャッフルしながら候補文字を追加していく。
-  while (candidateChars.size() < requiredSize)
-  {
-    shuffledWords.shuffle();
-    wordCandidates.clear();
-
-    int32 accumulated = 0;
-
-    // batchSize に到達するまで辞書語を積み上げて候補リストに加える。
-    for (const auto& word : shuffledWords)
+    for (int32 x = 0; x < totalColumns; ++x)
     {
-      wordCandidates << word;
-      accumulated += static_cast<int32>(word.size());
-
-      if (accumulated >= batchSize)
+      if (grid[y][x].isEmpty())
       {
-        break;
+        grid[y][x] = RandomHiragana();
       }
-    }
-
-    if (wordCandidates.isEmpty())
-    {
-      // 辞書が空、または有効な語を取得できない場合は処理を終了する。
-      break;
-    }
-
-    // 候補語自体をシャッフルし、元となる単語の順序を均一化する。
-    wordCandidates.shuffle();
-
-    // 各候補語の文字を 1 文字ずつ取り出して候補文字リストに格納。
-    Array<String> charBatch;
-    charBatch.reserve(accumulated);
-
-    for (const auto& word : wordCandidates)
-    {
-      for (const char32 ch : word)
-      {
-        if (const auto normalized = NormalizeKanaChar(ch))
-        {
-          charBatch << String(1, *normalized);
-        }
-      }
-    }
-
-    charBatch.shuffle();
-
-    for (const auto& ch : charBatch)
-    {
-      candidateChars << ch;
-
-      if (candidateChars.size() >= requiredSize)
-      {
-        // 必要数を満たしたら即座に外側のループへ抜ける。
-        break;
-      }
-    }
-
-    if (candidateChars.size() >= requiredSize)
-    {
-      break;
     }
   }
 
-  // 候補文字リストを行列構造に再配置する。
-  grid.reserve(row);
-  size_t index = 0;
+  // 実際に配置できた単語を Console に出力（セグメント境界を明示）
+  bool anyPlaced = false;
+  for (const auto& v : segmentPlacedWords) {
+    if (!v.isEmpty()) { anyPlaced = true; break; }
+  }
 
-  for (int32 r = 0; r < row; ++r)
+  if (anyPlaced)
   {
-    Array<String> line;
-    line.reserve(column);
+    Console.open();
+    Console.writeln(U"[GenerateBlockGrid] Prefetch segments: {}"_fmt(prefetching));
 
-    for (int32 c = 0; c < column; ++c)
+    for (int32 seg = 0; seg < prefetching; ++seg)
     {
-      if (index < candidateChars.size())
+      const int32 yOffset = seg * row;
+      const int32 fromRow = yOffset;
+      const int32 toRow = yOffset + row - 1;
+
+      Array<String> words = segmentPlacedWords[seg];
+      words.sort();
+      auto newEnd = std::unique(words.begin(), words.end());
+      words.erase(newEnd, words.end());
+
+      Console.writeln(U"--- Segment {}/{} [rows {}..{}] : {} word(s) ---"_fmt(seg + 1, prefetching, fromRow, toRow, words.size()));
+      for (const auto& w : words)
       {
-        line << candidateChars[index++];
-      }
-      else
-      {
-        // 候補が不足した場合は空文字を詰めてサイズを合わせる。
-        line << String();
+        Console.writeln(U"  - {}"_fmt(w));
       }
     }
-
-    grid << std::move(line);
   }
 
   return grid;
