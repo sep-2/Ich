@@ -620,6 +620,8 @@ void Game::UpdatePlayerMovement(float delta_time)
   // 次の位置を計算
   Vec2 horizontalNextPos = playerPos;
   horizontalNextPos.x += moveInput.x * moveDistance;
+  const float intendedX = horizontalNextPos.x;
+  float finalY = playerPos.y;
 
   // プレイヤーの左右端を計算
   const float playerHalfWidth = player_->GetWidth() / 2.0f;
@@ -680,6 +682,30 @@ void Game::UpdatePlayerMovement(float delta_time)
     }
   }
 
+  // 壁にぶつかった際の階段昇降判定
+  if (!canMove) {
+    int32 gridRow = 0;
+    int32 gridCol = 0;
+    if (GetPlayerGridPosition(gridRow, gridCol)) {
+      const int32 direction = (moveInput.x < 0.0f) ? -1 : 1;
+      const int32 forwardCol = gridCol + direction;
+      const int32 aboveRow = gridRow - 1;
+      const bool hasForwardBlock = HasBlockAt(gridRow, forwardCol);
+      const bool emptyAboveCurrent = !HasBlockAt(aboveRow, gridCol);
+      const bool emptyAboveForward = !HasBlockAt(aboveRow, forwardCol);
+
+      if (hasForwardBlock && emptyAboveCurrent && emptyAboveForward &&
+        forwardCol >= 0 && forwardCol < static_cast<int32>(block_grid_[0].size())) {
+        // 条件を満たしたら1段上に乗り上げて階段を登る
+        const Block& forwardBlock = block_grid_[gridRow][forwardCol];
+        const float stairTop = forwardBlock.position.y;
+        horizontalNextPos.x = intendedX;
+        finalY = stairTop - player_->GetHeight() / 2.0f;
+        canMove = true;
+      }
+    }
+  }
+
   // 画面端チェック
   if (horizontalNextPos.x - playerHalfWidth < 0) {
     horizontalNextPos.x = playerHalfWidth;
@@ -688,7 +714,7 @@ void Game::UpdatePlayerMovement(float delta_time)
   }
 
   // 位置を更新
-  player_->SetPosition(horizontalNextPos.x, playerPos.y);
+  player_->SetPosition(horizontalNextPos.x, finalY);
 }
 
 void Game::update()
