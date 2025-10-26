@@ -119,6 +119,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InGame\BlockDestroyEffect.cpp" />
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -345,6 +346,7 @@
     <Xml Include="App\example\xml\test.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InGame\BlockDestroyEffect.h" />
     <ClInclude Include="InGame\Ui.h" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Scenes\Enum.h" />

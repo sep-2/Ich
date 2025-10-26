@@ -225,6 +225,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\InGame\Player</Filter>
     </ClCompile>
+    <ClCompile Include="InGame\BlockDestroyEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -939,6 +942,9 @@
       <Filter>Source Files\System\Logic</Filter>
     </ClInclude>
     <ClInclude Include="Player.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InGame\BlockDestroyEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

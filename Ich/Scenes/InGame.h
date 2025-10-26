@@ -7,6 +7,7 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/Menu.h"
 #include "InGame/Ui.h"
+#include "InGame/BlockDestroyEffect.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -207,6 +208,9 @@ private:
   // カメラオフセット（ワールド座標からスクリーン座標への変換）
   Vec2 camera_offset_ = Vec2::Zero();
 
+  // ブロック破壊演出
+  std::unique_ptr<BlockDestroyEffect> block_destroy_effect_;
+
   // デバッグモード
 #if _DEBUG
   static constexpr bool kDebugMode = true;
@@ -214,6 +218,9 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
+
+
+
 
 
 
