@@ -13,8 +13,9 @@ namespace InGameConstants {
 
   // ブロックサイズ
   constexpr int32 kBlockSize = 100;
-  constexpr int32 kStartX = 100;
+  constexpr int32 kStartX = 20;
   constexpr int32 kStartY = 250;
+  constexpr int32 kWallStartY = 0;               // 壁ブロックの開始Y座標（画面最上部）
 
   // プレイヤーの物理パラメータ
   constexpr float kGravity = 800.0f;              // ピクセル/秒^2
@@ -38,9 +39,10 @@ namespace InGameConstants {
   constexpr int32 kGridRows = 36;                 // グリッド行数
   constexpr int32 kGridColumns = 6;               // グリッド列数
   constexpr int32 kBatchSize = 36;                // バッチサイズ
+  constexpr int32 kWallThickness = 1;             // 壁の厚さ（ブロック数）
 
   // プレイヤー初期位置
-  constexpr int32 kPlayerInitialX = 100;
+  constexpr int32 kPlayerInitialX = 200;
   constexpr int32 kPlayerInitialY = 20;
 
   // もじぴったん風UIパラメータ
@@ -60,23 +62,23 @@ namespace InGameConstants {
 
   // ブロック破壊判定パラメータ
   constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // 上下のブロック破壊判定の閾値
-  
+
   // 物理演算パラメータ
   constexpr float kSimpleGravity = 4.0f;          // 簡易重力（UpdatePlayerMovement用）
   constexpr float kGravityMargin = 5.0f;          // 重力適用時のマージン
-  
+
   // 画面サイズ
   constexpr int32 kScreenWidth = 1280;
   constexpr int32 kScreenHeight = 720;
-  
+
   // シード計算用の定数
   constexpr uint64 kSeedMultiplierRow = 982451653ULL;
   constexpr uint64 kSeedMultiplierCol = 1572869ULL;
-  
+
   // 影オフセット
   const Vec2 kBlockTextShadowOffset{ 3.0, 3.0 };
   const Vec2 kCharBoxTextShadowOffset{ 2.0, 2.0 };
-  
+
   // 色定義
   const ColorF kBlockTextShadowColor{ 0.0, 0.0, 0.0, 0.9 };
   const ColorF kBlockTextColor{ 1.0 };
@@ -101,14 +103,14 @@ namespace InGameConstants {
   const ColorF kDebugFrameColorRed = Palette::Red;
   const ColorF kDebugCircleColorRed = Palette::Red;
   const ColorF kDebugTextColorWhite = Palette::White;
-  
+
   // 角丸半径
   constexpr double kBlockRoundRadius = 15.0;
   constexpr double kCharBoxRoundRadius = 5.0;
   constexpr double kCompletedBoardRoundRadius = 10.0;
   constexpr double kHintBoxRoundRadius = 18.0;
   constexpr double kWeaponRoundRadius = 10.0;
-  
+
   // 線の太さ
   constexpr double kBlockFrameThickness = 2.0;
   constexpr double kCharBoxFrameThickness = 3.0;
@@ -118,7 +120,7 @@ namespace InGameConstants {
   constexpr double kDebugFrameThickness = 2.0;
   constexpr double kHintBubbleFrameThickness1 = 1.5;
   constexpr double kHintBubbleFrameThickness2 = 1.2;
-  
+
   // ヒントバブルパラメータ
   const Vec2 kHintBoxOffset{ -80.0, -70.0 }; // 20px 下へ
   const Vec2 kHintBubbleAnchorOffset{ -50.0, -30.0 }; // 20px 下へ
@@ -126,14 +128,14 @@ namespace InGameConstants {
   constexpr double kHintBoxPadding = 18.0;
   constexpr double kHintBubble1Radius = 8.0;
   constexpr double kHintBubble2Radius = 5.0;
-  
+
   // デバッグ表示パラメータ
   constexpr int32 kDebugTextX = 20;
   constexpr int32 kDebugTextY1 = 20;
   constexpr int32 kDebugTextY2 = 40;
   constexpr int32 kDebugTextY3 = 60;
   constexpr double kDebugCircleRadius = 3.0;
-  
+
   // 完成単語ボードパラメータ
   constexpr int32 kCompletedBoardColumns = 4;
   constexpr double kCompletedBoardColumnPadding = 12.0;
@@ -141,22 +143,20 @@ namespace InGameConstants {
   constexpr int32 kCompletedBoardContentStartY = 60;
   constexpr int32 kCompletedBoardCountOffsetX = 10;
   constexpr int32 kCompletedBoardCountOffsetY = 25;
-  
+
   // エア量調整パラメータ
   constexpr float kAirDecreaseRate = 0.1f;        // エア減少率（10秒で空になる）
   constexpr float kAirIncreaseRate = 0.5f;        // エア回復率（2秒で満タン）
-  
+
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
   constexpr int32 kCompletedWordFontSize = 16;
   constexpr int32 kHintFontSize = 20;
   constexpr int32 kDebugFontSize = 16;
-  
-  // 絵文字範囲
-  constexpr uint32 kEmojiRangeStart = 0x1F600;
-  constexpr uint32 kEmojiRangeEnd = 0x1F64F;
 
-  // ブロックのイメージパス
+  /// <summary>
+  /// ブロックのイメージパス
+  /// </summary>
   const Array<String> kBlockTexturePaths = {
     U"Assets/Image/block_blue.jpg",
     U"Assets/Image/block_green.jpg",
@@ -185,6 +185,13 @@ namespace InGameConstants {
   ColorF{ 0.3, 1.0, 0.6 },  // 緑青
   ColorF{ 1.0, 0.8, 0.3 },  // 金色
   };
+
+  // 壁ブロックの色
+  const ColorF kWallBlockColor{ 0.3, 0.3, 0.3 };  // ダークグレー
+  const ColorF kWallBlockFrameColor{ 0.15, 0.15, 0.15, 0.8 }; // より暗いグレー
+  const ColorF kWallPatternColor{ 0.2, 0.2, 0.2, 0.3 }; // パターンの色
+  constexpr double kWallPatternLineSpacing = 15.0; // 壁パターンの線間隔
+  constexpr double kWallPatternLineThickness = 1.5; // 壁パターンの線の太さ
 }
 
 Game::Game(const InitData& init)
@@ -238,23 +245,61 @@ Game::Game(const InitData& init)
     keywords
   );
 
-  // String配列をBlock配列に変換
-  block_grid_.resize(stringGrid.size());
-  for (size_t row = 0; row < stringGrid.size(); ++row) {
-    block_grid_[row].resize(stringGrid[row].size());
-    for (size_t col = 0; col < stringGrid[row].size(); ++col) {
-      block_grid_[row][col] = Block(stringGrid[row][col]);
-      const float gridX = InGameConstants::kStartBlock.x + row * InGameConstants::kBlockSize;
-      const float gridY = InGameConstants::kStartBlock.y + col * InGameConstants::kBlockSize;
-      //block_grid_[row][col].position = Vec2(static_cast<int32>(gridX), static_cast<int32>(gridY));
-      block_grid_[row][col].position = GetGridTopLeft(row, col);
+  // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
+  const int32 totalColumns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
+  
+  // 壁ブロックの高さを計算（画面最上部から通常ブロック領域の下端まで）
+  const int32 wallHeight = static_cast<int32>(std::ceil((InGameConstants::kStartY + stringGrid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
+  
+  block_grid_.resize(wallHeight);
+
+  for (size_t row = 0; row < wallHeight; ++row) {
+    block_grid_[row].resize(totalColumns);
+
+    for (size_t col = 0; col < totalColumns; ++col) {
+      const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
+      
+      // 左右の壁（画面最上部から開始）
+      if (isWallColumn) {
+        block_grid_[row][col] = Block(Block::Type::kWall);
+        // 壁ブロックは画面最上部から配置
+        const float wallX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+        const float wallY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+        block_grid_[row][col].position = Vec2{ wallX, wallY };
+      }
+      // 通常のブロック領域
+      else {
+        // 通常ブロック領域の行インデックスを計算
+        const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+        
+        if (row >= normalBlockRowOffset && row < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
+          const size_t actualRow = row - normalBlockRowOffset;
+          const size_t actualCol = col - InGameConstants::kWallThickness;
+          block_grid_[row][col] = Block(stringGrid[actualRow][actualCol]);
+          // 通常ブロックも壁座標系で位置を設定
+          const float blockX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+          const float blockY = InGameConstants::kStartY + actualRow * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ blockX, blockY };
+        }
+        else {
+          // 通常ブロック領域外は空ブロック
+          block_grid_[row][col] = Block();
+          const float emptyX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+          const float emptyY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ emptyX, emptyY };
+        }
+      }
     }
   }
 
   // プレイヤーの初期設定（グリッドの一番上の中央に配置）
-  const int32 initialCol = 5;  // 中央
-  const int32 initialRow = 0;  // 一番上
-  const Vec2 initialPos = GridToPixel(initialRow, initialCol);
+  const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+  const int32 initialCol = InGameConstants::kGridColumns / 2 + InGameConstants::kWallThickness;  // 中央（壁を考慮）
+  const int32 initialRow = normalBlockRowOffset;  // 通常ブロック領域の一番上
+  const Vec2 initialPos = Vec2{
+    InGameConstants::kStartX + initialCol * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f,
+    InGameConstants::kWallStartY + initialRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f
+  };
 
   //player_->SetPosition(initialPos.x, initialPos.y);
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
@@ -273,9 +318,9 @@ Game::~Game()
 
 bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) const
 {
-  // ピクセル座標からグリッド座標を計算
+  // ピクセル座標からグリッド座標を計算（壁用の座標系を使用）
   const float relativeX = pixelPos.x - InGameConstants::kStartX;
-  const float relativeY = pixelPos.y - InGameConstants::kStartY;
+  const float relativeY = pixelPos.y - InGameConstants::kWallStartY;
 
   gridCol = static_cast<int32>(relativeX / InGameConstants::kBlockSize);
   gridRow = static_cast<int32>(relativeY / InGameConstants::kBlockSize);
@@ -326,8 +371,8 @@ void Game::DestroyBlockUnderPlayer()
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       Block& block = block_grid_[i][j];
 
-      // 空または破壊されたブロックはスキップ
-      if (block.isEmpty()) {
+      // 空、破壊済み、または壁ブロックはスキップ
+      if (block.isEmpty() || block.isWall()) {
         continue;
       }
 
@@ -375,14 +420,14 @@ void Game::DestroyBlockUnderPlayer()
       }
 
       if (canDestroy) {
-        // ブロックの中心位置を計算
-        const Vec2 blockCenter = GridToPixel(static_cast<int32>(i), static_cast<int32>(j));
-        
+        // ブロックの中心位置を計算（block.positionから直接計算）
+        const Vec2 blockCenter = blockPos + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
+
         // ブロックの色を決定（位置依存のシード）
         const size_t seed = (i * InGameConstants::kSeedMultiplierRow + j * InGameConstants::kSeedMultiplierCol);
         const size_t colorCount = InGameConstants::kBlockColors.size();
         const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
-        
+
         // 破壊演出を追加
         if (block_destroy_effect_) {
           block_destroy_effect_->AddEffect(blockCenter, blockColor, block.value);
@@ -439,8 +484,8 @@ void Game::UpdatePlayerFall(float delta_time)
     Vec2 playerPos = player_->GetPosition();
     playerPos.y += player_fall_velocity_ * delta_time;
 
-    // 次のブロックの位置を計算
-    const float nextBlockY = InGameConstants::kStartY + belowRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
+    // 次のブロックの位置を計算（壁座標系を使用）
+    const float nextBlockY = InGameConstants::kWallStartY + belowRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
 
     // ブロックの位置に到達したら停止
     bool landed = false;
@@ -474,8 +519,10 @@ bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
     return false;
   }
 
-  // ブロックが存在するかチェック（空でない、かつ破壊されていない）
-  return !block_grid_[gridRow][gridCol].isEmpty();
+  const Block& block = block_grid_[gridRow][gridCol];
+
+  // 壁ブロックまたは通常の未破壊ブロックが存在する場合true
+  return block.isWall() || !block.isEmpty();
 }
 
 void Game::UpdatePlayerMovement(float delta_time)
@@ -523,8 +570,8 @@ void Game::UpdatePlayerMovement(float delta_time)
     for (int j = 0; j < block_grid_[i].size(); j++) {
       const Block& block = block_grid_[i][j];
 
-      // 空または破壊されたブロックはスキップ
-      if (block.isEmpty()) {
+      // 空または破壊されたブロックはスキップ（壁は衝突対象）
+      if (block.isEmpty() && !block.isWall()) {
         continue;
       }
 
@@ -587,8 +634,8 @@ void Game::UpdatePlayerMovement(float delta_time)
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       const Block& block = block_grid_[i][j];
 
-      // 空または破壊されたブロックはスキップ
-      if (block.isEmpty()) {
+      // 空または破壊されたブロックはスキップ（壁は衝突対象）
+      if (block.isEmpty() && !block.isWall()) {
         continue;
       }
 
@@ -820,35 +867,51 @@ void Game::draw() const
       for (size_t col = 0; col < block_grid_[row].size(); ++col) {
         const Block& block = block_grid_[row][col];
 
-        // 空のブロックまたは破壊されたブロックはスキップ
-        if (block.isEmpty()) {
+        // 空のブロックまたは破壊されたブロックはスキップ（壁は描画する）
+        if (block.isEmpty() && !block.isWall()) {
           continue;
         }
 
-        // ブロックの位置をグリッド座標から取得
-        const Vec2 blockTopLeft = GetGridTopLeft(static_cast<int32>(row), static_cast<int32>(col));
-        const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
+        // ブロックの位置を直接使用（既にコンストラクタで設定済み）
+        const Vec2 blockTopLeft = block.position;
+        const Vec2 blockCenter = blockTopLeft + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
 
-        // ブロックの見た目を位置依存のシードで決定
-        const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
         const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, InGameConstants::kBlockRoundRadius };
 
-        if (hasBlockTextures) {
-          const Texture& blockTexture = block_textures_[seed % textureCount];
-          const TextureRegion blockRegion = blockTexture.resized(InGameConstants::kBlockSize, InGameConstants::kBlockSize);
-          blockShape(blockRegion).draw();
-        } else {
-          const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
-          blockShape.draw(blockColor);
+        // 壁ブロックの場合
+        if (block.isWall()) {
+          blockShape.draw(InGameConstants::kWallBlockColor);
+          blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kWallBlockFrameColor);
+
+          // 壁のパターンを描画（斜線など）
+          for (double offset = -InGameConstants::kBlockSize; offset < InGameConstants::kBlockSize * 2; offset += InGameConstants::kWallPatternLineSpacing) {
+            const Vec2 start{ blockTopLeft.x + offset, blockTopLeft.y };
+            const Vec2 end{ blockTopLeft.x + offset + InGameConstants::kBlockSize, blockTopLeft.y + InGameConstants::kBlockSize };
+            Line{ start, end }.draw(InGameConstants::kWallPatternLineThickness, InGameConstants::kWallPatternColor);
+          }
         }
+        // 通常のブロックの場合
+        else {
+          // ブロックの見た目を位置依存のシードで決定
+          const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
 
-        // ブロックの枠線を描画
-        blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
+          if (hasBlockTextures) {
+            const Texture& blockTexture = block_textures_[seed % textureCount];
+            const TextureRegion blockRegion = blockTexture.resized(InGameConstants::kBlockSize, InGameConstants::kBlockSize);
+            blockShape(blockRegion).draw();
+          } else {
+            const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
+            blockShape.draw(blockColor);
+          }
 
-        // ブロック内のテキストを中央に描画
-        const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
-        block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
-        block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
+          // ブロックの枠線を描画
+          blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
+
+          // ブロック内のテキストを中央に描画
+          const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
+          block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
+          block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
+        }
       }
     }
 
@@ -1017,9 +1080,9 @@ void Game::UpdateCamera()
     camera_offset_.x = 0;
   }
 
-  // 上端より上には移動しない
-  if (camera_offset_.y < 0) {
-    camera_offset_.y = 0;
+  // 上端より上には移動しない（壁の最上部を考慮）
+  if (camera_offset_.y < InGameConstants::kWallStartY) {
+    camera_offset_.y = InGameConstants::kWallStartY;
   }
 
   // 右端の制限（ブロックグリッドのサイズに応じて）
@@ -1030,8 +1093,8 @@ void Game::UpdateCamera()
   }
 
   // 下端の制限（ブロックグリッドのサイズに応じて）
-  const float worldHeight = InGameConstants::kStartY + block_grid_.size() * InGameConstants::kBlockSize;
-  const float maxCameraY = worldHeight - Scene::Height() + yBias; // バイアス分だけ下方向に許容
+  const float worldHeight = InGameConstants::kWallStartY + block_grid_.size() * InGameConstants::kBlockSize;
+  const float maxCameraY = worldHeight - Scene::Height();
   if (camera_offset_.y > maxCameraY && maxCameraY > 0) {
     camera_offset_.y = maxCameraY;
   }
