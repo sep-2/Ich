@@ -2,38 +2,28 @@
 
 #include <unordered_map>
 #include <stdexcept>
+#include <algorithm>
 
 namespace
 {
   using FrequencyTable = std::unordered_map<char32, int32>;
 
-  /// <summary>
-  /// ひらがな1文字をゲーム内ルールに沿って正規化する。
-  /// ・濁点／半濁点付き文字は清音へ集約
-  /// ・小書き文字は通常サイズへ置換
-  /// ・長音記号は完全に無視（= none を返す）
-  /// </summary>
-  /// <param name="ch">入力された1文字</param>
-  /// <returns>正規化後の文字。長音記号の場合は none。</returns>
   Optional<char32> NormalizeKanaChar(const char32 ch)
   {
     switch (ch)
     {
-    case U'ー': // 一般的な長音符号
-    case U'－': // 全角ハイフン（長音として扱う）
-    case U'―': // ダッシュ（長音扱い）
+    case U'ー':
+    case U'－':
+    case U'―':
       return none;
     default:
       break;
     }
 
     static const std::unordered_map<char32, char32> kNormalizationMap = {
-      // 小書き文字 -> 通常字
       { U'ぁ', U'あ' }, { U'ぃ', U'い' }, { U'ぅ', U'う' }, { U'ぇ', U'え' }, { U'ぉ', U'お' },
       { U'っ', U'つ' }, { U'ゃ', U'や' }, { U'ゅ', U'ゆ' }, { U'ょ', U'よ' }, { U'ゎ', U'わ' },
       { U'ゕ', U'か' }, { U'ゖ', U'け' },
-
-      // 濁点・半濁点付き文字 -> 清音
       { U'が', U'か' }, { U'ぎ', U'き' }, { U'ぐ', U'く' }, { U'げ', U'け' }, { U'ご', U'こ' },
       { U'ざ', U'さ' }, { U'じ', U'し' }, { U'ず', U'す' }, { U'ぜ', U'せ' }, { U'ぞ', U'そ' },
       { U'だ', U'た' }, { U'ぢ', U'ち' }, { U'づ', U'つ' }, { U'で', U'て' }, { U'ど', U'と' },
@@ -50,10 +40,6 @@ namespace
     return ch;
   }
 
-  /// <summary>
-  /// ブロック配列（または文字列）から、正規化済みの線形シーケンスを生成する
-  /// （長音は除去、小書き・濁点は統合）。
-  /// </summary>
   Array<char32> BuildNormalizedSequence(const Array<String>& source)
   {
     Array<char32> seq;
@@ -89,17 +75,9 @@ namespace
     return seq;
   }
 
-  /// <summary>
-  /// haystack に needle の連続した並びが含まれるか（部分列/部分文字列判定）。
-  /// </summary>
   bool ContainsContiguousSubsequence(const Array<char32>& haystack, const Array<char32>& needle)
   {
-    if (needle.isEmpty())
-    {
-      return false;
-    }
-
-    if (needle.size() > haystack.size())
+    if (needle.isEmpty() || needle.size() > haystack.size())
     {
       return false;
     }
@@ -118,52 +96,43 @@ namespace
           break;
         }
       }
-
-      if (ok)
-      {
-        return true;
-      }
+      if (ok) return true;
     }
-
     return false;
   }
 
-  /// 既存の頻度表ベースのヘルパ（現状は GenerateBlockGrid のみで使用）
-  struct Dummy { };
-  FrequencyTable BuildFrequency(const Array<String>& source)
+  String RandomHiragana()
   {
-    FrequencyTable table;
-
-    for (const auto& token : source)
-    {
-      for (const char32 ch : token)
-      {
-        if (const auto normalized = NormalizeKanaChar(ch))
-        {
-          ++table[*normalized];
-        }
-      }
-    }
-
-    return table;
+    static const Array<char32> hira = {
+      U'あ',U'い',U'う',U'え',U'お',
+      U'か',U'き',U'く',U'け',U'こ',
+      U'さ',U'し',U'す',U'せ',U'そ',
+      U'た',U'ち',U'つ',U'て',U'と',
+      U'な',U'に',U'ぬ',U'ね',U'の',
+      U'は',U'ひ',U'ふ',U'へ',U'ほ',
+      U'ま',U'み',U'む',U'め',U'も',
+      U'や',U'ゆ',U'よ',
+      U'ら',U'り',U'る',U'れ',U'ろ',
+      U'わ',U'を',U'ん'
+    };
+    const size_t idx = static_cast<size_t>(Random(0, static_cast<int32>(hira.size() - 1)));
+    return String(1, hira[idx]);
   }
 
-  FrequencyTable BuildFrequency(const String& word)
+  struct Vec2i { int32 y; int32 x; };
+
+  bool InBounds(int32 y, int32 x, int32 height, int32 width)
   {
-    FrequencyTable table;
-
-    for (const char32 ch : word)
-    {
-      if (const auto normalized = NormalizeKanaChar(ch))
-      {
-        ++table[*normalized];
-      }
-    }
-
-    return table;
+    return (0 <= y && y < height && 0 <= x && x < width);
   }
 
-} // namespace
+  Array<Vec2i> NextSteps()
+  {
+    Array<Vec2i> dirs = { Vec2i{+1,0}, Vec2i{0,-1}, Vec2i{0,+1} };
+    dirs.shuffle();
+    return dirs;
+  }
+}
 
 BlockManager::BlockManager() = default;
 BlockManager::~BlockManager() = default;
@@ -173,8 +142,6 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
   Array<String> result;
   result.reserve(dictionary.size());
 
-  // 新ルール: 並び順も考慮し、A（ブロック列）内に B（単語）の正規化列が
-  // 連続して現れるか（部分文字列）で判定する。
   const Array<char32> normalizedBlocks = BuildNormalizedSequence(blocks);
 
   for (const auto& word : dictionary)
@@ -191,109 +158,157 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
 
 Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>& /*blocks*/, const Array<String>& /*dictionary*/) const
 {
-  // いったんリーチ判定は未対応（空配列を返却）
   return {};
 }
 
-Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 batchSize, const Array<String>& dictionary) const
+Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 prefetching) const
 {
-  Array<Array<String>> grid;
-
-  if (row <= 0 || column <= 0 || batchSize <= 0 || dictionary.isEmpty())
+  if (row <= 0 || column <= 0 || requestedCount < 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0)
   {
-    return grid;
+    return {};
   }
 
-  const int32 requiredSize = row * column;
-  if (requiredSize % batchSize != 0)
+  const int32 totalColumns = column * prefetching;
+  Array<Array<String>> grid(row, Array<String>(totalColumns, U""));
+
+  // 追加: 実際に配置できた単語の一覧（重複あり、最後に重複排除して出力）
+  Array<String> placedWords;
+  placedWords.reserve(requestedCount * prefetching);
+
+  // セグメントごとに配置
+  for (int32 seg = 0; seg < prefetching; ++seg)
   {
-    throw std::invalid_argument("row * column must be a multiple of batchSize.");
-  }
+    const int32 xOffset = seg * column;
 
-  Array<String> candidateChars;
-  candidateChars.reserve(requiredSize);
+    int32 placedCount = 0;
 
-  Array<String> shuffledWords = dictionary;
-  Array<String> wordCandidates;
-
-  while (candidateChars.size() < requiredSize)
-  {
-    shuffledWords.shuffle();
-    wordCandidates.clear();
-
-    int32 accumulated = 0;
-
-    for (const auto& word : shuffledWords)
+    for (int32 trial = 0; trial < requestedCount; ++trial)
     {
-      wordCandidates << word;
-      accumulated += static_cast<int32>(word.size());
+      bool placed = false;
 
-      if (accumulated >= batchSize)
+      for (int32 attempt = 0; attempt < attemptsPerWord && !placed; ++attempt)
       {
-        break;
-      }
-    }
+        const String& word = dictionary[Random(0, static_cast<int32>(dictionary.size() - 1))];
 
-    if (wordCandidates.isEmpty())
-    {
-      break;
-    }
-
-    wordCandidates.shuffle();
-
-    Array<String> charBatch;
-    charBatch.reserve(accumulated);
-
-    for (const auto& word : wordCandidates)
-    {
-      for (const char32 ch : word)
-      {
-        if (const auto normalized = NormalizeKanaChar(ch))
+        Array<Vec2i> empties;
+        for (int32 y = 0; y < row; ++y)
         {
-          charBatch << String(1, *normalized);
+          for (int32 x = 0; x < column; ++x)
+          {
+            if (grid[y][xOffset + x].isEmpty())
+            {
+              empties << Vec2i{ y, xOffset + x };
+            }
+          }
+        }
+
+        if (empties.isEmpty())
+        {
+          break;
+        }
+
+        const Vec2i start = empties[Random(0, static_cast<int32>(empties.size() - 1))];
+
+        // 1 文字ずつ配置（曲がり可、上は禁止）
+        Vec2i current = start;
+        Array<Vec2i> used;
+        used.reserve(word.size());
+
+        bool failed = false;
+
+        size_t stepIndex = 0;
+        for (const char32 ch : word)
+        {
+          ++stepIndex;
+          const auto normalized = NormalizeKanaChar(ch);
+          if (!normalized)
+          {
+            continue; // 長音はスキップ
+          }
+
+          if (!grid[current.y][current.x].isEmpty())
+          {
+            failed = true;
+            break;
+          }
+
+          grid[current.y][current.x] = String(1, *normalized);
+          used << current;
+
+          // 次の進行先を決める（下・左右、セグメント内、未使用マス）
+          bool advanced = false;
+          if (stepIndex < word.size())
+          {
+            for (const auto dir : NextSteps())
+            {
+              const int32 ny = current.y + dir.y;
+              const int32 nx = current.x + dir.x;
+              if (InBounds(ny, nx, row, totalColumns)
+                && nx >= xOffset && nx < xOffset + column
+                && grid[ny][nx].isEmpty())
+              {
+                current = { ny, nx };
+                advanced = true;
+                break;
+              }
+            }
+
+            if (!advanced)
+            {
+              failed = true;
+              break;
+            }
+          }
+        }
+
+        if (failed)
+        {
+          for (const auto& pos : used)
+          {
+            grid[pos.y][pos.x].clear();
+          }
+        }
+        else
+        {
+          placed = true;
+          ++placedCount;
+          placedWords << word; // 出力用に記録（原文）
         }
       }
-    }
 
-    charBatch.shuffle();
-
-    for (const auto& ch : charBatch)
-    {
-      candidateChars << ch;
-
-      if (candidateChars.size() >= requiredSize)
+      if (placedCount >= requestedCount)
       {
         break;
       }
     }
+  }
 
-    if (candidateChars.size() >= requiredSize)
+  // 未充填マスはランダムひらがな
+  for (int32 y = 0; y < row; ++y)
+  {
+    for (int32 x = 0; x < totalColumns; ++x)
     {
-      break;
+      if (grid[y][x].isEmpty())
+      {
+        grid[y][x] = RandomHiragana();
+      }
     }
   }
 
-  grid.reserve(row);
-  size_t index = 0;
-
-  for (int32 r = 0; r < row; ++r)
+  // 実際に配置できた単語を Console に出力（重複除去）
+  if (!placedWords.isEmpty())
   {
-    Array<String> line;
-    line.reserve(column);
+    placedWords.sort();
+    // 連続重複除去
+    auto newEnd = std::unique(placedWords.begin(), placedWords.end());
+    placedWords.erase(newEnd, placedWords.end());
 
-    for (int32 c = 0; c < column; ++c)
+    Console.open();
+    Console.writeln(U"[GenerateBlockGrid] Placed words ({}):"_fmt(placedWords.size()));
+    for (const auto& w : placedWords)
     {
-      if (index < candidateChars.size())
-      {
-        line << candidateChars[index++];
-      }
-      else
-      {
-        line << String();
-      }
+      Console.writeln(U" - {}"_fmt(w));
     }
-
-    grid << std::move(line);
   }
 
   return grid;
