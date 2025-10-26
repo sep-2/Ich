@@ -44,6 +44,6 @@ public:
   /// <param name="requestedCount">1 セグメントで試みる単語数の上限</param>
   /// <param name="attemptsPerWord">1 単語あたりの試行回数</param>
   /// <param name="dictionary">配置に用いる単語辞書</param>
-  /// <param name="prefetching">横方向の先読み（セグメント数）。デフォルト 1</param>
-  Array<Array<String>> GenerateBlockGrid(int32 row, int32 column, int32 requestedCount, int32 attemptsPerWord, const Array<String>& dictionary, int32 prefetching = 1) const;
+  /// <param name="segmentCount">セグメント数。デフォルト 1</param>
+  Array<Array<String>> GenerateBlockGrid(int32 row, int32 column, int32 requestedCount, int32 attemptsPerWord, const Array<String>& dictionary, int32 segmentCount = 1) const;
 };
