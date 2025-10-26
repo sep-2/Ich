@@ -23,6 +23,8 @@ namespace InGameConstants {
 
   // カメラパラメータ
   constexpr float kCameraFollowSpeed = 0.1f;      // カメラ追従速度（0.0～1.0）
+  // プレイヤーの下限の見え方を上げるための縦バイアス（ブロック数）
+  constexpr int32 kCameraVerticalBiasBlocks = 2;  // ブロック2個分だけ上げる
 
   // 文字収集パラメータ
   constexpr size_t kMaxCharacters = 5;            // 最大文字数
@@ -118,8 +120,8 @@ namespace InGameConstants {
   constexpr double kHintBubbleFrameThickness2 = 1.2;
   
   // ヒントバブルパラメータ
-  const Vec2 kHintBoxOffset{ -80.0, -150.0 };
-  const Vec2 kHintBubbleAnchorOffset{ -40.0, -100.0 };
+  const Vec2 kHintBoxOffset{ -80.0, -70.0 }; // 20px 下へ
+  const Vec2 kHintBubbleAnchorOffset{ -50.0, -30.0 }; // 20px 下へ
   const Vec2 kHintBubble2Offset{ 15.0, 15.0 };
   constexpr double kHintBoxPadding = 18.0;
   constexpr double kHintBubble1Radius = 8.0;
@@ -997,10 +999,13 @@ void Game::UpdateCamera()
   // プレイヤーの位置を取得
   const Vec2 playerPos = player_->GetPosition();
 
-  // カメラの目標位置を計算（プレイヤーを画面中央に配置）
+  // 縦方向の見た目オフセット（ブロック2個分、主人公を画面内で高く見せる）
+  const float yBias = static_cast<float>(InGameConstants::kBlockSize * InGameConstants::kCameraVerticalBiasBlocks);
+
+  // カメラの目標位置を計算（プレイヤーを画面中央より上に配置）
   const Vec2 targetCameraPos = Vec2{
     playerPos.x - Scene::Width() / 2.0f,
-    playerPos.y - Scene::Height() / 2.0f
+    playerPos.y - Scene::Height() / 2.0f + yBias
   };
 
   // カメラ位置をスムーズに更新（線形補間）
@@ -1026,7 +1031,7 @@ void Game::UpdateCamera()
 
   // 下端の制限（ブロックグリッドのサイズに応じて）
   const float worldHeight = InGameConstants::kStartY + block_grid_.size() * InGameConstants::kBlockSize;
-  const float maxCameraY = worldHeight - Scene::Height();
+  const float maxCameraY = worldHeight - Scene::Height() + yBias; // バイアス分だけ下方向に許容
   if (camera_offset_.y > maxCameraY && maxCameraY > 0) {
     camera_offset_.y = maxCameraY;
   }
