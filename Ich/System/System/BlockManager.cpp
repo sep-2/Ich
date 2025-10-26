@@ -305,7 +305,7 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     {
       if (grid[y][x].isEmpty())
       {
-        grid[y][x] = RandomHiragana();
+        grid[y][x] = U"*";
       }
     }
   }
