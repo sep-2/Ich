@@ -226,6 +226,9 @@ private:
   // プレイヤーの移動入力
   Vec2 player_move_input_ = Vec2::Zero();
 
+  // 壁に接触している時間
+  float wall_contact_time_ = 0.0f;
+
   Array<String> have_words_;
 
   // 最大文字数

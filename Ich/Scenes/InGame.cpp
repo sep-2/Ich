@@ -691,8 +691,14 @@ void Game::UpdatePlayerMovement(float delta_time)
     }
   }
 
+  if (canMove) {
+    wall_contact_time_ = 0.0f;
+  } else {
+    wall_contact_time_ += delta_time;
+  }
+
   // 壁にぶつかった際の階段昇降判定
-  if (!canMove && hasGridPosition && blockingRow >= 0) {
+  if (!canMove && hasGridPosition && blockingRow >= 0 && wall_contact_time_ >= 0.5f) {
     const int32 direction = (moveInput.x < 0.0f) ? -1 : 1;
     const int32 forwardCol = gridCol + direction;
     const int32 headRow = gridRow - 1;
