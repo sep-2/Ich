@@ -168,17 +168,20 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     return {};
   }
 
-  const int32 totalColumns = column * prefetching;
-  Array<Array<String>> grid(row, Array<String>(totalColumns, U""));
+  // row は 1 セグメントあたりの行数として解釈し、総行数は row * prefetching
+  const int32 totalRows = row * prefetching;
+  const int32 totalColumns = column; // 列はセグメント幅のまま
 
-  // セグメントごとの配置結果を保持
+  Array<Array<String>> grid(totalRows, Array<String>(totalColumns, U""));
+
+  // セグメントごとの配置結果を保持（縦方向に積む）
   Array<Array<String>> segmentPlacedWords;
   segmentPlacedWords.resize(prefetching);
 
   // セグメントごとに TS 実装に準拠した配置ロジックを適用
   for (int32 seg = 0; seg < prefetching; ++seg)
   {
-    const int32 xOffset = seg * column;
+    const int32 yOffset = seg * row;
 
     // clampedCount: min(words, 空きマス) に 1..requestedCount でクランプ
     const int32 upperBound = static_cast<int32>(Min(static_cast<size_t>(dictionary.size()), static_cast<size_t>(row * column)));
@@ -197,10 +200,10 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
       {
         for (int32 x = 0; x < column; ++x)
         {
-          const int32 gx = xOffset + x;
-          if (grid[y][gx].isEmpty())
+          const int32 gy = yOffset + y;
+          if (grid[gy][x].isEmpty())
           {
-            out << Vec2i{ y, gx };
+            out << Vec2i{ gy, x };
           }
         }
       }
@@ -210,7 +213,7 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     {
       if (word.isEmpty()) return false;
 
-      // 文字配列（正規化せず、そのまま配置。参考実装に合わせて長音も含める）
+      // 文字配列（正規化せず、そのまま配置）
       Array<char32> letters;
       letters.reserve(word.size());
       for (const char32 ch : word)
@@ -227,7 +230,6 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
       }
 
       const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
-
       Array<Vec2i> placements;
       placements << start;
       grid[start.y][start.x] = String(1, letters[0]);
@@ -242,8 +244,8 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
         {
           const int32 ny = prev.y + dir.y;
           const int32 nx = prev.x + dir.x;
-          if (InBounds(ny, nx, row, totalColumns)
-            && nx >= xOffset && nx < xOffset + column
+          if (InBounds(ny, nx, totalRows, totalColumns)
+            && ny >= yOffset && ny < yOffset + row
             && grid[ny][nx].isEmpty())
           {
             grid[ny][nx] = String(1, letters[i]);
@@ -291,13 +293,13 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
         }
       }
 
-      // 参考実装に倣い、成功/失敗に関わらずクオータを減算
+      // 成功/失敗に関わらずクオータを減算
       --remainingQuota;
     }
   }
 
   // 未充填マスはランダムひらがな
-  for (int32 y = 0; y < row; ++y)
+  for (int32 y = 0; y < totalRows; ++y)
   {
     for (int32 x = 0; x < totalColumns; ++x)
     {
@@ -321,16 +323,16 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
 
     for (int32 seg = 0; seg < prefetching; ++seg)
     {
-      const int32 xOffset = seg * column;
-      const int32 fromCol = xOffset;
-      const int32 toCol = xOffset + column - 1;
+      const int32 yOffset = seg * row;
+      const int32 fromRow = yOffset;
+      const int32 toRow = yOffset + row - 1;
 
       Array<String> words = segmentPlacedWords[seg];
       words.sort();
       auto newEnd = std::unique(words.begin(), words.end());
       words.erase(newEnd, words.end());
 
-      Console.writeln(U"--- Segment {}/{} [cols {}..{}] : {} word(s) ---"_fmt(seg + 1, prefetching, fromCol, toCol, words.size()));
+      Console.writeln(U"--- Segment {}/{} [rows {}..{}] : {} word(s) ---"_fmt(seg + 1, prefetching, fromRow, toRow, words.size()));
       for (const auto& w : words)
       {
         Console.writeln(U"  - {}"_fmt(w));
