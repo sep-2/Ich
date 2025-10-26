@@ -56,6 +56,104 @@ namespace InGameConstants {
 
   constexpr double kHintUpdateInterval = 3.0;
 
+  // ブロック破壊判定パラメータ
+  constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // 上下のブロック破壊判定の閾値
+  
+  // 物理演算パラメータ
+  constexpr float kSimpleGravity = 4.0f;          // 簡易重力（UpdatePlayerMovement用）
+  constexpr float kGravityMargin = 5.0f;          // 重力適用時のマージン
+  
+  // 画面サイズ
+  constexpr int32 kScreenWidth = 1280;
+  constexpr int32 kScreenHeight = 720;
+  
+  // シード計算用の定数
+  constexpr uint64 kSeedMultiplierRow = 982451653ULL;
+  constexpr uint64 kSeedMultiplierCol = 1572869ULL;
+  
+  // 影オフセット
+  const Vec2 kBlockTextShadowOffset{ 3.0, 3.0 };
+  const Vec2 kCharBoxTextShadowOffset{ 2.0, 2.0 };
+  
+  // 色定義
+  const ColorF kBlockTextShadowColor{ 0.0, 0.0, 0.0, 0.9 };
+  const ColorF kBlockTextColor{ 1.0 };
+  const ColorF kCharBoxTextShadowColor{ 0.0, 0.0, 0.0, 0.3 };
+  const ColorF kCharBoxDefaultTextColor{ 0.0, 0.0, 0.0 };
+  const ColorF kCharBoxCompletedTextColor{ 0.8, 0.0, 0.0 };
+  const ColorF kCharBoxDefaultBoxColor{ 1.0, 1.0, 1.0 };
+  const ColorF kCharBoxCompletedBoxColor{ 1.0, 0.8, 0.8 };
+  const ColorF kCharBoxDefaultBorderColor{ 0.3, 0.3, 0.3 };
+  const ColorF kCharBoxCompletedBorderColor{ 1.0, 0.0, 0.0 };
+  const ColorF kBlockFrameColor{ 0.2, 0.2, 0.2, 0.5 };
+  const ColorF kCompletedBoardBackgroundColor{ 0.1, 0.1, 0.1, 0.8 };
+  const ColorF kCompletedBoardBorderColor{ 0.8, 0.8, 0.8 };
+  const ColorF kCompletedBoardTitleColor{ 1.0, 1.0, 0.0 };
+  const ColorF kCompletedWordTextColor{ 0.0, 1.0, 0.0 };
+  const ColorF kBackgroundColor{ 0.6, 0.8, 0.7 };
+  const ColorF kHintBackgroundColor{ 1.0, 1.0, 1.0, 0.92 };
+  const ColorF kHintBorderColor{ 0.2, 0.3, 0.5, 0.9 };
+  const ColorF kHintTextColor{ 0.1, 0.1, 0.1 };
+  const ColorF kDebugLineColorBlue = Palette::Blue;
+  const ColorF kDebugLineColorOrange = Palette::Orange;
+  const ColorF kDebugFrameColorRed = Palette::Red;
+  const ColorF kDebugCircleColorRed = Palette::Red;
+  const ColorF kDebugTextColorWhite = Palette::White;
+  
+  // 角丸半径
+  constexpr double kBlockRoundRadius = 15.0;
+  constexpr double kCharBoxRoundRadius = 5.0;
+  constexpr double kCompletedBoardRoundRadius = 10.0;
+  constexpr double kHintBoxRoundRadius = 18.0;
+  constexpr double kWeaponRoundRadius = 10.0;
+  
+  // 線の太さ
+  constexpr double kBlockFrameThickness = 2.0;
+  constexpr double kCharBoxFrameThickness = 3.0;
+  constexpr double kCompletedBoardFrameThickness = 3.0;
+  constexpr double kHintBoxFrameThickness = 2.0;
+  constexpr double kDebugLineThickness = 2.0;
+  constexpr double kDebugFrameThickness = 2.0;
+  constexpr double kHintBubbleFrameThickness1 = 1.5;
+  constexpr double kHintBubbleFrameThickness2 = 1.2;
+  
+  // ヒントバブルパラメータ
+  const Vec2 kHintBoxOffset{ -80.0, -150.0 };
+  const Vec2 kHintBubbleAnchorOffset{ -40.0, -100.0 };
+  const Vec2 kHintBubble2Offset{ 15.0, 15.0 };
+  constexpr double kHintBoxPadding = 18.0;
+  constexpr double kHintBubble1Radius = 8.0;
+  constexpr double kHintBubble2Radius = 5.0;
+  
+  // デバッグ表示パラメータ
+  constexpr int32 kDebugTextX = 20;
+  constexpr int32 kDebugTextY1 = 20;
+  constexpr int32 kDebugTextY2 = 40;
+  constexpr int32 kDebugTextY3 = 60;
+  constexpr double kDebugCircleRadius = 3.0;
+  
+  // 完成単語ボードパラメータ
+  constexpr int32 kCompletedBoardColumns = 4;
+  constexpr double kCompletedBoardColumnPadding = 12.0;
+  constexpr int32 kCompletedBoardTitleOffsetY = 30;
+  constexpr int32 kCompletedBoardContentStartY = 60;
+  constexpr int32 kCompletedBoardCountOffsetX = 10;
+  constexpr int32 kCompletedBoardCountOffsetY = 25;
+  
+  // エア量調整パラメータ
+  constexpr float kAirDecreaseRate = 0.1f;        // エア減少率（10秒で空になる）
+  constexpr float kAirIncreaseRate = 0.5f;        // エア回復率（2秒で満タン）
+  
+  // フォントサイズ
+  constexpr int32 kBlockFontSize = 40;
+  constexpr int32 kCompletedWordFontSize = 16;
+  constexpr int32 kHintFontSize = 20;
+  constexpr int32 kDebugFontSize = 16;
+  
+  // 絵文字範囲
+  constexpr uint32 kEmojiRangeStart = 0x1F600;
+  constexpr uint32 kEmojiRangeEnd = 0x1F64F;
+
   // ブロックのイメージパス
   const Array<String> kBlockTexturePaths = {
     U"Assets/Image/block_blue.jpg",
@@ -93,11 +191,12 @@ Game::Game(const InitData& init)
   , menu_(std::make_unique<Menu>())
   , ui_(std::make_shared<Ui>())
   , player_(std::make_shared<Player>())
+  , block_destroy_effect_(std::make_unique<BlockDestroyEffect>())
   , air_amount_(1.0f)
-  , block_font_{ 40, Typeface::Bold }
-  , completed_word_font_{ 16 }
-  , hint_font_{ 20 }
-  , debug_font_{ 16 }
+  , block_font_{ InGameConstants::kBlockFontSize, Typeface::Bold }
+  , completed_word_font_{ InGameConstants::kCompletedWordFontSize }
+  , hint_font_{ InGameConstants::kHintFontSize }
+  , debug_font_{ InGameConstants::kDebugFontSize }
 {
   //PRINT << U"Game::Game()";
 
@@ -158,7 +257,7 @@ Game::Game(const InitData& init)
   //player_->SetPosition(initialPos.x, initialPos.y);
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
   player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // 移動速度を200ピクセル/秒に設定
-  
+
   for (size_t i = 0; i < max_string_; i++) {
     have_words_.push_back(U"");
   }
@@ -241,7 +340,7 @@ void Game::DestroyBlockUnderPlayer()
 
       // 下のブロック（足元）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
-        if (playerBottomY >= blockTop && playerBottomY <= blockTop + 10.0f) {
+        if (playerBottomY >= blockTop && playerBottomY <= blockTop + InGameConstants::kBlockDestroyVerticalThreshold) {
           if (!KeyLeft.pressed() && !KeyRight.pressed()) {
             canDestroy = true;
             direction = U"下";
@@ -267,13 +366,26 @@ void Game::DestroyBlockUnderPlayer()
 
       // 上のブロック（頭上）
       if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
-        if (playerTop <= blockBottom && playerTop >= blockBottom - 10.0f) {
+        if (playerTop <= blockBottom && playerTop >= blockBottom - InGameConstants::kBlockDestroyVerticalThreshold) {
           canDestroy = true;
           direction = U"上";
         }
       }
 
       if (canDestroy) {
+        // ブロックの中心位置を計算
+        const Vec2 blockCenter = GridToPixel(static_cast<int32>(i), static_cast<int32>(j));
+        
+        // ブロックの色を決定（位置依存のシード）
+        const size_t seed = (i * InGameConstants::kSeedMultiplierRow + j * InGameConstants::kSeedMultiplierCol);
+        const size_t colorCount = InGameConstants::kBlockColors.size();
+        const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
+        
+        // 破壊演出を追加
+        if (block_destroy_effect_) {
+          block_destroy_effect_->AddEffect(blockCenter, blockColor, block.value);
+        }
+
         // ブロックを破壊
         block.is_destroyed = true;
         PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
@@ -398,9 +510,8 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   // プレイヤーの現在位置を取得
   Vec2 playerPos = player_->GetPosition();
-  const float gravity = 4.0f;
   Vec2 nextPos = playerPos;
-  nextPos.y += gravity;
+  nextPos.y += InGameConstants::kSimpleGravity;
 
   const float playerBottomY = nextPos.y + player_->GetHeight() / 2.0f;
   bool isOnBlock = false;
@@ -423,14 +534,14 @@ void Game::UpdatePlayerMovement(float delta_time)
 
       // デバッグ用の線描画
       if (kDebugMode) {
-        Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(2.0, Palette::Blue);
-        Line{ blockRight, blockTop, blockRight, blockBottom }.draw(2.0, Palette::Orange);
+        Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorBlue);
+        Line{ blockRight, blockTop, blockRight, blockBottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorOrange);
       }
 
       // プレイヤーの中心がブロックのX範囲内にあるかチェック
       if (nextPos.x >= blockLeft && nextPos.x <= blockRight) {
         // プレイヤーの下端がブロックの上面付近にあるかチェック
-        if (playerBottomY >= blockTop && playerBottomY <= blockTop + gravity + 5.0f) {
+        if (playerBottomY >= blockTop && playerBottomY <= blockTop + InGameConstants::kSimpleGravity + InGameConstants::kGravityMargin) {
           // プレイヤーをブロックの上に配置
           nextPos.y = blockTop - player_->GetHeight() / 2.0f;
           isOnBlock = true;
@@ -522,8 +633,8 @@ void Game::UpdatePlayerMovement(float delta_time)
   // 画面端チェック
   if (horizontalNextPos.x - playerHalfWidth < 0) {
     horizontalNextPos.x = playerHalfWidth;
-  } else if (horizontalNextPos.x + playerHalfWidth > 1280) {
-    horizontalNextPos.x = 1280 - playerHalfWidth;
+  } else if (horizontalNextPos.x + playerHalfWidth > InGameConstants::kScreenWidth) {
+    horizontalNextPos.x = InGameConstants::kScreenWidth - playerHalfWidth;
   }
 
   // 位置を更新
@@ -560,6 +671,11 @@ void Game::update()
     }
 
     return;  // ゲームロジックは更新しない
+  }
+
+  // ブロック破壊演出を更新
+  if (block_destroy_effect_) {
+    block_destroy_effect_->Update(Scene::DeltaTime());
   }
 
   // have_words_を連結して1行で表示
@@ -600,14 +716,14 @@ void Game::update()
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
 
     // デモ用：時間経過でエアが減少
-    air_amount_ -= static_cast<float>(Scene::DeltaTime() * 0.1);  // 10秒で空になる
+    air_amount_ -= static_cast<float>(Scene::DeltaTime() * InGameConstants::kAirDecreaseRate);
     if (air_amount_ < 0.0f) {
       air_amount_ = 0.0f;
     }
 
     // スペースキーでエア回復（デモ用）
     if (KeySpace.pressed()) {
-      air_amount_ += static_cast<float>(Scene::DeltaTime() * 0.5);  // 2秒で満タン
+      air_amount_ += static_cast<float>(Scene::DeltaTime() * InGameConstants::kAirIncreaseRate);
       if (air_amount_ > 1.0f) {
         air_amount_ = 1.0f;
       }
@@ -653,10 +769,10 @@ void Game::DrawDebugInfo() const
     playerHeight
   };
 
-  playerHitBox.drawFrame(2.0, Palette::Red);
+  playerHitBox.drawFrame(InGameConstants::kDebugFrameThickness, InGameConstants::kDebugFrameColorRed);
 
   // プレイヤーの中心点を描画
-  Circle{ playerPos, 3 }.draw(Palette::Red);
+  Circle{ playerPos, InGameConstants::kDebugCircleRadius }.draw(InGameConstants::kDebugCircleColorRed);
 
   // グリッド位置を取得
   int32 gridRow, gridCol;
@@ -673,17 +789,17 @@ void Game::DrawDebugInfo() const
 
     // グリッド座標を表示（メンバー変数のフォントを使用）
     debug_font_(U"Grid: ({}, {})"_fmt(gridCol, gridRow))
-      .draw(20, 20, Palette::White);
+      .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY1, InGameConstants::kDebugTextColorWhite);
     debug_font_(U"Pos: ({:.1f}, {:.1f})"_fmt(playerPos.x, playerPos.y))
-      .draw(20, 40, Palette::White);
+      .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY2, InGameConstants::kDebugTextColorWhite);
     debug_font_(U"Fall Velocity: {:.1f}"_fmt(player_fall_velocity_))
-      .draw(20, 60, Palette::White);
+      .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY3, InGameConstants::kDebugTextColorWhite);
   }
 }
 
 void Game::draw() const
 {
-  Scene::SetBackground(ColorF{ 0.6, 0.8, 0.7 });
+  Scene::SetBackground(InGameConstants::kBackgroundColor);
 
   if (!block_bg_texture_.isEmpty()) {
     block_bg_texture_.resized(Scene::Size()).draw(0, 0);
@@ -712,8 +828,8 @@ void Game::draw() const
         const Vec2 blockCenter = GridToPixel(static_cast<int32>(row), static_cast<int32>(col));
 
         // ブロックの見た目を位置依存のシードで決定
-        const size_t seed = (row * 982451653ULL + col * 1572869ULL);
-        const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, 15 };
+        const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
+        const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, InGameConstants::kBlockRoundRadius };
 
         if (hasBlockTextures) {
           const Texture& blockTexture = block_textures_[seed % textureCount];
@@ -725,14 +841,18 @@ void Game::draw() const
         }
 
         // ブロックの枠線を描画
-        blockShape.drawFrame(2, ColorF{ 0.2, 0.2, 0.2, 0.5 });
+        blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
 
         // ブロック内のテキストを中央に描画
-        constexpr Vec2 shadowOffset{ 3.0, 3.0 };
-        const Vec2 shadowPos = blockCenter + shadowOffset;
-        block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, ColorF{ 0.0, 0.0, 0.0, 0.9 });
-        block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, ColorF{ 1.0 });
+        const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
+        block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
+        block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
       }
+    }
+
+    // ブロック破壊演出の描画（カメラオフセット適用範囲内）
+    if (block_destroy_effect_) {
+      block_destroy_effect_->Draw();
     }
 
     // プレイヤーの描画（カメラオフセット適用範囲内）
@@ -754,21 +874,20 @@ void Game::draw() const
         const ColorF weaponColor = player_->GetWeaponColor();
 
         const Transformer2D weaponTransform{ Mat3x2::Rotate(weaponRotation, weaponPos), TransformCursor::No };
-        RoundRect{ Arg::center(weaponPos), weaponSize, 10.0 }.draw(weaponColor);
+        RoundRect{ Arg::center(weaponPos), weaponSize, InGameConstants::kWeaponRoundRadius }.draw(weaponColor);
       }
 
       if (!current_hint_.isEmpty()) {
-        const Vec2 hintCenter = playerPos + Vec2{ -80.0, -150.0 };
-        const double padding = 18.0;
+        const Vec2 hintCenter = playerPos + InGameConstants::kHintBoxOffset;
         const RectF textRegion = hint_font_(current_hint_).region();
-        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + padding * 2, textRegion.h + padding * 2, 18 };
-        hintRect.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 });
-        hintRect.drawFrame(2, ColorF{ 0.2, 0.3, 0.5, 0.9 });
-        hint_font_(current_hint_).drawAt(hintCenter, ColorF{ 0.1, 0.1, 0.1 });
+        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + InGameConstants::kHintBoxPadding * 2, textRegion.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
+        hintRect.draw(InGameConstants::kHintBackgroundColor);
+        hintRect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
+        hint_font_(current_hint_).drawAt(hintCenter, InGameConstants::kHintTextColor);
 
-        const Vec2 bubbleAnchor = playerPos + Vec2{ -40.0, -100.0 };
-        Circle{ bubbleAnchor, 8.0 }.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 }).drawFrame(1.5, ColorF{ 0.2, 0.3, 0.5, 0.9 });
-        Circle{ bubbleAnchor + Vec2{ 15.0, 15.0 }, 5.0 }.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 }).drawFrame(1.2, ColorF{ 0.2, 0.3, 0.5, 0.9 });
+        const Vec2 bubbleAnchor = playerPos + InGameConstants::kHintBubbleAnchorOffset;
+        Circle{ bubbleAnchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
+        Circle{ bubbleAnchor + InGameConstants::kHintBubble2Offset, InGameConstants::kHintBubble2Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness2, InGameConstants::kHintBorderColor);
       }
     }
 
@@ -811,48 +930,47 @@ void Game::draw() const
     const int32 boxY = InGameConstants::kCharBoxStartY;
 
     // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
-    const ColorF boxColor = isInCompletedWord ? ColorF{ 1.0, 0.8, 0.8 } : ColorF{ 1.0, 1.0, 1.0 };
-    const ColorF borderColor = isInCompletedWord ? ColorF{ 1.0, 0.0, 0.0 } : ColorF{ 0.3, 0.3, 0.3 };
+    const ColorF boxColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
+    const ColorF borderColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBorderColor : InGameConstants::kCharBoxDefaultBorderColor;
 
     // ボックスを描画（角丸四角形）
-    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, 5 }.draw(boxColor);
-    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, 5 }.drawFrame(3, borderColor);
+    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.draw(boxColor);
+    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.drawFrame(InGameConstants::kCharBoxFrameThickness, borderColor);
 
     // 文字を中央に描画（影付き）
     const Vec2 textCenter{ boxX + InGameConstants::kCharBoxSize / 2.0, boxY + InGameConstants::kCharBoxSize / 2.0 };
     constexpr Vec2 shadowOffset{ 2.0, 2.0 };
 
     // 影
-    block_font_(word).drawAt(textCenter + shadowOffset, ColorF{ 0.0, 0.0, 0.0, 0.3 });
+    block_font_(word).drawAt(textCenter + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);
     // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
-    const ColorF textColor = isInCompletedWord ? ColorF{ 0.8, 0.0, 0.0 } : ColorF{ 0.0, 0.0, 0.0 };
+    const ColorF textColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedTextColor : InGameConstants::kCharBoxDefaultTextColor;
     block_font_(word).drawAt(textCenter, textColor);
   }
 
   //------- 右側のボード：完成した単語を表示 - 画面固定
   // ボードの背景を描画
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, 10 }.draw(ColorF{ 0.1, 0.1, 0.1, 0.8 });
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, 10 }.drawFrame(3, ColorF{ 0.8, 0.8, 0.8 });
+  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.draw(InGameConstants::kCompletedBoardBackgroundColor);
+  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
 
   // タイトルを描画
-  block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + 30, ColorF{ 1.0, 1.0, 0.0 });
+  block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
 
   // 完成した単語を4列グリッドで配置
-  const double columnWidth = InGameConstants::kCompletedBoardWidth / 4.0;
-  const double columnPadding = 12.0;
-  const double rowStartY = InGameConstants::kCompletedBoardY + 60.0;
+  const double columnWidth = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
+  const double rowStartY = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
   const double rowHeight = InGameConstants::kCompletedBoardLineHeight;
 
   for (size_t index = 0; index < completed_words_.size(); ++index) {
-    const size_t column = index % 4;
-    const size_t row = index / 4;
-    const double textX = InGameConstants::kCompletedBoardX + column * columnWidth + columnPadding;
+    const size_t column = index % InGameConstants::kCompletedBoardColumns;
+    const size_t row = index / InGameConstants::kCompletedBoardColumns;
+    const double textX = InGameConstants::kCompletedBoardX + column * columnWidth + InGameConstants::kCompletedBoardColumnPadding;
     const double textY = rowStartY + row * rowHeight;
-    completed_word_font_(completed_words_[index]).draw(textX, textY, ColorF{ 0.0, 1.0, 0.0 });
+    completed_word_font_(completed_words_[index]).draw(textX, textY, InGameConstants::kCompletedWordTextColor);
   }
 
   // 完成した単語の数を表示
-  debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + 10, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - 25, ColorF{ 1.0 });
+  debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
 }
 
 void Game::drawFadeIn(double t) const
@@ -937,8 +1055,7 @@ void Game::UpdateHint()
         }
       }
       candidates << masked;
-    }
-    else {
+    } else {
       candidates << entry.first;
     }
   }
