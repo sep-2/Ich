@@ -155,24 +155,55 @@ private:
   // ブロック構造体
   struct Block
   {
+    /// <summary>
+    /// ブロックの種類
+    /// </summary>
+    enum class Type
+    {
+      kNormal,      // 通常の破壊可能ブロック
+      kWall,        // 壊せない壁
+      kEmpty        // 空
+    };
+
     String value;           // ブロックに表示される文字列
     bool is_destroyed;      // ブロックが破壊されているか
-    Vec2 position;      // ブロックのピクセル位置（左上）
+    Vec2 position;          // ブロックのピクセル位置（左上）
+    Type type;              // ブロックの種類
     
     Block() 
       : value(U"")
       , is_destroyed(false)
+      , type(Type::kEmpty)
     {}
     
     Block(const String& val) 
       : value(val)
       , is_destroyed(false)
+      , type(Type::kNormal)
+    {}
+
+    Block(Type blockType)
+      : value(U"")
+      , is_destroyed(false)
+      , type(blockType)
     {}
     
     // ブロックが空かどうか
     bool isEmpty() const
     {
-      return value.isEmpty() || is_destroyed;
+      return (value.isEmpty() || is_destroyed) && type != Type::kWall;
+    }
+
+    // ブロックが破壊可能かどうか
+    bool isDestroyable() const
+    {
+      return type == Type::kNormal && !is_destroyed;
+    }
+
+    // 壁ブロックかどうか
+    bool isWall() const
+    {
+      return type == Type::kWall;
     }
   };
 
@@ -218,6 +249,10 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
+
+
+
+
 
 
 
