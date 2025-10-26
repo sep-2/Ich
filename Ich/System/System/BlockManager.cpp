@@ -163,7 +163,7 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
 
 Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 prefetching) const
 {
-  if (row <= 0 || column <= 0 || requestedCount < 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0)
+  if (row <= 0 || column <= 0 || requestedCount <= 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0)
   {
     return {};
   }
@@ -171,115 +171,128 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
   const int32 totalColumns = column * prefetching;
   Array<Array<String>> grid(row, Array<String>(totalColumns, U""));
 
-  // 追加: 実際に配置できた単語の一覧（重複あり、最後に重複排除して出力）
-  Array<String> placedWords;
-  placedWords.reserve(requestedCount * prefetching);
+  // セグメントごとの配置結果を保持
+  Array<Array<String>> segmentPlacedWords;
+  segmentPlacedWords.resize(prefetching);
 
-  // セグメントごとに配置
+  // セグメントごとに TS 実装に準拠した配置ロジックを適用
   for (int32 seg = 0; seg < prefetching; ++seg)
   {
     const int32 xOffset = seg * column;
 
-    int32 placedCount = 0;
+    // clampedCount: min(words, 空きマス) に 1..requestedCount でクランプ
+    const int32 upperBound = static_cast<int32>(Min(static_cast<size_t>(dictionary.size()), static_cast<size_t>(row * column)));
+    int32 remainingQuota = Max<int32>(1, Min<int32>(requestedCount, upperBound));
+    const int32 attemptLimit = Max<int32>(1, attemptsPerWord);
 
-    for (int32 trial = 0; trial < requestedCount; ++trial)
+    // 候補は一度 shuffle し、pop で一意に取り出す
+    Array<String> shuffledWords = dictionary;
+    shuffledWords.shuffle();
+
+    auto getEmptyCells = [&](Array<Vec2i>& out)
     {
-      bool placed = false;
-
-      for (int32 attempt = 0; attempt < attemptsPerWord && !placed; ++attempt)
+      out.clear();
+      out.reserve(static_cast<size_t>(row * column));
+      for (int32 y = 0; y < row; ++y)
       {
-        const String& word = dictionary[Random(0, static_cast<int32>(dictionary.size() - 1))];
-
-        Array<Vec2i> empties;
-        for (int32 y = 0; y < row; ++y)
+        for (int32 x = 0; x < column; ++x)
         {
-          for (int32 x = 0; x < column; ++x)
+          const int32 gx = xOffset + x;
+          if (grid[y][gx].isEmpty())
           {
-            if (grid[y][xOffset + x].isEmpty())
-            {
-              empties << Vec2i{ y, xOffset + x };
-            }
+            out << Vec2i{ y, gx };
           }
         }
+      }
+    };
 
-        if (empties.isEmpty())
+    auto placeWordAlongPath = [&](const String& word) -> bool
+    {
+      if (word.isEmpty()) return false;
+
+      // 文字配列（正規化せず、そのまま配置。参考実装に合わせて長音も含める）
+      Array<char32> letters;
+      letters.reserve(word.size());
+      for (const char32 ch : word)
+      {
+        letters << ch;
+      }
+
+      Array<Vec2i> empties;
+      getEmptyCells(empties);
+
+      if (letters.size() > empties.size() || empties.isEmpty())
+      {
+        return false;
+      }
+
+      const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
+
+      Array<Vec2i> placements;
+      placements << start;
+      grid[start.y][start.x] = String(1, letters[0]);
+
+      for (size_t i = 1; i < letters.size(); ++i)
+      {
+        const Vec2i prev = placements.back();
+
+        // 近傍（下・左右）をランダム順に走査し、最初の空きに置く
+        bool moved = false;
+        for (const auto dir : NextSteps())
         {
-          break;
-        }
-
-        const Vec2i start = empties[Random(0, static_cast<int32>(empties.size() - 1))];
-
-        // 1 文字ずつ配置（曲がり可、上は禁止）
-        Vec2i current = start;
-        Array<Vec2i> used;
-        used.reserve(word.size());
-
-        bool failed = false;
-
-        size_t stepIndex = 0;
-        for (const char32 ch : word)
-        {
-          ++stepIndex;
-          const auto normalized = NormalizeKanaChar(ch);
-          if (!normalized)
+          const int32 ny = prev.y + dir.y;
+          const int32 nx = prev.x + dir.x;
+          if (InBounds(ny, nx, row, totalColumns)
+            && nx >= xOffset && nx < xOffset + column
+            && grid[ny][nx].isEmpty())
           {
-            continue; // 長音はスキップ
-          }
-
-          if (!grid[current.y][current.x].isEmpty())
-          {
-            failed = true;
+            grid[ny][nx] = String(1, letters[i]);
+            placements << Vec2i{ ny, nx };
+            moved = true;
             break;
           }
-
-          grid[current.y][current.x] = String(1, *normalized);
-          used << current;
-
-          // 次の進行先を決める（下・左右、セグメント内、未使用マス）
-          bool advanced = false;
-          if (stepIndex < word.size())
-          {
-            for (const auto dir : NextSteps())
-            {
-              const int32 ny = current.y + dir.y;
-              const int32 nx = current.x + dir.x;
-              if (InBounds(ny, nx, row, totalColumns)
-                && nx >= xOffset && nx < xOffset + column
-                && grid[ny][nx].isEmpty())
-              {
-                current = { ny, nx };
-                advanced = true;
-                break;
-              }
-            }
-
-            if (!advanced)
-            {
-              failed = true;
-              break;
-            }
-          }
         }
 
-        if (failed)
+        if (!moved)
         {
-          for (const auto& pos : used)
+          // ロールバック
+          for (const auto& cell : placements)
           {
-            grid[pos.y][pos.x].clear();
+            grid[cell.y][cell.x].clear();
           }
-        }
-        else
-        {
-          placed = true;
-          ++placedCount;
-          placedWords << word; // 出力用に記録（原文）
+          return false;
         }
       }
 
-      if (placedCount >= requestedCount)
+      return true;
+    };
+
+    while (remainingQuota > 0 && !shuffledWords.isEmpty())
+    {
+      // セグメント内の空きが無ければ終了
+      Array<Vec2i> empties;
+      getEmptyCells(empties);
+      if (empties.isEmpty())
       {
         break;
       }
+
+      const String candidate = shuffledWords.back();
+      shuffledWords.pop_back();
+
+      bool placed = false;
+      for (int32 attempt = 0; attempt < attemptLimit; ++attempt)
+      {
+        if (placeWordAlongPath(candidate))
+        {
+          placed = true;
+          segmentPlacedWords[seg] << candidate;
+          break;
+        }
+      }
+
+      // 参考実装に倣い、成功/失敗に関わらずクオータを減算
+      --remainingQuota;
     }
   }
 
@@ -295,19 +308,33 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     }
   }
 
-  // 実際に配置できた単語を Console に出力（重複除去）
-  if (!placedWords.isEmpty())
-  {
-    placedWords.sort();
-    // 連続重複除去
-    auto newEnd = std::unique(placedWords.begin(), placedWords.end());
-    placedWords.erase(newEnd, placedWords.end());
+  // 実際に配置できた単語を Console に出力（セグメント境界を明示）
+  bool anyPlaced = false;
+  for (const auto& v : segmentPlacedWords) {
+    if (!v.isEmpty()) { anyPlaced = true; break; }
+  }
 
+  if (anyPlaced)
+  {
     Console.open();
-    Console.writeln(U"[GenerateBlockGrid] Placed words ({}):"_fmt(placedWords.size()));
-    for (const auto& w : placedWords)
+    Console.writeln(U"[GenerateBlockGrid] Prefetch segments: {}"_fmt(prefetching));
+
+    for (int32 seg = 0; seg < prefetching; ++seg)
     {
-      Console.writeln(U" - {}"_fmt(w));
+      const int32 xOffset = seg * column;
+      const int32 fromCol = xOffset;
+      const int32 toCol = xOffset + column - 1;
+
+      Array<String> words = segmentPlacedWords[seg];
+      words.sort();
+      auto newEnd = std::unique(words.begin(), words.end());
+      words.erase(newEnd, words.end());
+
+      Console.writeln(U"--- Segment {}/{} [cols {}..{}] : {} word(s) ---"_fmt(seg + 1, prefetching, fromCol, toCol, words.size()));
+      for (const auto& w : words)
+      {
+        Console.writeln(U"  - {}"_fmt(w));
+      }
     }
   }
 

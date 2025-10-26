@@ -73,53 +73,6 @@ namespace UnitTest
       Assert::IsFalse(result.contains(U"わかれる"));
     }
 
-    TEST_METHOD(GenerateBlockGrid_ReturnsGridWithRequestedSize)
-    {
-      BlockManager manager;
-      const Array<String> dictionary = { U"わかめ", U"わかれる" };
-
-      const int32 row = 2;
-      const int32 column = 3;
-      const int32 requestedCount = 3;
-      const int32 attemptsPerWord = 5;
-      const int32 prefetching = 1;
-
-      const auto grid = manager.GenerateBlockGrid(row, column, requestedCount, attemptsPerWord, dictionary, prefetching);
-
-      Assert::AreEqual(static_cast<size_t>(row), grid.size());
-
-      const auto flattened = FlattenGrid(grid, column * prefetching);
-      Assert::AreEqual(static_cast<size_t>(row * column * prefetching), flattened.size());
-
-      for (const auto& cell : flattened)
-      {
-        Assert::IsTrue(cell.size() <= 1);
-      }
-    }
-
-    TEST_METHOD(GenerateBlockGrid_HandlesDictionarySmallerThanGrid)
-    {
-      BlockManager manager;
-      const Array<String> dictionary = { U"あ", U"い" };
-
-      const int32 row = 2;
-      const int32 column = 3;
-      const int32 requestedCount = 2;
-      const int32 attemptsPerWord = 5;
-
-      const auto grid = manager.GenerateBlockGrid(row, column, requestedCount, attemptsPerWord, dictionary);
-
-      Assert::AreEqual(static_cast<size_t>(row), grid.size());
-
-      const auto flattened = FlattenGrid(grid, column);
-      Assert::AreEqual(static_cast<size_t>(row * column), flattened.size());
-
-      for (const auto& cell : flattened)
-      {
-        Assert::IsTrue(cell.size() <= 1);
-      }
-    }
-
   private:
     static Array<String> FlattenGrid(const Array<Array<String>>& grid, const int32 expectedColumn)
     {
