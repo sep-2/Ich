@@ -622,6 +622,9 @@ void Game::UpdatePlayerMovement(float delta_time)
   horizontalNextPos.x += moveInput.x * moveDistance;
   const float intendedX = horizontalNextPos.x;
   float finalY = playerPos.y;
+  int32 gridRow = 0;
+  int32 gridCol = 0;
+  const bool hasGridPosition = GetPlayerGridPosition(gridRow, gridCol);
 
   // プレイヤーの左右端を計算
   const float playerHalfWidth = player_->GetWidth() / 2.0f;
@@ -632,6 +635,8 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   // ブロックとの左右衝突判定
   bool canMove = true;
+  int32 blockingRow = -1;
+  int32 blockingCol = -1;
 
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
@@ -662,6 +667,8 @@ void Game::UpdatePlayerMovement(float delta_time)
           // ブロックの右端にプレイヤーの左端を配置
           horizontalNextPos.x = blockRight + playerHalfWidth;
           canMove = false;
+          blockingRow = static_cast<int32>(i);
+          blockingCol = static_cast<int32>(j);
           break;
         }
       }
@@ -672,6 +679,8 @@ void Game::UpdatePlayerMovement(float delta_time)
           // ブロックの左端にプレイヤーの右端を配置
           horizontalNextPos.x = blockLeft - playerHalfWidth;
           canMove = false;
+          blockingRow = static_cast<int32>(i);
+          blockingCol = static_cast<int32>(j);
           break;
         }
       }
@@ -683,24 +692,23 @@ void Game::UpdatePlayerMovement(float delta_time)
   }
 
   // 壁にぶつかった際の階段昇降判定
-  if (!canMove) {
-    int32 gridRow = 0;
-    int32 gridCol = 0;
-    if (GetPlayerGridPosition(gridRow, gridCol)) {
-      const int32 direction = (moveInput.x < 0.0f) ? -1 : 1;
-      const int32 forwardCol = gridCol + direction;
-      const int32 aboveRow = gridRow - 1;
-      const bool hasForwardBlock = HasBlockAt(gridRow, forwardCol);
-      const bool emptyAboveCurrent = !HasBlockAt(aboveRow, gridCol);
-      const bool emptyAboveForward = !HasBlockAt(aboveRow, forwardCol);
+  if (!canMove && hasGridPosition && blockingRow >= 0) {
+    const int32 direction = (moveInput.x < 0.0f) ? -1 : 1;
+    const int32 forwardCol = gridCol + direction;
+    const int32 headRow = gridRow - 1;
+    const bool headClear = (headRow < 0) ? true : !HasBlockAt(headRow, gridCol);
 
-      if (hasForwardBlock && emptyAboveCurrent && emptyAboveForward &&
-        forwardCol >= 0 && forwardCol < static_cast<int32>(block_grid_[0].size())) {
-        // 条件を満たしたら1段上に乗り上げて階段を登る
-        const Block& forwardBlock = block_grid_[gridRow][forwardCol];
-        const float stairTop = forwardBlock.position.y;
+    const int32 frontHeadRow = blockingRow - 1;
+    const bool frontHeadClear = (frontHeadRow >= 0) ? !HasBlockAt(frontHeadRow, blockingCol) : false;
+    const bool forwardMatches = (forwardCol == blockingCol);
+
+    if (headClear && frontHeadClear && forwardMatches) {
+      const Block& blockingBlock = block_grid_[blockingRow][blockingCol];
+      const float stairTop = blockingBlock.position.y;
+      const float candidateY = stairTop - player_->GetHeight() / 2.0f;
+      if (candidateY < playerPos.y) {
         horizontalNextPos.x = intendedX;
-        finalY = stairTop - player_->GetHeight() / 2.0f;
+        finalY = candidateY;
         canMove = true;
       }
     }
