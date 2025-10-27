@@ -237,7 +237,7 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x6列、バッチサイズ20）
-  const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(
+  const Array<Array<std::pair<String, bool>>> stringGrid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
     30,
@@ -254,18 +254,18 @@ Game::Game(const InitData& init)
   
   block_grid_.resize(wallHeight);
 
-  for (size_t row = 0; row < wallHeight; ++row) {
+  for (size_t row = 0; row < static_cast<size_t>(wallHeight); ++row) {
     block_grid_[row].resize(totalColumns);
 
-    for (size_t col = 0; col < totalColumns; ++col) {
-      const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
+    for (size_t col = 0; col < static_cast<size_t>(totalColumns); ++col) {
+      const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= static_cast<size_t>(InGameConstants::kGridColumns + InGameConstants::kWallThickness));
       
       // 左右の壁（画面最上部から開始）
       if (isWallColumn) {
         block_grid_[row][col] = Block(Block::Type::kWall);
         // 壁ブロックは画面最上部から配置
-        const float wallX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-        const float wallY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+        const float wallX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+        const float wallY = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
         block_grid_[row][col].position = Vec2{ wallX, wallY };
       }
       // 通常のブロック領域
@@ -273,20 +273,21 @@ Game::Game(const InitData& init)
         // 通常ブロック領域の行インデックスを計算
         const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
         
-        if (row >= normalBlockRowOffset && row < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
-          const size_t actualRow = row - normalBlockRowOffset;
-          const size_t actualCol = col - InGameConstants::kWallThickness;
-          block_grid_[row][col] = Block(stringGrid[actualRow][actualCol]);
+        if (static_cast<int32>(row) >= normalBlockRowOffset && static_cast<int32>(row) < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
+          const size_t actualRow = static_cast<size_t>(static_cast<int32>(row) - normalBlockRowOffset);
+          const size_t actualCol = static_cast<size_t>(static_cast<int32>(col) - InGameConstants::kWallThickness);
+          const auto& cell = stringGrid[actualRow][actualCol];
+          block_grid_[row][col] = Block(cell.first, cell.second);
           // 通常ブロックも壁座標系で位置を設定
-          const float blockX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float blockY = InGameConstants::kStartY + actualRow * InGameConstants::kBlockSize;
+          const float blockX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+          const float blockY = InGameConstants::kStartY + static_cast<int32>(actualRow) * InGameConstants::kBlockSize;
           block_grid_[row][col].position = Vec2{ blockX, blockY };
         }
         else {
           // 通常ブロック領域外は空ブロック
           block_grid_[row][col] = Block();
-          const float emptyX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float emptyY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+          const float emptyX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+          const float emptyY = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
           block_grid_[row][col].position = Vec2{ emptyX, emptyY };
         }
       }

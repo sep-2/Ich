@@ -170,23 +170,27 @@ private:
     bool is_destroyed;      // ブロックが破壊されているか
     Vec2 position;          // ブロックのピクセル位置（左上）
     Type type;              // ブロックの種類
+    bool is_first;          // 単語の先頭文字フラグ
     
     Block() 
       : value(U"")
       , is_destroyed(false)
       , type(Type::kEmpty)
+      , is_first(false)
     {}
     
-    Block(const String& val) 
+    Block(const String& val, bool first = false) 
       : value(val)
       , is_destroyed(false)
       , type(Type::kNormal)
+      , is_first(first)
     {}
 
     Block(Type blockType)
       : value(U"")
       , is_destroyed(false)
       , type(blockType)
+      , is_first(false)
     {}
     
     // ブロックが空かどうか
@@ -253,6 +257,15 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
+
+
+
+
+
+
+
+
+
 
 
 
