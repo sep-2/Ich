@@ -18,7 +18,7 @@ class HitEffect
 
 public:
   HitEffect()
-    : font_(40, Typeface::Bold) {}
+    : font_(80, Typeface::Bold) {}
 
   void Add(const Vec2& worldCenter, const String& text)
   {
