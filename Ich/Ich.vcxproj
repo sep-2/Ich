@@ -351,6 +351,7 @@
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Scenes\Enum.h" />
     <ClInclude Include="Scenes\InGame.h" />
+    <ClInclude Include="Scenes\InGame\HitEffect.h" />
     <ClInclude Include="Scenes\Title.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="System\Audio\AudioManager.h" />

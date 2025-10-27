@@ -226,6 +226,8 @@ Game::Game(const InitData& init)
 
   auto& data = getData<SaveData>();
 
+  PRINT << data.click_count_;
+
   // UIの初期設定（1280x720対応）
   ui_->SetAirGaugePosition(InGameConstants::kAirGaugeX, InGameConstants::kAirGaugeY);
   ui_->SetAirGauge(air_amount_);
@@ -751,6 +753,8 @@ void Game::update()
   if (block_destroy_effect_) {
     block_destroy_effect_->Update(Scene::DeltaTime());
   }
+  // ヒット演出の更新
+  hit_effect_.Update(Scene::DeltaTime());
 
   // have_words_を連結して1行で表示
   String concatenated;
@@ -767,7 +771,12 @@ void Game::update()
       // 完成した単語をcompleted_words_に追加（重複チェック）
       if (!completed_words_.includes(hitWord)) {
         completed_words_.push_back(hitWord);
-        //PRINT << U"Completed word: " << hitWord;
+        // HitEffect をプレイヤーの少し上に生成
+        if (player_) {
+          const Vec2 pos = player_->GetPosition() + Vec2{ 0.0, -60.0 };
+          hit_effect_.Add(pos, hitWord);
+        }
+        // 効果音など入れるならここ
       }
     }
   }
@@ -983,6 +992,9 @@ void Game::draw() const
 
     // デバッグ情報の描画（カメラオフセット適用範囲内）
     DrawDebugInfo();
+
+    // 最前面にヒット演出を描画
+    hit_effect_.Draw();
   }
   // カメラオフセット適用範囲ここまで
 
@@ -1015,9 +1027,9 @@ void Game::draw() const
       }
     }
 
-    // ボックスの位置を計算
-    const int32 boxX = InGameConstants::kCharBoxStartX + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
-    const int32 boxY = InGameConstants::kCharBoxStartY;
+    // ボックスの位置を計算（縦方向に配置：上から下）
+    const int32 boxX = InGameConstants::kCharBoxStartX;
+    const int32 boxY = InGameConstants::kCharBoxStartY + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
 
     // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
     const ColorF boxColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
@@ -1029,7 +1041,6 @@ void Game::draw() const
 
     // 文字を中央に描画（影付き）
     const Vec2 textCenter{ boxX + InGameConstants::kCharBoxSize / 2.0, boxY + InGameConstants::kCharBoxSize / 2.0 };
-    constexpr Vec2 shadowOffset{ 2.0, 2.0 };
 
     // 影
     block_font_(word).drawAt(textCenter + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);

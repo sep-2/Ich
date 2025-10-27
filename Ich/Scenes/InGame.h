@@ -8,6 +8,7 @@
 #include "System/Menu/Menu.h"
 #include "InGame/Ui.h"
 #include "InGame/BlockDestroyEffect.h"
+#include "InGame/HitEffect.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -241,6 +242,9 @@ private:
 
   // ブロック破壊演出
   std::unique_ptr<BlockDestroyEffect> block_destroy_effect_;
+
+  // ヒット演出（取得単語表示）
+  HitEffect hit_effect_;
 
   // デバッグモード
 #if _DEBUG
