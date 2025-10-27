@@ -6,6 +6,7 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/GameSettings.h"
 #include "System/System/BlockManager.h"
+#include "System/Audio/AudioManager.h"
 #include "Keywords.hpp"
 
 namespace InGameConstants {
@@ -448,7 +449,7 @@ void Game::DestroyBlockUnderPlayer()
 
         // ブロックを破壊
         block.is_destroyed = true;
-        PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
+        //PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
 
         // エアを消費
         air_amount_ -= InGameConstants::kAirConsumeRate;
@@ -467,6 +468,8 @@ void Game::DestroyBlockUnderPlayer()
 
         hint_timer_ = 0.0;
         UpdateHint();
+
+        AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
 
         return;  // 1つだけ破壊して終了
       }
@@ -754,7 +757,6 @@ void Game::update()
   // メニューが開いている場合
   if (menu_->IsOpen())
   {
-    PRINT << U"IsOpen now";
     if (!KeyEscape.down())
     {
       menu_->Update();
@@ -814,6 +816,7 @@ void Game::update()
         }
         
         // 効果音など入れるならここ
+        AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
       }
     }
   }
