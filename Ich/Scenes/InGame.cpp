@@ -226,8 +226,6 @@ Game::Game(const InitData& init)
 
   auto& data = getData<SaveData>();
 
-  PRINT << data.click_count_;
-
   // UIの初期設定（1280x720対応）
   ui_->SetAirGaugePosition(InGameConstants::kAirGaugeX, InGameConstants::kAirGaugeY);
   ui_->SetAirGauge(air_amount_);
@@ -474,7 +472,7 @@ void Game::UpdatePlayerFall(float delta_time)
 
   if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
     gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
-    hasBlockBelow = !block_grid_[belowRow][gridCol].isEmpty();
+    hasBlockBelow = HasBlockAt(belowRow, gridCol);  // isEmpty()ではなくHasBlockAt()を使用
   }
 
   // 下にブロックがない場合は落下
@@ -485,22 +483,48 @@ void Game::UpdatePlayerFall(float delta_time)
     Vec2 playerPos = player_->GetPosition();
     playerPos.y += player_fall_velocity_ * delta_time;
 
-    // 次のブロックの位置を計算（壁座標系を使用）
-    const float nextBlockY = InGameConstants::kWallStartY + belowRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
+    // 下にブロックがあるかどうかを、ピクセル座標ベースでも確認
+    const float playerBottomY = playerPos.y + player_->GetHeight() / 2.0f;
+    bool shouldLand = false;
+    float landingY = playerPos.y;
 
-    // ブロックの位置に到達したら停止
-    bool landed = false;
-    if (playerPos.y >= nextBlockY) {
-      playerPos.y = nextBlockY;
-      player_fall_velocity_ = 0.0f;
-      landed = true;
+    // 全ブロックをチェックして衝突判定
+    for (size_t i = 0; i < block_grid_.size(); i++) {
+      for (size_t j = 0; j < block_grid_[i].size(); j++) {
+        const Block& block = block_grid_[i][j];
+        
+        // 空または破壊されたブロックはスキップ（壁は衝突対象）
+        if (block.isEmpty() && !block.isWall()) {
+          continue;
+        }
+
+        const Vec2 blockPos = block.position;
+        const float blockLeft = blockPos.x;
+        const float blockRight = blockPos.x + InGameConstants::kBlockSize;
+        const float blockTop = blockPos.y;
+
+        // プレイヤーの中心がブロックのX範囲内にあるかチェック
+        if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
+          // プレイヤーの下端がブロックの上面に到達または超えた場合
+          if (playerBottomY >= blockTop && playerPos.y < blockTop) {
+            shouldLand = true;
+            landingY = blockTop - player_->GetHeight() / 2.0f;
+            break;
+          }
+        }
+      }
+      if (shouldLand) {
+        break;
+      }
     }
 
-    player_->SetPosition(playerPos.x, playerPos.y);
-
-    if (landed) {
+    if (shouldLand) {
+      playerPos.y = landingY;
+      player_fall_velocity_ = 0.0f;
+      player_->SetPosition(playerPos.x, playerPos.y);
       player_->RefreshPoseFromMovement();
     } else {
+      player_->SetPosition(playerPos.x, playerPos.y);
       player_->SetPose(Player::Pose::kFall);
     }
   } else {
