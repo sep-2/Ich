@@ -170,13 +170,13 @@ namespace InGameConstants {
   const String kBlockBgTexturePath = U"Assets/Image/block_bg.png";
 
   /// <summary>
-  /// ブロックカラー
+  /// ブロックCOLOR
   /// </summary>
   const Array<ColorF> kBlockColors = {
   ColorF{ 1.0, 0.3, 0.3 },  // 赤
   ColorF{ 0.3, 1.0, 0.3 },  // 緑
   ColorF{ 0.3, 0.3, 1.0 },  // 青
-  ColorF{ 1.0, 1.0, 0.3 },  // 黄
+  ColorF{ 1.0, 1.0, 0.3 },  // 黄色
   ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
   ColorF{ 0.3, 1.0, 1.0 },  // シアン
   ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
@@ -223,6 +223,9 @@ Game::Game(const InitData& init)
 {
   //PRINT << U"Game::Game()";
 
+  // ✨ テクスチャを生成（絵文字）
+  sparkle_tex_ = Texture{ Emoji{ U"✨" } };
+
   for (const auto& path : InGameConstants::kBlockTexturePaths) {
     Texture texture{ path };
     if (texture.isEmpty()) {
@@ -245,7 +248,7 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x6列、バッチサイズ20）
-  const Array<Array<String>> string_grid = block_manager_.GenerateBlockGrid(
+  const Array<Array<std::pair<String, bool>>> stringGrid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
     30,
@@ -262,39 +265,41 @@ Game::Game(const InitData& init)
 
   block_grid_.resize(wall_height);
 
-  for (size_t row = 0; row < wall_height; ++row) {
-    block_grid_[row].resize(total_columns);
+  for (size_t row = 0; row < static_cast<size_t>(wallHeight); ++row) {
+    block_grid_[row].resize(totalColumns);
 
-    for (size_t col = 0; col < total_columns; ++col) {
-      const bool is_wall_column = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
-
+    for (size_t col = 0; col < static_cast<size_t>(totalColumns); ++col) {
+      const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= static_cast<size_t>(InGameConstants::kGridColumns + InGameConstants::kWallThickness));
+      
       // 左右の壁（画面最上部から開始）
       if (is_wall_column) {
         block_grid_[row][col] = Block(Block::Type::kWall);
         // 壁ブロックは画面最上部から配置
-        const float wall_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-        const float wall_y = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
-        block_grid_[row][col].position = Vec2{ wall_x, wall_y };
+        const float wallX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+        const float wallY = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
+        block_grid_[row][col].position = Vec2{ wallX, wallY };
       }
       // 通常のブロック領域
       else {
         // 通常ブロック領域の行インデックスを計算
-        const int32 normal_block_row_offset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
-
-        if (row >= normal_block_row_offset && row < normal_block_row_offset + static_cast<int32>(string_grid.size())) {
-          const size_t actual_row = row - normal_block_row_offset;
-          const size_t actual_col = col - InGameConstants::kWallThickness;
-          block_grid_[row][col] = Block(string_grid[actual_row][actual_col]);
+        const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+        
+        if (static_cast<int32>(row) >= normalBlockRowOffset && static_cast<int32>(row) < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
+          const size_t actualRow = static_cast<size_t>(static_cast<int32>(row) - normalBlockRowOffset);
+          const size_t actualCol = static_cast<size_t>(static_cast<int32>(col) - InGameConstants::kWallThickness);
+          const auto& cell = stringGrid[actualRow][actualCol];
+          block_grid_[row][col] = Block(cell.first, cell.second);
           // 通常ブロックも壁座標系で位置を設定
-          const float block_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float block_y = InGameConstants::kStartY + actual_row * InGameConstants::kBlockSize;
-          block_grid_[row][col].position = Vec2{ block_x, block_y };
-        } else {
+          const float blockX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+          const float blockY = InGameConstants::kStartY + static_cast<int32>(actualRow) * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ blockX, blockY };
+        }
+        else {
           // 通常ブロック領域外は空ブロック
           block_grid_[row][col] = Block();
-          const float empty_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float empty_y = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
-          block_grid_[row][col].position = Vec2{ empty_x, empty_y };
+          const float emptyX = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+          const float emptyY = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ emptyX, emptyY };
         }
       }
     }
@@ -949,9 +954,23 @@ void Game::draw() const
           block_shape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
 
           // ブロック内のテキストを中央に描画
-          const Vec2 shadow_pos = block_center + InGameConstants::kBlockTextShadowOffset;
-          block_font_(block.value).drawAt(shadow_pos.x, shadow_pos.y, InGameConstants::kBlockTextShadowColor);
-          block_font_(block.value).drawAt(block_center.x, block_center.y, InGameConstants::kBlockTextColor);
+          const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
+          block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
+          block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
+
+          // プレイヤーに 1 ブロック以内かつ first の場合、✨を小さく描画（斜め上）
+          if (block.is_first && player_)
+          {
+            const Vec2 playerPos = player_->GetPosition();
+            const double dx = std::abs(playerPos.x - blockCenter.x);
+            const double dy = std::abs(playerPos.y - blockCenter.y);
+            const bool withinOne = (dx <= InGameConstants::kBlockSize && dy <= InGameConstants::kBlockSize);
+            if (withinOne && !sparkle_tex_.isEmpty())
+            {
+              const Vec2 sparklePos = blockTopLeft + Vec2{ InGameConstants::kBlockSize * 0.75f, InGameConstants::kBlockSize * 0.25f };
+              sparkle_tex_.scaled(0.25).drawAt(sparklePos);
+            }
+          }
         }
       }
     }
