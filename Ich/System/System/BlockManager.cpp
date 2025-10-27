@@ -10,8 +10,7 @@ namespace
 
   Optional<char32> NormalizeKanaChar(const char32 ch)
   {
-    switch (ch)
-    {
+    switch (ch) {
     case U'ー':
     case U'－':
     case U'―':
@@ -32,8 +31,7 @@ namespace
       { U'ゔ', U'う' }
     };
 
-    if (const auto it = kNormalizationMap.find(ch); it != kNormalizationMap.end())
-    {
+    if (const auto it = kNormalizationMap.find(ch); it != kNormalizationMap.end()) {
       return it->second;
     }
 
@@ -45,12 +43,9 @@ namespace
     Array<char32> seq;
     seq.reserve(source.size());
 
-    for (const auto& token : source)
-    {
-      for (const char32 ch : token)
-      {
-        if (const auto normalized = NormalizeKanaChar(ch))
-        {
+    for (const auto& token : source) {
+      for (const char32 ch : token) {
+        if (const auto normalized = NormalizeKanaChar(ch)) {
           seq << *normalized;
         }
       }
@@ -64,10 +59,8 @@ namespace
     Array<char32> seq;
     seq.reserve(word.size());
 
-    for (const char32 ch : word)
-    {
-      if (const auto normalized = NormalizeKanaChar(ch))
-      {
+    for (const char32 ch : word) {
+      if (const auto normalized = NormalizeKanaChar(ch)) {
         seq << *normalized;
       }
     }
@@ -77,21 +70,17 @@ namespace
 
   bool ContainsContiguousSubsequence(const Array<char32>& haystack, const Array<char32>& needle)
   {
-    if (needle.isEmpty() || needle.size() > haystack.size())
-    {
+    if (needle.isEmpty() || needle.size() > haystack.size()) {
       return false;
     }
 
     const size_t H = haystack.size();
     const size_t N = needle.size();
 
-    for (size_t i = 0; i + N <= H; ++i)
-    {
+    for (size_t i = 0; i + N <= H; ++i) {
       bool ok = true;
-      for (size_t j = 0; j < N; ++j)
-      {
-        if (haystack[i + j] != needle[j])
-        {
+      for (size_t j = 0; j < N; ++j) {
+        if (haystack[i + j] != needle[j]) {
           ok = false;
           break;
         }
@@ -144,11 +133,9 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
 
   const Array<char32> normalizedBlocks = BuildNormalizedSequence(blocks);
 
-  for (const auto& word : dictionary)
-  {
+  for (const auto& word : dictionary) {
     const Array<char32> normalizedWord = BuildNormalizedSequence(word);
-    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord))
-    {
+    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord)) {
       result << word;
     }
   }
@@ -210,33 +197,30 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
     };
 
     auto placeWordAlongPath = [&](const String& word) -> bool
-    {
-      if (word.isEmpty()) return false;
-
-      // 文字配列（正規化せず、そのまま配置）
-      Array<char32> letters;
-      letters.reserve(word.size());
-      for (const char32 ch : word)
       {
-        letters << ch;
-      }
+        if (word.isEmpty()) return false;
 
-      Array<Vec2i> empties;
-      getEmptyCells(empties);
+        // 文字配列（正規化せず、そのまま配置）
+        Array<char32> letters;
+        letters.reserve(word.size());
+        for (const char32 ch : word) {
+          letters << ch;
+        }
 
-      if (letters.size() > empties.size() || empties.isEmpty())
-      {
-        return false;
-      }
+        Array<Vec2i> empties;
+        getEmptyCells(empties);
+
+        if (letters.size() > empties.size() || empties.isEmpty()) {
+          return false;
+        }
 
       const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
       Array<Vec2i> placements;
       placements << start;
       grid[start.y][start.x] = { String(1, letters[0]), true }; // 先頭文字: フラグ true
 
-      for (size_t i = 1; i < letters.size(); ++i)
-      {
-        const Vec2i prev = placements.back();
+        for (size_t i = 1; i < letters.size(); ++i) {
+          const Vec2i prev = placements.back();
 
         // 近傍（下・左右）をランダム順に走査し、最初の空きに置く
         bool moved = false;
@@ -266,16 +250,14 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
         }
       }
 
-      return true;
-    };
+        return true;
+      };
 
-    while (remainingQuota > 0 && !shuffledWords.isEmpty())
-    {
+    while (remainingQuota > 0 && !shuffledWords.isEmpty()) {
       // セグメント内の空きが無ければ終了
       Array<Vec2i> empties;
       getEmptyCells(empties);
-      if (empties.isEmpty())
-      {
+      if (empties.isEmpty()) {
         break;
       }
 
@@ -283,10 +265,8 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
       shuffledWords.pop_back();
 
       bool placed = false;
-      for (int32 attempt = 0; attempt < attemptLimit; ++attempt)
-      {
-        if (placeWordAlongPath(candidate))
-        {
+      for (int32 attempt = 0; attempt < attemptLimit; ++attempt) {
+        if (placeWordAlongPath(candidate)) {
           placed = true;
           segmentPlacedWords[seg] << candidate;
           break;
@@ -316,8 +296,7 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
     if (!v.isEmpty()) { anyPlaced = true; break; }
   }
 
-  if (anyPlaced)
-  {
+  if (anyPlaced) {
     Console.open();
     Console.writeln(U"[GenerateBlockGrid] Prefetch segments: {}"_fmt(segmentCount));
 

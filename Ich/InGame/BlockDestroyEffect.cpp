@@ -12,16 +12,16 @@ namespace BlockDestroyEffectConstants {
   constexpr double kGravity = 300.0;             // 重力加速度
   constexpr double kEffectDuration = 1.5;        // 演出全体の持続時間（秒）
   constexpr double kParticleUpwardBias = -100.0; // パーティクルの上方向バイアス
-  
+
   // テキスト演出の設定
   constexpr double kTextRiseSpeed = -50.0;       // テキスト上昇速度
   constexpr int32 kFontSize = 30;                // フォントサイズ
-  
+
   // 影の設定
   const Vec2 kTextShadowOffset{ 2.0, 2.0 };      // テキスト影のオフセット
   constexpr double kTextShadowAlphaMultiplier = 0.5; // 影のアルファ乗数
   const ColorF kTextShadowColor{ 0.0, 0.0, 0.0 }; // 影の基本色
-  
+
   // 爆発エフェクトの設定
   constexpr double kExplosionDuration = 0.3;     // 爆発演出の持続時間（秒）
   constexpr double kExplosionMaxRadius = 50.0;   // 爆発の最大半径
@@ -72,11 +72,11 @@ void BlockDestroyEffect::AddEffect(const Vec2& position, const ColorF& color, co
   effects_ << effect;
 }
 
-void BlockDestroyEffect::Update(double deltaTime)
+void BlockDestroyEffect::Update(double delta_time)
 {
   // 各演出を更新
   for (auto it = effects_.begin(); it != effects_.end();) {
-    it->elapsed += deltaTime;
+    it->elapsed += delta_time;
 
     // 演出時間が終了したら削除
     if (it->elapsed >= BlockDestroyEffectConstants::kEffectDuration) {
@@ -86,13 +86,13 @@ void BlockDestroyEffect::Update(double deltaTime)
 
     // パーティクルを更新
     for (auto& particle : it->particles) {
-      particle.lifetime += deltaTime;
+      particle.lifetime += delta_time;
 
       // 重力を適用
-      particle.velocity.y += BlockDestroyEffectConstants::kGravity * deltaTime;
+      particle.velocity.y += BlockDestroyEffectConstants::kGravity * delta_time;
 
       // 位置を更新
-      particle.position += particle.velocity * deltaTime;
+      particle.position += particle.velocity * delta_time;
     }
 
     ++it;
@@ -107,34 +107,34 @@ void BlockDestroyEffect::Draw() const
       // フェードアウト
       const double alpha = 1.0 - (particle.lifetime / particle.maxLifetime);
       if (alpha > 0.0) {
-        ColorF drawColor = particle.color;
-        drawColor.a = alpha;
-        Circle{ particle.position, particle.size }.draw(drawColor);
+        ColorF draw_color = particle.color;
+        draw_color.a = alpha;
+        Circle{ particle.position, particle.size }.draw(draw_color);
       }
     }
 
     // テキストをフェードアウトしながら上昇
-    const double textAlpha = Max(0.0, 1.0 - (effect.elapsed / BlockDestroyEffectConstants::kEffectDuration));
-    if (textAlpha > 0.0) {
-      const Vec2 textPos = effect.position + Vec2{ 0, BlockDestroyEffectConstants::kTextRiseSpeed * effect.elapsed };
-      ColorF textColor = effect.blockColor;
-      textColor.a = textAlpha;
+    const double text_alpha = Max(0.0, 1.0 - (effect.elapsed / BlockDestroyEffectConstants::kEffectDuration));
+    if (text_alpha > 0.0) {
+      const Vec2 text_pos = effect.position + Vec2{ 0, BlockDestroyEffectConstants::kTextRiseSpeed * effect.elapsed };
+      ColorF text_color = effect.blockColor;
+      text_color.a = text_alpha;
 
       // 影
-      ColorF shadowColor = BlockDestroyEffectConstants::kTextShadowColor;
-      shadowColor.a = textAlpha * BlockDestroyEffectConstants::kTextShadowAlphaMultiplier;
-      font_(effect.blockText).drawAt(textPos + BlockDestroyEffectConstants::kTextShadowOffset, shadowColor);
+      ColorF shadow_color = BlockDestroyEffectConstants::kTextShadowColor;
+      shadow_color.a = text_alpha * BlockDestroyEffectConstants::kTextShadowAlphaMultiplier;
+      font_(effect.blockText).drawAt(text_pos + BlockDestroyEffectConstants::kTextShadowOffset, shadow_color);
       // 本体
-      font_(effect.blockText).drawAt(textPos, textColor);
+      font_(effect.blockText).drawAt(text_pos, text_color);
     }
 
     // 爆発の円
     if (effect.elapsed < BlockDestroyEffectConstants::kExplosionDuration) {
-      const double explosionAlpha = 1.0 - (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
-      const double explosionRadius = BlockDestroyEffectConstants::kExplosionMaxRadius * (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
-      ColorF explosionColor = BlockDestroyEffectConstants::kExplosionColor;
-      explosionColor.a = explosionAlpha * BlockDestroyEffectConstants::kExplosionAlphaMultiplier;
-      Circle{ effect.position, explosionRadius }.drawFrame(BlockDestroyEffectConstants::kExplosionFrameThickness, explosionColor);
+      const double explosion_alpha = 1.0 - (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
+      const double explosion_radius = BlockDestroyEffectConstants::kExplosionMaxRadius * (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
+      ColorF explosion_color = BlockDestroyEffectConstants::kExplosionColor;
+      explosion_color.a = explosion_alpha * BlockDestroyEffectConstants::kExplosionAlphaMultiplier;
+      Circle{ effect.position, explosion_radius }.drawFrame(BlockDestroyEffectConstants::kExplosionFrameThickness, explosion_color);
     }
   }
 }
