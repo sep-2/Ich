@@ -52,6 +52,13 @@ public:
   /// </summary>
   bool IsQuitRequested() const { return quit_requested_; }
 
+#if _DEBUG
+  /// <summary>
+  /// ゲーム再起動がリクエストされたか
+  /// </summary>
+  bool IsRestartRequested() const { return restart_requested_; }
+#endif
+
 private:
   MenuState state_;
   Font font_;
@@ -60,10 +67,18 @@ private:
   Rect option_button_;
   Rect quit_button_;
   
+#if _DEBUG
+  Rect restart_button_;  // ゲーム再起動ボタン（DEBUGのみ）
+#endif
+  
   // 終了確認ダイアログ用
   Rect quit_yes_button_;
   Rect quit_no_button_;
   
   std::unique_ptr<MenuOption> menu_option_;
   bool quit_requested_ = false;
+
+#if _DEBUG
+  bool restart_requested_ = false;
+#endif
 };

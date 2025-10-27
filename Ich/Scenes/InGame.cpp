@@ -752,16 +752,28 @@ void Game::update()
   }
 
   // メニューが開いている場合
-  if (menu_->IsOpen()) {
+  if (menu_->IsOpen())
+  {
     PRINT << U"IsOpen now";
-    if (!KeyEscape.down()) {
+    if (!KeyEscape.down())
+    {
       menu_->Update();
 
       // ゲーム終了がリクエストされたかチェック
-      if (menu_->IsQuitRequested()) {
+      if (menu_->IsQuitRequested())
+      {
         System::Exit();
         return;
       }
+
+#if _DEBUG
+      // ゲーム再起動がリクエストされたかチェック（DEBUGのみ）
+      if (menu_->IsRestartRequested())
+      {
+        changeScene(EnumScene::kInGame);
+        return;
+      }
+#endif
     }
 
     return;  // ゲームロジックは更新しない
@@ -1100,24 +1112,24 @@ void Game::draw() const
   debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
 }
 
-void Game::drawFadeIn(double t) const
-{
-  //draw();
-
-  //// 1280x720対応のフェードイン効果
-  //for (int32 y = 0; y < 8; ++y) {
-  //  RectF{ (1280 + y * 120 - (1 + t) * 2560), (y * 90), 2560, 90 }.draw(HSV{ (y * 20), 0.2, 1.0 });
-  //}
-}
-
-void Game::drawFadeOut(double t) const
-{
-  draw();
-
-  // 1280x720対応のフェードアウト効果
-  Circle{ 640, 360, 640 }
-  .drawFrame((t * 640), 0, ColorF{ 0.2, 0.3, 0.4 });
-}
+//void Game::drawFadeIn(double t) const
+//{
+//  //draw();
+//
+//  //// 1280x720対応のフェードイン効果
+//  //for (int32 y = 0; y < 8; ++y) {
+//  //  RectF{ (1280 + y * 120 - (1 + t) * 2560), (y * 90), 2560, 90 }.draw(HSV{ (y * 20), 0.2, 1.0 });
+//  //}
+//}
+//
+//void Game::drawFadeOut(double t) const
+//{
+//  //draw();
+//
+//  //// 1280x720対応のフェードアウト効果
+//  //Circle{ 640, 360, 640 }
+//  //.drawFrame((t * 640), 0, ColorF{ 0.2, 0.3, 0.4 });
+//}
 
 void Game::UpdateCamera()
 {
