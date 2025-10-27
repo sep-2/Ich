@@ -2,20 +2,70 @@
 #include "Menu.h"
 #include "MenuSoundManager.h"
 
+namespace MenuConstants
+{
+  // メニュー位置・サイズ
+  constexpr int32 kMenuCenterX = 400;
+  constexpr int32 kMenuTitleY = 100;
+  constexpr int32 kButtonWidth = 300;
+  constexpr int32 kButtonHeight = 60;
+  constexpr int32 kButtonX = 250;
+  
+  // ボタンY座標（DEBUG/RELEASE共通）
+  constexpr int32 kResumeButtonY = 180;
+  
+  // DEBUG専用ボタンY座標
+#if _DEBUG
+  constexpr int32 kRestartButtonY = 260;
+  constexpr int32 kOptionButtonYDebug = 340;
+  constexpr int32 kQuitButtonYDebug = 420;
+#else
+  constexpr int32 kOptionButtonYRelease = 260;
+  constexpr int32 kQuitButtonYRelease = 340;
+#endif
+  
+  // 終了確認ダイアログ
+  constexpr int32 kDialogX = 200;
+  constexpr int32 kDialogY = 180;
+  constexpr int32 kDialogWidth = 400;
+  constexpr int32 kDialogHeight = 180;
+  constexpr int32 kDialogMessageY = 230;
+  constexpr int32 kDialogButtonWidth = 150;
+  constexpr int32 kDialogButtonHeight = 60;
+  constexpr int32 kDialogYesButtonX = 220;
+  constexpr int32 kDialogNoButtonX = 430;
+  constexpr int32 kDialogButtonY = 280;
+  
+  // フォントサイズ
+  constexpr int32 kMainFontSize = 40;
+  constexpr int32 kMessageFontSize = 35;
+  
+  // 色・透明度
+  const ColorF kBackgroundColor{ 0.0, 0.0, 0.0, 0.5 };
+  const ColorF kDialogBackgroundColor{ 0.0, 0.0, 0.0, 0.7 };
+  const ColorF kDialogBoxColor{ 0.2, 0.2, 0.3, 0.95 };
+  constexpr double kDialogBorderThickness = 2.0;
+  
+  // 明滅設定
+  constexpr double kPulseMin = 0.5;
+  constexpr double kPulseMax = 1.0;
+  const Duration kPulseDuration = 1.5s;
+}
+
 Menu::Menu()
   : state_(MenuState::kNone)
-  , font_(40)
-  , resume_button_(250, 180, 300, 60)
+  , font_(MenuConstants::kMainFontSize)
+  , resume_button_(MenuConstants::kButtonX, MenuConstants::kResumeButtonY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
 #if _DEBUG
-  , restart_button_(250, 260, 300, 60)
-  , option_button_(250, 340, 300, 60)
-  , quit_button_(250, 420, 300, 60)
+  , restart_button_(MenuConstants::kButtonX, MenuConstants::kRestartButtonY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
 #else
-  , option_button_(250, 260, 300, 60)
-  , quit_button_(250, 340, 300, 60)
+  , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
 #endif
-  , quit_yes_button_(220, 280, 150, 60)
-  , quit_no_button_(430, 280, 150, 60)
+  , quit_yes_button_(MenuConstants::kDialogYesButtonX, MenuConstants::kDialogButtonY, MenuConstants::kDialogButtonWidth, MenuConstants::kDialogButtonHeight)
+  , quit_no_button_(MenuConstants::kDialogNoButtonX, MenuConstants::kDialogButtonY, MenuConstants::kDialogButtonWidth, MenuConstants::kDialogButtonHeight)
   , menu_option_(std::make_unique<MenuOption>())
   , quit_requested_(false)
 #if _DEBUG
@@ -24,7 +74,7 @@ Menu::Menu()
 {
   
   // 確認ダイアログ用のフォントをメンバとして初期化（Draw関数内での生成を避ける）
-  message_font_ = Font(35);
+  message_font_ = Font(MenuConstants::kMessageFontSize);
 }
 
 Menu::~Menu()
@@ -203,13 +253,13 @@ void Menu::Draw() const
   if (state_ == MenuState::kMain)
   {
     // 半透明背景
-    Scene::Rect().draw(ColorF(0.0, 0.0, 0.0, 0.5));
+    Scene::Rect().draw(MenuConstants::kBackgroundColor);
 
     // メニュータイトル
-    font_(U"メニュー").drawAt(400, 100, Palette::White);
+    font_(U"メニュー").drawAt(MenuConstants::kMenuCenterX, MenuConstants::kMenuTitleY, Palette::White);
 
     // 明滅用の係数（0.5〜1.0の範囲で変化）
-    const double pulse = 0.5 + 0.5 * Periodic::Sine0_1(1.5s);
+    const double pulse = MenuConstants::kPulseMin + (MenuConstants::kPulseMax - MenuConstants::kPulseMin) * Periodic::Sine0_1(MenuConstants::kPulseDuration);
 
     // 戻るボタン
     if (resume_button_.mouseOver())
@@ -280,18 +330,18 @@ void Menu::Draw() const
   else if (state_ == MenuState::kQuitConfirm)
   {
     // より暗い背景
-    Scene::Rect().draw(ColorF(0.0, 0.0, 0.0, 0.7));
+    Scene::Rect().draw(MenuConstants::kDialogBackgroundColor);
 
     // 確認ダイアログボックス
-    const Rect dialog_box(200, 180, 400, 180);
-    dialog_box.draw(ColorF(0.2, 0.2, 0.3, 0.95));
-    dialog_box.drawFrame(2, Palette::White);
+    const Rect dialog_box(MenuConstants::kDialogX, MenuConstants::kDialogY, MenuConstants::kDialogWidth, MenuConstants::kDialogHeight);
+    dialog_box.draw(MenuConstants::kDialogBoxColor);
+    dialog_box.drawFrame(MenuConstants::kDialogBorderThickness, Palette::White);
 
     // 確認メッセージ（メンバ変数のフォントを使用）
-    message_font_(U"本当に終了しますか？").drawAt(400, 230, Palette::White);
+    message_font_(U"本当に終了しますか？").drawAt(MenuConstants::kMenuCenterX, MenuConstants::kDialogMessageY, Palette::White);
 
     // 明滅用の係数
-    const double pulse = 0.5 + 0.5 * Periodic::Sine0_1(1.5s);
+    const double pulse = MenuConstants::kPulseMin + (MenuConstants::kPulseMax - MenuConstants::kPulseMin) * Periodic::Sine0_1(MenuConstants::kPulseDuration);
 
     // はいボタン
     if (quit_yes_button_.mouseOver())

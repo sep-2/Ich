@@ -770,7 +770,7 @@ void Game::update()
       // ゲーム再起動がリクエストされたかチェック（DEBUGのみ）
       if (menu_->IsRestartRequested())
       {
-        changeScene(EnumScene::kInGame);
+        changeScene(EnumScene::kInGame, 0s);
         return;
       }
 #endif
