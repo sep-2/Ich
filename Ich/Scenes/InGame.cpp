@@ -170,13 +170,13 @@ namespace InGameConstants {
   const String kBlockBgTexturePath = U"Assets/Image/block_bg.png";
 
   /// <summary>
-  /// ブロックカラー
+  /// ブロックCOLOR
   /// </summary>
   const Array<ColorF> kBlockColors = {
   ColorF{ 1.0, 0.3, 0.3 },  // 赤
   ColorF{ 0.3, 1.0, 0.3 },  // 緑
   ColorF{ 0.3, 0.3, 1.0 },  // 青
-  ColorF{ 1.0, 1.0, 0.3 },  // 黄
+  ColorF{ 1.0, 1.0, 0.3 },  // 黄色
   ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
   ColorF{ 0.3, 1.0, 1.0 },  // シアン
   ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
@@ -207,6 +207,9 @@ Game::Game(const InitData& init)
   , debug_font_{ InGameConstants::kDebugFontSize }
 {
   //PRINT << U"Game::Game()";
+
+  // ✨ テクスチャを生成（絵文字）
+  sparkle_tex_ = Texture{ Emoji{ U"✨" } };
 
   for (const auto& path : InGameConstants::kBlockTexturePaths) {
     Texture texture{ path };
@@ -946,6 +949,20 @@ void Game::draw() const
           const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
           block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
           block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
+
+          // プレイヤーに 1 ブロック以内かつ first の場合、✨を小さく描画（斜め上）
+          if (block.is_first && player_)
+          {
+            const Vec2 playerPos = player_->GetPosition();
+            const double dx = std::abs(playerPos.x - blockCenter.x);
+            const double dy = std::abs(playerPos.y - blockCenter.y);
+            const bool withinOne = (dx <= InGameConstants::kBlockSize && dy <= InGameConstants::kBlockSize);
+            if (withinOne && !sparkle_tex_.isEmpty())
+            {
+              const Vec2 sparklePos = blockTopLeft + Vec2{ InGameConstants::kBlockSize * 0.75f, InGameConstants::kBlockSize * 0.25f };
+              sparkle_tex_.scaled(0.25).drawAt(sparklePos);
+            }
+          }
         }
       }
     }

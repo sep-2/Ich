@@ -147,6 +147,9 @@ private:
 
   Array<Texture> block_textures_;
 
+  // ✨アイコン
+  Texture sparkle_tex_;
+
   // エア残量（デモ用）
   float air_amount_ = 1.0f;
 
@@ -257,6 +260,24 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
