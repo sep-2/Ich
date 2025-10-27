@@ -8,13 +8,13 @@
 namespace PlayerConstants {
   // 初期位置
   constexpr Vec2 kInitialPosition{ 100.0f, 200.0f };
-  
+
   // 移動速度（ピクセル/秒）
   constexpr float kInitialMoveSpeed = 200.0f;
-  
+
   // アニメーションフレーム切り替え間隔（秒）
   constexpr float kFrameIntervalSeconds = 0.2f;
-  
+
   // 武器の色
   const ColorF kWeaponColor{ 0.9, 0.25, 0.25, 0.85 };
 

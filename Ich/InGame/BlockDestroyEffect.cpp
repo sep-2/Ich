@@ -12,16 +12,16 @@ namespace BlockDestroyEffectConstants {
   constexpr double kGravity = 300.0;             // 重力加速度
   constexpr double kEffectDuration = 1.5;        // 演出全体の持続時間（秒）
   constexpr double kParticleUpwardBias = -100.0; // パーティクルの上方向バイアス
-  
+
   // テキスト演出の設定
   constexpr double kTextRiseSpeed = -50.0;       // テキスト上昇速度
   constexpr int32 kFontSize = 30;                // フォントサイズ
-  
+
   // 影の設定
   const Vec2 kTextShadowOffset{ 2.0, 2.0 };      // テキスト影のオフセット
   constexpr double kTextShadowAlphaMultiplier = 0.5; // 影のアルファ乗数
   const ColorF kTextShadowColor{ 0.0, 0.0, 0.0 }; // 影の基本色
-  
+
   // 爆発エフェクトの設定
   constexpr double kExplosionDuration = 0.3;     // 爆発演出の持続時間（秒）
   constexpr double kExplosionMaxRadius = 50.0;   // 爆発の最大半径
