@@ -237,7 +237,7 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x6列、バッチサイズ20）
-  const Array<Array<String>> stringGrid = block_manager_.GenerateBlockGrid(
+  const Array<Array<String>> string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
     30,
@@ -247,61 +247,61 @@ Game::Game(const InitData& init)
   );
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
-  const int32 totalColumns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
+  const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
 
   // 壁ブロックの高さを計算（画面最上部から通常ブロック領域の下端まで）
-  const int32 wallHeight = static_cast<int32>(std::ceil((InGameConstants::kStartY + stringGrid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
+  const int32 wall_height = static_cast<int32>(std::ceil((InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
 
-  block_grid_.resize(wallHeight);
+  block_grid_.resize(wall_height);
 
-  for (size_t row = 0; row < wallHeight; ++row) {
-    block_grid_[row].resize(totalColumns);
+  for (size_t row = 0; row < wall_height; ++row) {
+    block_grid_[row].resize(total_columns);
 
-    for (size_t col = 0; col < totalColumns; ++col) {
-      const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
+    for (size_t col = 0; col < total_columns; ++col) {
+      const bool is_wall_column = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
 
       // 左右の壁（画面最上部から開始）
-      if (isWallColumn) {
+      if (is_wall_column) {
         block_grid_[row][col] = Block(Block::Type::kWall);
         // 壁ブロックは画面最上部から配置
-        const float wallX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-        const float wallY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
-        block_grid_[row][col].position = Vec2{ wallX, wallY };
+        const float wall_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+        const float wall_y = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+        block_grid_[row][col].position = Vec2{ wall_x, wall_y };
       }
       // 通常のブロック領域
       else {
         // 通常ブロック領域の行インデックスを計算
-        const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+        const int32 normal_block_row_offset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
 
-        if (row >= normalBlockRowOffset && row < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
-          const size_t actualRow = row - normalBlockRowOffset;
-          const size_t actualCol = col - InGameConstants::kWallThickness;
-          block_grid_[row][col] = Block(stringGrid[actualRow][actualCol]);
+        if (row >= normal_block_row_offset && row < normal_block_row_offset + static_cast<int32>(string_grid.size())) {
+          const size_t actual_row = row - normal_block_row_offset;
+          const size_t actual_col = col - InGameConstants::kWallThickness;
+          block_grid_[row][col] = Block(string_grid[actual_row][actual_col]);
           // 通常ブロックも壁座標系で位置を設定
-          const float blockX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float blockY = InGameConstants::kStartY + actualRow * InGameConstants::kBlockSize;
-          block_grid_[row][col].position = Vec2{ blockX, blockY };
+          const float block_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+          const float block_y = InGameConstants::kStartY + actual_row * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ block_x, block_y };
         } else {
           // 通常ブロック領域外は空ブロック
           block_grid_[row][col] = Block();
-          const float emptyX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
-          const float emptyY = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
-          block_grid_[row][col].position = Vec2{ emptyX, emptyY };
+          const float empty_x = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
+          const float empty_y = InGameConstants::kWallStartY + row * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ empty_x, empty_y };
         }
       }
     }
   }
 
   // プレイヤーの初期設定（グリッドの一番上の中央に配置）
-  const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
-  const int32 initialCol = InGameConstants::kGridColumns / 2 + InGameConstants::kWallThickness;  // 中央（壁を考慮）
-  const int32 initialRow = normalBlockRowOffset;  // 通常ブロック領域の一番上
-  const Vec2 initialPos = Vec2{
-    InGameConstants::kStartX + initialCol * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f,
-    InGameConstants::kWallStartY + initialRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f
+  const int32 normal_block_row_offset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+  const int32 initial_col = InGameConstants::kGridColumns / 2 + InGameConstants::kWallThickness;  // 中央（壁を考慮）
+  const int32 initial_row = normal_block_row_offset;  // 通常ブロック領域の一番上
+  const Vec2 initial_pos = Vec2{
+    InGameConstants::kStartX + initial_col * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f,
+    InGameConstants::kWallStartY + initial_row * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f
   };
 
-  //player_->SetPosition(initialPos.x, initialPos.y);
+  //player_->SetPosition(initial_pos.x, initial_pos.y);
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
   player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // 移動速度を200ピクセル/秒に設定
 
@@ -319,11 +319,11 @@ Game::~Game()
 bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) const
 {
   // ピクセル座標からグリッド座標を計算（壁用の座標系を使用）
-  const float relativeX = pixelPos.x - InGameConstants::kStartX;
-  const float relativeY = pixelPos.y - InGameConstants::kWallStartY;
+  const float relative_x = pixelPos.x - InGameConstants::kStartX;
+  const float relative_y = pixelPos.y - InGameConstants::kWallStartY;
 
-  gridCol = static_cast<int32>(relativeX / InGameConstants::kBlockSize);
-  gridRow = static_cast<int32>(relativeY / InGameConstants::kBlockSize);
+  gridCol = static_cast<int32>(relative_x / InGameConstants::kBlockSize);
+  gridRow = static_cast<int32>(relative_y / InGameConstants::kBlockSize);
 
   // グリッドの範囲内かチェック
   if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
@@ -339,32 +339,32 @@ bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) con
 Vec2 Game::GridToPixel(int32 gridRow, int32 gridCol) const
 {
   // グリッド座標からピクセル座標（中心）を計算
-  const float pixelX = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
-  const float pixelY = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
-  return Vec2{ pixelX, pixelY };
+  const float pixel_x = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
+  const float pixel_y = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
+  return Vec2{ pixel_x, pixel_y };
 }
 
 Vec2 Game::GetGridTopLeft(int32 gridRow, int32 gridCol) const
 {
   // グリッドの左上座標を取得
-  const float pixelX = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize;
-  const float pixelY = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize;
-  return Vec2{ pixelX, pixelY };
+  const float pixel_x = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize;
+  const float pixel_y = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize;
+  return Vec2{ pixel_x, pixel_y };
 }
 
 bool Game::GetPlayerGridPosition(int32& gridRow, int32& gridCol) const
 {
-  const Vec2 playerPos = player_->GetPosition();
-  return PixelToGrid(playerPos, gridRow, gridCol);
+  const Vec2 player_pos = player_->GetPosition();
+  return PixelToGrid(player_pos, gridRow, gridCol);
 }
 
 void Game::DestroyBlockUnderPlayer()
 {
-  const Vec2 playerPos = player_->GetPosition();
-  const float playerBottomY = playerPos.y + player_->GetHeight() / 2.0f;
-  const float playerLeft = playerPos.x - player_->GetWidth() / 2.0f;
-  const float playerRight = playerPos.x + player_->GetWidth() / 2.0f;
-  const float playerTop = playerPos.y - player_->GetHeight() / 2.0f;
+  const Vec2 player_pos = player_->GetPosition();
+  const float player_bottom_y = player_pos.y + player_->GetHeight() / 2.0f;
+  const float player_left = player_pos.x - player_->GetWidth() / 2.0f;
+  const float player_right = player_pos.x + player_->GetWidth() / 2.0f;
+  const float player_top = player_pos.y - player_->GetHeight() / 2.0f;
 
   // プレイヤーの周囲のブロックを探す
   for (size_t i = 0; i < block_grid_.size(); i++) {
@@ -376,61 +376,61 @@ void Game::DestroyBlockUnderPlayer()
         continue;
       }
 
-      const Vec2 blockPos = block.position;
-      const float blockLeft = blockPos.x;
-      const float blockRight = blockPos.x + InGameConstants::kBlockSize;
-      const float blockTop = blockPos.y;
-      const float blockBottom = blockPos.y + InGameConstants::kBlockSize;
+      const Vec2 block_pos = block.position;
+      const float block_left = block_pos.x;
+      const float block_right = block_pos.x + InGameConstants::kBlockSize;
+      const float block_top = block_pos.y;
+      const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
-      bool canDestroy = false;
+      bool can_destroy = false;
       String direction;
 
       // 下のブロック（足元）
-      if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
-        if (playerBottomY >= blockTop && playerBottomY <= blockTop + InGameConstants::kBlockDestroyVerticalThreshold) {
+      if (player_pos.x >= block_left && player_pos.x <= block_right) {
+        if (player_bottom_y >= block_top && player_bottom_y <= block_top + InGameConstants::kBlockDestroyVerticalThreshold) {
           if (!KeyLeft.pressed() && !KeyRight.pressed()) {
-            canDestroy = true;
+            can_destroy = true;
             direction = U"下";
           }
         }
       }
 
       // 左のブロック
-      if (KeyLeft.pressed() && playerLeft >= blockLeft && playerLeft <= blockRight) {
-        if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
-          canDestroy = true;
+      if (KeyLeft.pressed() && player_left >= block_left && player_left <= block_right) {
+        if (player_pos.y >= block_top && player_pos.y <= block_bottom) {
+          can_destroy = true;
           direction = U"左";
         }
       }
 
       // 右のブロック
-      if (KeyRight.pressed() && playerRight >= blockLeft && playerRight <= blockRight) {
-        if (playerPos.y >= blockTop && playerPos.y <= blockBottom) {
-          canDestroy = true;
+      if (KeyRight.pressed() && player_right >= block_left && player_right <= block_right) {
+        if (player_pos.y >= block_top && player_pos.y <= block_bottom) {
+          can_destroy = true;
           direction = U"右";
         }
       }
 
       // 上のブロック（頭上）
-      if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
-        if (playerTop <= blockBottom && playerTop >= blockBottom - InGameConstants::kBlockDestroyVerticalThreshold) {
-          canDestroy = true;
+      if (player_pos.x >= block_left && player_pos.x <= block_right) {
+        if (player_top <= block_bottom && player_top >= block_bottom - InGameConstants::kBlockDestroyVerticalThreshold) {
+          can_destroy = true;
           direction = U"上";
         }
       }
 
-      if (canDestroy) {
+      if (can_destroy) {
         // ブロックの中心位置を計算（block.positionから直接計算）
-        const Vec2 blockCenter = blockPos + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
+        const Vec2 block_center = block_pos + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
 
         // ブロックの色を決定（位置依存のシード）
         const size_t seed = (i * InGameConstants::kSeedMultiplierRow + j * InGameConstants::kSeedMultiplierCol);
-        const size_t colorCount = InGameConstants::kBlockColors.size();
-        const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
+        const size_t color_count = InGameConstants::kBlockColors.size();
+        const ColorF block_color = InGameConstants::kBlockColors[seed % color_count];
 
         // 破壊演出を追加
         if (block_destroy_effect_) {
-          block_destroy_effect_->AddEffect(blockCenter, blockColor, block.value);
+          block_destroy_effect_->AddEffect(block_center, block_color, block.value);
         }
 
         // ブロックを破壊
@@ -459,35 +459,35 @@ void Game::DestroyBlockUnderPlayer()
 
 void Game::UpdatePlayerFall(float delta_time)
 {
-  int32 gridRow, gridCol;
-  if (!GetPlayerGridPosition(gridRow, gridCol)) {
+  int32 grid_row, grid_col;
+  if (!GetPlayerGridPosition(grid_row, grid_col)) {
     return;
   }
 
   //// プレイヤーの現在位置のブロックをチェック
-  const bool isOnBlock = HasBlockAt(gridRow, gridCol);
+  const bool is_on_block = HasBlockAt(grid_row, grid_col);
 
   // プレイヤーの下のブロックをチェック
-  const int32 belowRow = gridRow + 1;
-  bool hasBlockBelow = false;
+  const int32 below_row = grid_row + 1;
+  bool has_block_below = false;
 
-  if (belowRow >= 0 && belowRow < static_cast<int32>(block_grid_.size()) &&
-    gridCol >= 0 && gridCol < static_cast<int32>(block_grid_[belowRow].size())) {
-    hasBlockBelow = HasBlockAt(belowRow, gridCol);  // isEmpty()ではなくHasBlockAt()を使用
+  if (below_row >= 0 && below_row < static_cast<int32>(block_grid_.size()) &&
+    grid_col >= 0 && grid_col < static_cast<int32>(block_grid_[below_row].size())) {
+    has_block_below = HasBlockAt(below_row, grid_col);  // isEmpty()ではなくHasBlockAt()を使用
   }
 
   // 下にブロックがない場合は落下
-  if (!hasBlockBelow && belowRow < static_cast<int32>(block_grid_.size())) {
+  if (!has_block_below && below_row < static_cast<int32>(block_grid_.size())) {
     player_fall_velocity_ += InGameConstants::kGravity * delta_time;
     player_fall_velocity_ = Min(player_fall_velocity_, InGameConstants::kMaxFallSpeed);
 
-    Vec2 playerPos = player_->GetPosition();
-    playerPos.y += player_fall_velocity_ * delta_time;
+    Vec2 player_pos = player_->GetPosition();
+    player_pos.y += player_fall_velocity_ * delta_time;
 
     // 下にブロックがあるかどうかを、ピクセル座標ベースでも確認
-    const float playerBottomY = playerPos.y + player_->GetHeight() / 2.0f;
-    bool shouldLand = false;
-    float landingY = playerPos.y;
+    const float player_bottom_y = player_pos.y + player_->GetHeight() / 2.0f;
+    bool should_land = false;
+    float landing_y = player_pos.y;
 
     // 全ブロックをチェックして衝突判定
     for (size_t i = 0; i < block_grid_.size(); i++) {
@@ -499,33 +499,33 @@ void Game::UpdatePlayerFall(float delta_time)
           continue;
         }
 
-        const Vec2 blockPos = block.position;
-        const float blockLeft = blockPos.x;
-        const float blockRight = blockPos.x + InGameConstants::kBlockSize;
-        const float blockTop = blockPos.y;
+        const Vec2 block_pos = block.position;
+        const float block_left = block_pos.x;
+        const float block_right = block_pos.x + InGameConstants::kBlockSize;
+        const float block_top = block_pos.y;
 
         // プレイヤーの中心がブロックのX範囲内にあるかチェック
-        if (playerPos.x >= blockLeft && playerPos.x <= blockRight) {
+        if (player_pos.x >= block_left && player_pos.x <= block_right) {
           // プレイヤーの下端がブロックの上面に到達または超えた場合
-          if (playerBottomY >= blockTop && playerPos.y < blockTop) {
-            shouldLand = true;
-            landingY = blockTop - player_->GetHeight() / 2.0f;
+          if (player_bottom_y >= block_top && player_pos.y < block_top) {
+            should_land = true;
+            landing_y = block_top - player_->GetHeight() / 2.0f;
             break;
           }
         }
       }
-      if (shouldLand) {
+      if (should_land) {
         break;
       }
     }
 
-    if (shouldLand) {
-      playerPos.y = landingY;
+    if (should_land) {
+      player_pos.y = landing_y;
       player_fall_velocity_ = 0.0f;
-      player_->SetPosition(playerPos.x, playerPos.y);
+      player_->SetPosition(player_pos.x, player_pos.y);
       player_->RefreshPoseFromMovement();
     } else {
-      player_->SetPosition(playerPos.x, playerPos.y);
+      player_->SetPosition(player_pos.x, player_pos.y);
       player_->SetPose(Player::Pose::kFall);
     }
   } else {
@@ -554,42 +554,42 @@ bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
 void Game::UpdatePlayerMovement(float delta_time)
 {
   // 移動入力を取得
-  Vec2 moveInput = Vec2::Zero();
-  bool isMoving = false;
-  bool facingLeft = false;
+  Vec2 move_input = Vec2::Zero();
+  bool is_moving = false;
+  bool facing_left = false;
 
-  const bool walkForwardLeft = KeyUp.pressed() || KeyW.pressed();
-  const bool walkForwardRight = KeyDown.pressed() || KeyS.pressed();
+  const bool walk_forward_left = KeyUp.pressed() || KeyW.pressed();
+  const bool walk_forward_right = KeyDown.pressed() || KeyS.pressed();
 
   // 上下入力は「その場で向きを変えるだけ」なので歩行アニメーションには移行させず、待機ポーズを使用する。
-  if (walkForwardLeft || walkForwardRight) {
+  if (walk_forward_left || walk_forward_right) {
     player_->SetMoving(false);
     player_->SetPose(Player::Pose::kIdle);
   }
 
   if (KeyLeft.pressed() || KeyA.pressed()) {
-    moveInput.x = -1.0f;
-    isMoving = true;
-    facingLeft = true;
+    move_input.x = -1.0f;
+    is_moving = true;
+    facing_left = true;
   } else if (KeyRight.pressed() || KeyD.pressed()) {
-    moveInput.x = 1.0f;
-    isMoving = true;
-    facingLeft = false;
+    move_input.x = 1.0f;
+    is_moving = true;
+    facing_left = false;
   }
 
   // プレイヤーの移動状態と向きを更新
-  player_->SetMoving(isMoving);
-  if (isMoving) {
-    player_->SetFacingLeft(facingLeft);
+  player_->SetMoving(is_moving);
+  if (is_moving) {
+    player_->SetFacingLeft(facing_left);
   }
 
   // プレイヤーの現在位置を取得
-  Vec2 playerPos = player_->GetPosition();
-  Vec2 nextPos = playerPos;
-  nextPos.y += InGameConstants::kSimpleGravity;
+  Vec2 player_pos = player_->GetPosition();
+  Vec2 next_pos = player_pos;
+  next_pos.y += InGameConstants::kSimpleGravity;
 
-  const float playerBottomY = nextPos.y + player_->GetHeight() / 2.0f;
-  bool isOnBlock = false;
+  const float player_bottom_y = next_pos.y + player_->GetHeight() / 2.0f;
+  bool is_on_block = false;
 
   // 重力による落下とブロック衝突判定
   for (int i = 0; i < block_grid_.size(); i++) {
@@ -601,60 +601,60 @@ void Game::UpdatePlayerMovement(float delta_time)
         continue;
       }
 
-      const Vec2 blockPos = block.position;
-      const float blockLeft = blockPos.x;
-      const float blockRight = blockPos.x + InGameConstants::kBlockSize;
-      const float blockTop = blockPos.y;
-      const float blockBottom = blockPos.y + InGameConstants::kBlockSize;
+      const Vec2 block_pos = block.position;
+      const float block_left = block_pos.x;
+      const float block_right = block_pos.x + InGameConstants::kBlockSize;
+      const float block_top = block_pos.y;
+      const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
       // デバッグ用の線描画
       if (kDebugMode) {
-        Line{ blockLeft, blockTop, blockLeft, blockBottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorBlue);
-        Line{ blockRight, blockTop, blockRight, blockBottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorOrange);
+        Line{ block_left, block_top, block_left, block_bottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorBlue);
+        Line{ block_right, block_top, block_right, block_bottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorOrange);
       }
 
       // プレイヤーの中心がブロックのX範囲内にあるかチェック
-      if (nextPos.x >= blockLeft && nextPos.x <= blockRight) {
+      if (next_pos.x >= block_left && next_pos.x <= block_right) {
         // プレイヤーの下端がブロックの上面付近にあるかチェック
-        if (playerBottomY >= blockTop && playerBottomY <= blockTop + InGameConstants::kSimpleGravity + InGameConstants::kGravityMargin) {
+        if (player_bottom_y >= block_top && player_bottom_y <= block_top + InGameConstants::kSimpleGravity + InGameConstants::kGravityMargin) {
           // プレイヤーをブロックの上に配置
-          nextPos.y = blockTop - player_->GetHeight() / 2.0f;
-          isOnBlock = true;
+          next_pos.y = block_top - player_->GetHeight() / 2.0f;
+          is_on_block = true;
           break;
         }
       }
     }
 
-    if (isOnBlock) {
+    if (is_on_block) {
       break;
     }
   }
 
-  player_->SetPosition(nextPos.x, nextPos.y);
+  player_->SetPosition(next_pos.x, next_pos.y);
 
   // 横移動がない場合は早期リターン
-  if (moveInput.x == 0.0f) {
+  if (move_input.x == 0.0f) {
     return;
   }
 
   // プレイヤーの現在位置を更新
-  playerPos = player_->GetPosition();
-  const float moveSpeed = player_->move_speed_;
-  const float moveDistance = moveSpeed * delta_time;
+  player_pos = player_->GetPosition();
+  const float move_speed = player_->move_speed_;
+  const float move_distance = move_speed * delta_time;
 
   // 次の位置を計算
-  Vec2 horizontalNextPos = playerPos;
-  horizontalNextPos.x += moveInput.x * moveDistance;
+  Vec2 horizontal_next_pos = player_pos;
+  horizontal_next_pos.x += move_input.x * move_distance;
 
   // プレイヤーの左右端を計算
-  const float playerHalfWidth = player_->GetWidth() / 2.0f;
-  const float playerLeft = horizontalNextPos.x - playerHalfWidth;
-  const float playerRight = horizontalNextPos.x + playerHalfWidth;
-  const float playerTop = horizontalNextPos.y - player_->GetHeight() / 2.0f;
-  const float playerBottom = horizontalNextPos.y + player_->GetHeight() / 2.0f;
+  const float player_half_width = player_->GetWidth() / 2.0f;
+  const float player_left = horizontal_next_pos.x - player_half_width;
+  const float player_right = horizontal_next_pos.x + player_half_width;
+  const float player_top = horizontal_next_pos.y - player_->GetHeight() / 2.0f;
+  const float player_bottom = horizontal_next_pos.y + player_->GetHeight() / 2.0f;
 
   // ブロックとの左右衝突判定
-  bool canMove = true;
+  bool can_move = true;
 
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
@@ -665,55 +665,55 @@ void Game::UpdatePlayerMovement(float delta_time)
         continue;
       }
 
-      const Vec2 blockPos = block.position;
-      const float blockLeft = blockPos.x;
-      const float blockRight = blockPos.x + InGameConstants::kBlockSize;
-      const float blockTop = blockPos.y;
-      const float blockBottom = blockPos.y + InGameConstants::kBlockSize;
+      const Vec2 block_pos = block.position;
+      const float block_left = block_pos.x;
+      const float block_right = block_pos.x + InGameConstants::kBlockSize;
+      const float block_top = block_pos.y;
+      const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
       // プレイヤーとブロックのY座標が重なっているかチェック
-      const bool yOverlap = !(playerBottom <= blockTop || playerTop >= blockBottom);
+      const bool y_overlap = !(player_bottom <= block_top || player_top >= block_bottom);
 
-      if (!yOverlap) {
+      if (!y_overlap) {
         continue;
       }
 
       // 左に移動する場合
-      if (moveInput.x < 0) {
+      if (move_input.x < 0) {
         // プレイヤーの左端がブロックの右端より左にあり、かつ衝突する場合
-        if (playerLeft < blockRight && playerRight > blockRight) {
+        if (player_left < block_right && player_right > block_right) {
           // ブロックの右端にプレイヤーの左端を配置
-          horizontalNextPos.x = blockRight + playerHalfWidth;
-          canMove = false;
+          horizontal_next_pos.x = block_right + player_half_width;
+          can_move = false;
           break;
         }
       }
       // 右に移動する場合
-      else if (moveInput.x > 0) {
+      else if (move_input.x > 0) {
         // プレイヤーの右端がブロックの左端より右にあり、かつ衝突する場合
-        if (playerRight > blockLeft && playerLeft < blockLeft) {
+        if (player_right > block_left && player_left < block_left) {
           // ブロックの左端にプレイヤーの右端を配置
-          horizontalNextPos.x = blockLeft - playerHalfWidth;
-          canMove = false;
+          horizontal_next_pos.x = block_left - player_half_width;
+          can_move = false;
           break;
         }
       }
     }
 
-    if (!canMove) {
+    if (!can_move) {
       break;
     }
   }
 
   // 画面端チェック
-  if (horizontalNextPos.x - playerHalfWidth < 0) {
-    horizontalNextPos.x = playerHalfWidth;
-  } else if (horizontalNextPos.x + playerHalfWidth > InGameConstants::kScreenWidth) {
-    horizontalNextPos.x = InGameConstants::kScreenWidth - playerHalfWidth;
+  if (horizontal_next_pos.x - player_half_width < 0) {
+    horizontal_next_pos.x = player_half_width;
+  } else if (horizontal_next_pos.x + player_half_width > InGameConstants::kScreenWidth) {
+    horizontal_next_pos.x = InGameConstants::kScreenWidth - player_half_width;
   }
 
   // 位置を更新
-  player_->SetPosition(horizontalNextPos.x, playerPos.y);
+  player_->SetPosition(horizontal_next_pos.x, player_pos.y);
 }
 
 void Game::update()
@@ -781,7 +781,7 @@ void Game::update()
   }
 
   // Zキーでブロック破壊
-  if (KeyZ.pressed()) {
+  if (KeyZ.down()) {
     DestroyBlockUnderPlayer();
   }
 
@@ -837,42 +837,42 @@ void Game::DrawDebugInfo() const
   }
 
   // プレイヤーの位置を取得
-  const Vec2 playerPos = player_->GetPosition();
+  const Vec2 player_pos = player_->GetPosition();
 
   // プレイヤーのサイズを取得（スケール適用後）
-  const float playerWidth = player_->GetWidth();
-  const float playerHeight = player_->GetHeight();
+  const float player_width = player_->GetWidth();
+  const float player_height = player_->GetHeight();
 
   // プレイヤーの当たり判定を赤色の枠で描画
-  const RectF playerHitBox{
-    playerPos.x - playerWidth / 2.0f,
-    playerPos.y - playerHeight / 2.0f,
-    playerWidth,
-    playerHeight
+  const RectF player_hit_box{
+    player_pos.x - player_width / 2.0f,
+    player_pos.y - player_height / 2.0f,
+    player_width,
+    player_height
   };
 
-  playerHitBox.drawFrame(InGameConstants::kDebugFrameThickness, InGameConstants::kDebugFrameColorRed);
+  player_hit_box.drawFrame(InGameConstants::kDebugFrameThickness, InGameConstants::kDebugFrameColorRed);
 
   // プレイヤーの中心点を描画
-  Circle{ playerPos, InGameConstants::kDebugCircleRadius }.draw(InGameConstants::kDebugCircleColorRed);
+  Circle{ player_pos, InGameConstants::kDebugCircleRadius }.draw(InGameConstants::kDebugCircleColorRed);
 
   // グリッド位置を取得
-  int32 gridRow, gridCol;
-  if (GetPlayerGridPosition(gridRow, gridCol)) {
+  int32 grid_row, grid_col;
+  if (GetPlayerGridPosition(grid_row, grid_col)) {
     // 現在のグリッドを緑色の枠で描画
-    const Vec2 gridTopLeft = GetGridTopLeft(gridRow, gridCol);
-    const RectF currentGrid{
-      gridTopLeft.x,
-      gridTopLeft.y,
+    const Vec2 grid_top_left = GetGridTopLeft(grid_row, grid_col);
+    const RectF current_grid{
+      grid_top_left.x,
+      grid_top_left.y,
       InGameConstants::kBlockSize,
       InGameConstants::kBlockSize
     };
-    //currentGrid.drawFrame(3.0, Palette::Green);
+    //current_grid.drawFrame(3.0, Palette::Green);
 
     // グリッド座標を表示（メンバー変数のフォントを使用）
-    debug_font_(U"Grid: ({}, {})"_fmt(gridCol, gridRow))
+    debug_font_(U"Grid: ({}, {})"_fmt(grid_col, grid_row))
       .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY1, InGameConstants::kDebugTextColorWhite);
-    debug_font_(U"Pos: ({:.1f}, {:.1f})"_fmt(playerPos.x, playerPos.y))
+    debug_font_(U"Pos: ({:.1f}, {:.1f})"_fmt(player_pos.x, player_pos.y))
       .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY2, InGameConstants::kDebugTextColorWhite);
     debug_font_(U"Fall Velocity: {:.1f}"_fmt(player_fall_velocity_))
       .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY3, InGameConstants::kDebugTextColorWhite);
@@ -892,9 +892,9 @@ void Game::draw() const
     const Transformer2D transformer{ Mat3x2::Translate(-camera_offset_) };
 
     // ブロックグリッドの描画
-    const size_t textureCount = block_textures_.size();
-    const bool hasBlockTextures = (textureCount > 0);
-    const size_t colorCount = InGameConstants::kBlockColors.size();
+    const size_t texture_count = block_textures_.size();
+    const bool has_block_textures = (texture_count > 0);
+    const size_t color_count = InGameConstants::kBlockColors.size();
 
     for (size_t row = 0; row < block_grid_.size(); ++row) {
       for (size_t col = 0; col < block_grid_[row].size(); ++col) {
@@ -906,20 +906,20 @@ void Game::draw() const
         }
 
         // ブロックの位置を直接使用（既にコンストラクタで設定済み）
-        const Vec2 blockTopLeft = block.position;
-        const Vec2 blockCenter = blockTopLeft + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
+        const Vec2 block_top_left = block.position;
+        const Vec2 block_center = block_top_left + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
 
-        const RoundRect blockShape{ blockTopLeft.x, blockTopLeft.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, InGameConstants::kBlockRoundRadius };
+        const RoundRect block_shape{ block_top_left.x, block_top_left.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, InGameConstants::kBlockRoundRadius };
 
         // 壁ブロックの場合
         if (block.isWall()) {
-          blockShape.draw(InGameConstants::kWallBlockColor);
-          blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kWallBlockFrameColor);
+          block_shape.draw(InGameConstants::kWallBlockColor);
+          block_shape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kWallBlockFrameColor);
 
           // 壁のパターンを描画（斜線など）
           for (double offset = -InGameConstants::kBlockSize; offset < InGameConstants::kBlockSize * 2; offset += InGameConstants::kWallPatternLineSpacing) {
-            const Vec2 start{ blockTopLeft.x + offset, blockTopLeft.y };
-            const Vec2 end{ blockTopLeft.x + offset + InGameConstants::kBlockSize, blockTopLeft.y + InGameConstants::kBlockSize };
+            const Vec2 start{ block_top_left.x + offset, block_top_left.y };
+            const Vec2 end{ block_top_left.x + offset + InGameConstants::kBlockSize, block_top_left.y + InGameConstants::kBlockSize };
             Line{ start, end }.draw(InGameConstants::kWallPatternLineThickness, InGameConstants::kWallPatternColor);
           }
         }
@@ -928,22 +928,22 @@ void Game::draw() const
           // ブロックの見た目を位置依存のシードで決定
           const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
 
-          if (hasBlockTextures) {
-            const Texture& blockTexture = block_textures_[seed % textureCount];
-            const TextureRegion blockRegion = blockTexture.resized(InGameConstants::kBlockSize, InGameConstants::kBlockSize);
-            blockShape(blockRegion).draw();
+          if (has_block_textures) {
+            const Texture& block_texture = block_textures_[seed % texture_count];
+            const TextureRegion block_region = block_texture.resized(InGameConstants::kBlockSize, InGameConstants::kBlockSize);
+            block_shape(block_region).draw();
           } else {
-            const ColorF blockColor = InGameConstants::kBlockColors[seed % colorCount];
-            blockShape.draw(blockColor);
+            const ColorF block_color = InGameConstants::kBlockColors[seed % color_count];
+            block_shape.draw(block_color);
           }
 
           // ブロックの枠線を描画
-          blockShape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
+          block_shape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
 
           // ブロック内のテキストを中央に描画
-          const Vec2 shadowPos = blockCenter + InGameConstants::kBlockTextShadowOffset;
-          block_font_(block.value).drawAt(shadowPos.x, shadowPos.y, InGameConstants::kBlockTextShadowColor);
-          block_font_(block.value).drawAt(blockCenter.x, blockCenter.y, InGameConstants::kBlockTextColor);
+          const Vec2 shadow_pos = block_center + InGameConstants::kBlockTextShadowOffset;
+          block_font_(block.value).drawAt(shadow_pos.x, shadow_pos.y, InGameConstants::kBlockTextShadowColor);
+          block_font_(block.value).drawAt(block_center.x, block_center.y, InGameConstants::kBlockTextColor);
         }
       }
     }
@@ -956,36 +956,36 @@ void Game::draw() const
     // プレイヤーの描画（カメラオフセット適用範囲内）
     // Rendererシステムを使わずに直接描画してカメラに追従させる
     if (player_) {
-      const Vec2 playerPos = player_->GetPosition();
+      const Vec2 player_pos = player_->GetPosition();
       const auto texture = player_->GetTexture();
 
       if (texture) {
-        const float scaleX = player_->GetScaleX();
-        const float scaleY = player_->GetScaleY();
-        texture->scaled(scaleX, scaleY).drawAt(playerPos.x, playerPos.y);
+        const float scale_x = player_->GetScaleX();
+        const float scale_y = player_->GetScaleY();
+        texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
       }
 
       if (player_->IsWeaponVisible()) {
-        const Vec2 weaponPos = player_->GetWeaponPosition();
-        const SizeF weaponSize = player_->GetWeaponSize();
-        const double weaponRotation = player_->GetWeaponRotation();
-        const ColorF weaponColor = player_->GetWeaponColor();
+        const Vec2 weapon_pos = player_->GetWeaponPosition();
+        const SizeF weapon_size = player_->GetWeaponSize();
+        const double weapon_rotation = player_->GetWeaponRotation();
+        const ColorF weapon_color = player_->GetWeaponColor();
 
-        const Transformer2D weaponTransform{ Mat3x2::Rotate(weaponRotation, weaponPos), TransformCursor::No };
-        RoundRect{ Arg::center(weaponPos), weaponSize, InGameConstants::kWeaponRoundRadius }.draw(weaponColor);
+        const Transformer2D weapon_transform{ Mat3x2::Rotate(weapon_rotation, weapon_pos), TransformCursor::No };
+        RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
       }
 
       if (!current_hint_.isEmpty()) {
-        const Vec2 hintCenter = playerPos + InGameConstants::kHintBoxOffset;
-        const RectF textRegion = hint_font_(current_hint_).region();
-        const RoundRect hintRect{ Arg::center(hintCenter), textRegion.w + InGameConstants::kHintBoxPadding * 2, textRegion.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
-        hintRect.draw(InGameConstants::kHintBackgroundColor);
-        hintRect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
-        hint_font_(current_hint_).drawAt(hintCenter, InGameConstants::kHintTextColor);
+        const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
+        const RectF text_region = hint_font_(current_hint_).region();
+        const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
+        hint_rect.draw(InGameConstants::kHintBackgroundColor);
+        hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
+        hint_font_(current_hint_).drawAt(hint_center, InGameConstants::kHintTextColor);
 
-        const Vec2 bubbleAnchor = playerPos + InGameConstants::kHintBubbleAnchorOffset;
-        Circle{ bubbleAnchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
-        Circle{ bubbleAnchor + InGameConstants::kHintBubble2Offset, InGameConstants::kHintBubble2Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness2, InGameConstants::kHintBorderColor);
+        const Vec2 bubble_anchor = player_pos + InGameConstants::kHintBubbleAnchorOffset;
+        Circle{ bubble_anchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
+        Circle{ bubble_anchor + InGameConstants::kHintBubble2Offset, InGameConstants::kHintBubble2Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness2, InGameConstants::kHintBorderColor);
       }
     }
 
@@ -1017,35 +1017,35 @@ void Game::draw() const
     const String& word = have_words_[i];
 
     // この文字が完成した単語に含まれているかチェック
-    bool isInCompletedWord = false;
+    bool is_in_completed_word = false;
 
     for (const auto& completedWord : completed_words_) {
       if (completedWord.includes(word)) {
-        isInCompletedWord = true;
+        is_in_completed_word = true;
         break;
       }
     }
 
     // ボックスの位置を計算（縦方向に配置：上から下）
-    const int32 boxX = InGameConstants::kCharBoxStartX;
-    const int32 boxY = InGameConstants::kCharBoxStartY + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
+    const int32 box_x = InGameConstants::kCharBoxStartX;
+    const int32 box_y = InGameConstants::kCharBoxStartY + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
 
     // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
-    const ColorF boxColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
-    const ColorF borderColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBorderColor : InGameConstants::kCharBoxDefaultBorderColor;
+    const ColorF box_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
+    const ColorF border_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedBorderColor : InGameConstants::kCharBoxDefaultBorderColor;
 
     // ボックスを描画（角丸四角形）
-    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.draw(boxColor);
-    RoundRect{ boxX, boxY, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.drawFrame(InGameConstants::kCharBoxFrameThickness, borderColor);
+    RoundRect{ box_x, box_y, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.draw(box_color);
+    RoundRect{ box_x, box_y, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.drawFrame(InGameConstants::kCharBoxFrameThickness, border_color);
 
     // 文字を中央に描画（影付き）
-    const Vec2 textCenter{ boxX + InGameConstants::kCharBoxSize / 2.0, boxY + InGameConstants::kCharBoxSize / 2.0 };
+    const Vec2 text_center{ box_x + InGameConstants::kCharBoxSize / 2.0, box_y + InGameConstants::kCharBoxSize / 2.0 };
 
     // 影
-    block_font_(word).drawAt(textCenter + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);
+    block_font_(word).drawAt(text_center + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);
     // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
-    const ColorF textColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedTextColor : InGameConstants::kCharBoxDefaultTextColor;
-    block_font_(word).drawAt(textCenter, textColor);
+    const ColorF text_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedTextColor : InGameConstants::kCharBoxDefaultTextColor;
+    block_font_(word).drawAt(text_center, text_color);
   }
 
   //------- 右側のボード：完成した単語を表示 - 画面固定
@@ -1057,16 +1057,16 @@ void Game::draw() const
   block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
 
   // 完成した単語を4列グリッドで配置
-  const double columnWidth = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
-  const double rowStartY = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
-  const double rowHeight = InGameConstants::kCompletedBoardLineHeight;
+  const double column_width = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
+  const double row_start_y = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
+  const double row_height = InGameConstants::kCompletedBoardLineHeight;
 
   for (size_t index = 0; index < completed_words_.size(); ++index) {
     const size_t column = index % InGameConstants::kCompletedBoardColumns;
     const size_t row = index / InGameConstants::kCompletedBoardColumns;
-    const double textX = InGameConstants::kCompletedBoardX + column * columnWidth + InGameConstants::kCompletedBoardColumnPadding;
-    const double textY = rowStartY + row * rowHeight;
-    completed_word_font_(completed_words_[index]).draw(textX, textY, InGameConstants::kCompletedWordTextColor);
+    const double text_x = InGameConstants::kCompletedBoardX + column * column_width + InGameConstants::kCompletedBoardColumnPadding;
+    const double text_y = row_start_y + row * row_height;
+    completed_word_font_(completed_words_[index]).draw(text_x, text_y, InGameConstants::kCompletedWordTextColor);
   }
 
   // 完成した単語の数を表示
@@ -1095,19 +1095,19 @@ void Game::drawFadeOut(double t) const
 void Game::UpdateCamera()
 {
   // プレイヤーの位置を取得
-  const Vec2 playerPos = player_->GetPosition();
+  const Vec2 player_pos = player_->GetPosition();
 
   // 縦方向の見た目オフセット（ブロック2個分、主人公を画面内で高く見せる）
-  const float yBias = static_cast<float>(InGameConstants::kBlockSize * InGameConstants::kCameraVerticalBiasBlocks);
+  const float y_bias = static_cast<float>(InGameConstants::kBlockSize * InGameConstants::kCameraVerticalBiasBlocks);
 
   // カメラの目標位置を計算（プレイヤーを画面中央より上に配置）
-  const Vec2 targetCameraPos = Vec2{
-    playerPos.x - Scene::Width() / 2.0f,
-    playerPos.y - Scene::Height() / 2.0f + yBias
+  const Vec2 target_camera_pos = Vec2{
+    player_pos.x - Scene::Width() / 2.0f,
+    player_pos.y - Scene::Height() / 2.0f + y_bias
   };
 
   // カメラ位置をスムーズに更新（線形補間）
-  camera_offset_ += (targetCameraPos - camera_offset_) * InGameConstants::kCameraFollowSpeed;
+  camera_offset_ += (target_camera_pos - camera_offset_) * InGameConstants::kCameraFollowSpeed;
 
   // カメラの移動範囲を制限（必要に応じて）
   // 例：左端より左には移動しない
@@ -1121,32 +1121,32 @@ void Game::UpdateCamera()
   }
 
   // 右端の制限（ブロックグリッドのサイズに応じて）
-  const float worldWidth = InGameConstants::kStartX + block_grid_[0].size() * InGameConstants::kBlockSize;
-  const float maxCameraX = worldWidth - Scene::Width();
-  if (camera_offset_.x > maxCameraX && maxCameraX > 0) {
-    camera_offset_.x = maxCameraX;
+  const float world_width = InGameConstants::kStartX + block_grid_[0].size() * InGameConstants::kBlockSize;
+  const float max_camera_x = world_width - Scene::Width();
+  if (camera_offset_.x > max_camera_x && max_camera_x > 0) {
+    camera_offset_.x = max_camera_x;
   }
 
   // 下端の制限（ブロックグリッドのサイズに応じて）
-  const float worldHeight = InGameConstants::kWallStartY + block_grid_.size() * InGameConstants::kBlockSize;
-  const float maxCameraY = worldHeight - Scene::Height();
-  if (camera_offset_.y > maxCameraY && maxCameraY > 0) {
-    camera_offset_.y = maxCameraY;
+  const float world_height = InGameConstants::kWallStartY + block_grid_.size() * InGameConstants::kBlockSize;
+  const float max_camera_y = world_height - Scene::Height();
+  if (camera_offset_.y > max_camera_y && max_camera_y > 0) {
+    camera_offset_.y = max_camera_y;
   }
 }
 
 void Game::UpdateHint()
 {
-  const Array<std::pair<String, String>> reachWords = block_manager_.GetReachWords(have_words_, keywords);
+  const Array<std::pair<String, String>> reach_words = block_manager_.GetReachWords(have_words_, keywords);
 
-  if (reachWords.isEmpty()) {
+  if (reach_words.isEmpty()) {
     current_hint_.clear();
     return;
   }
 
   Array<String> candidates;
-  candidates.reserve(reachWords.size());
-  for (const auto& entry : reachWords) {
+  candidates.reserve(reach_words.size());
+  for (const auto& entry : reach_words) {
     if (entry.first.isEmpty()) {
       continue;
     }
