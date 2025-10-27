@@ -9,8 +9,8 @@
 /// 効果音の種類
 /// </summary>
 enum class SeKind {
-  kDecideSe,
-  kChangeSceneSe,
+  kDestroyBlock,
+  kCompleteWord,
 };
 
 /// <summary>
@@ -25,8 +25,8 @@ enum class BgmKind {
 class AudioManager {
 private:
   static inline const std::map<SeKind, std::string> kSeFilepaths = {
-    {SeKind::kDecideSe, "Assets/Audio/Decide.mp3"},
-    {SeKind::kChangeSceneSe, "Assets/Audio/Change.mp3"},
+    {SeKind::kDestroyBlock, "Assets/Audio/Se/DestroyBlock.mp3"},
+    {SeKind::kCompleteWord, "Assets/Audio/Se/CompleteWord.mp3"},
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {

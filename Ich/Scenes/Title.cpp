@@ -60,7 +60,7 @@ void Title::update()
 
     // ゲームシーンに遷移
     changeScene(EnumScene::kInGame);
-    AudioManager::GetInstance()->PlaySe(SeKind::kChangeSceneSe);
+    //AudioManager::GetInstance()->PlaySe(SeKind::kChangeSceneSe);
   }
 }
 
