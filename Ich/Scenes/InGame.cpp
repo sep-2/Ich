@@ -1027,9 +1027,9 @@ void Game::draw() const
       }
     }
 
-    // ボックスの位置を計算
-    const int32 boxX = InGameConstants::kCharBoxStartX + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
-    const int32 boxY = InGameConstants::kCharBoxStartY;
+    // ボックスの位置を計算（縦方向に配置：上から下）
+    const int32 boxX = InGameConstants::kCharBoxStartX;
+    const int32 boxY = InGameConstants::kCharBoxStartY + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
 
     // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
     const ColorF boxColor = isInCompletedWord ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
@@ -1041,7 +1041,6 @@ void Game::draw() const
 
     // 文字を中央に描画（影付き）
     const Vec2 textCenter{ boxX + InGameConstants::kCharBoxSize / 2.0, boxY + InGameConstants::kCharBoxSize / 2.0 };
-    constexpr Vec2 shadowOffset{ 2.0, 2.0 };
 
     // 影
     block_font_(word).drawAt(textCenter + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);
