@@ -226,6 +226,8 @@ Game::Game(const InitData& init)
 
   auto& data = getData<SaveData>();
 
+  PRINT << data.click_count_;
+
   // UIの初期設定（1280x720対応）
   ui_->SetAirGaugePosition(InGameConstants::kAirGaugeX, InGameConstants::kAirGaugeY);
   ui_->SetAirGauge(air_amount_);
@@ -751,6 +753,8 @@ void Game::update()
   if (block_destroy_effect_) {
     block_destroy_effect_->Update(Scene::DeltaTime());
   }
+  // ヒット演出の更新
+  hit_effect_.Update(Scene::DeltaTime());
 
   // have_words_を連結して1行で表示
   String concatenated;
@@ -767,7 +771,12 @@ void Game::update()
       // 完成した単語をcompleted_words_に追加（重複チェック）
       if (!completed_words_.includes(hitWord)) {
         completed_words_.push_back(hitWord);
-        //PRINT << U"Completed word: " << hitWord;
+        // HitEffect をプレイヤーの少し上に生成
+        if (player_) {
+          const Vec2 pos = player_->GetPosition() + Vec2{ 0.0, -60.0 };
+          hit_effect_.Add(pos, hitWord);
+        }
+        // 効果音など入れるならここ
       }
     }
   }
@@ -983,6 +992,9 @@ void Game::draw() const
 
     // デバッグ情報の描画（カメラオフセット適用範囲内）
     DrawDebugInfo();
+
+    // 最前面にヒット演出を描画
+    hit_effect_.Draw();
   }
   // カメラオフセット適用範囲ここまで
 

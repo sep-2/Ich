@@ -947,5 +947,8 @@
     <ClInclude Include="InGame\BlockDestroyEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scenes\InGame\HitEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
