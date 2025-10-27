@@ -248,10 +248,10 @@ Game::Game(const InitData& init)
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
   const int32 totalColumns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
-  
+
   // 壁ブロックの高さを計算（画面最上部から通常ブロック領域の下端まで）
   const int32 wallHeight = static_cast<int32>(std::ceil((InGameConstants::kStartY + stringGrid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
-  
+
   block_grid_.resize(wallHeight);
 
   for (size_t row = 0; row < wallHeight; ++row) {
@@ -259,7 +259,7 @@ Game::Game(const InitData& init)
 
     for (size_t col = 0; col < totalColumns; ++col) {
       const bool isWallColumn = (col < InGameConstants::kWallThickness || col >= InGameConstants::kGridColumns + InGameConstants::kWallThickness);
-      
+
       // 左右の壁（画面最上部から開始）
       if (isWallColumn) {
         block_grid_[row][col] = Block(Block::Type::kWall);
@@ -272,7 +272,7 @@ Game::Game(const InitData& init)
       else {
         // 通常ブロック領域の行インデックスを計算
         const int32 normalBlockRowOffset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
-        
+
         if (row >= normalBlockRowOffset && row < normalBlockRowOffset + static_cast<int32>(stringGrid.size())) {
           const size_t actualRow = row - normalBlockRowOffset;
           const size_t actualCol = col - InGameConstants::kWallThickness;
@@ -281,8 +281,7 @@ Game::Game(const InitData& init)
           const float blockX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
           const float blockY = InGameConstants::kStartY + actualRow * InGameConstants::kBlockSize;
           block_grid_[row][col].position = Vec2{ blockX, blockY };
-        }
-        else {
+        } else {
           // 通常ブロック領域外は空ブロック
           block_grid_[row][col] = Block();
           const float emptyX = InGameConstants::kStartX + col * InGameConstants::kBlockSize;
@@ -494,7 +493,7 @@ void Game::UpdatePlayerFall(float delta_time)
     for (size_t i = 0; i < block_grid_.size(); i++) {
       for (size_t j = 0; j < block_grid_[i].size(); j++) {
         const Block& block = block_grid_[i][j];
-        
+
         // 空または破壊されたブロックはスキップ（壁は衝突対象）
         if (block.isEmpty() && !block.isWall()) {
           continue;
