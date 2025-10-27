@@ -10,8 +10,7 @@ namespace
 
   Optional<char32> NormalizeKanaChar(const char32 ch)
   {
-    switch (ch)
-    {
+    switch (ch) {
     case U'ー':
     case U'－':
     case U'―':
@@ -32,8 +31,7 @@ namespace
       { U'ゔ', U'う' }
     };
 
-    if (const auto it = kNormalizationMap.find(ch); it != kNormalizationMap.end())
-    {
+    if (const auto it = kNormalizationMap.find(ch); it != kNormalizationMap.end()) {
       return it->second;
     }
 
@@ -45,12 +43,9 @@ namespace
     Array<char32> seq;
     seq.reserve(source.size());
 
-    for (const auto& token : source)
-    {
-      for (const char32 ch : token)
-      {
-        if (const auto normalized = NormalizeKanaChar(ch))
-        {
+    for (const auto& token : source) {
+      for (const char32 ch : token) {
+        if (const auto normalized = NormalizeKanaChar(ch)) {
           seq << *normalized;
         }
       }
@@ -64,10 +59,8 @@ namespace
     Array<char32> seq;
     seq.reserve(word.size());
 
-    for (const char32 ch : word)
-    {
-      if (const auto normalized = NormalizeKanaChar(ch))
-      {
+    for (const char32 ch : word) {
+      if (const auto normalized = NormalizeKanaChar(ch)) {
         seq << *normalized;
       }
     }
@@ -77,21 +70,17 @@ namespace
 
   bool ContainsContiguousSubsequence(const Array<char32>& haystack, const Array<char32>& needle)
   {
-    if (needle.isEmpty() || needle.size() > haystack.size())
-    {
+    if (needle.isEmpty() || needle.size() > haystack.size()) {
       return false;
     }
 
     const size_t H = haystack.size();
     const size_t N = needle.size();
 
-    for (size_t i = 0; i + N <= H; ++i)
-    {
+    for (size_t i = 0; i + N <= H; ++i) {
       bool ok = true;
-      for (size_t j = 0; j < N; ++j)
-      {
-        if (haystack[i + j] != needle[j])
-        {
+      for (size_t j = 0; j < N; ++j) {
+        if (haystack[i + j] != needle[j]) {
           ok = false;
           break;
         }
@@ -144,11 +133,9 @@ Array<String> BlockManager::GetHitWords(const Array<String>& blocks, const Array
 
   const Array<char32> normalizedBlocks = BuildNormalizedSequence(blocks);
 
-  for (const auto& word : dictionary)
-  {
+  for (const auto& word : dictionary) {
     const Array<char32> normalizedWord = BuildNormalizedSequence(word);
-    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord))
-    {
+    if (ContainsContiguousSubsequence(normalizedBlocks, normalizedWord)) {
       result << word;
     }
   }
@@ -163,8 +150,7 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
 
 Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 prefetching) const
 {
-  if (row <= 0 || column <= 0 || requestedCount <= 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0)
-  {
+  if (row <= 0 || column <= 0 || requestedCount <= 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || prefetching <= 0) {
     return {};
   }
 
@@ -179,8 +165,7 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
   segmentPlacedWords.resize(prefetching);
 
   // セグメントごとに TS 実装に準拠した配置ロジックを適用
-  for (int32 seg = 0; seg < prefetching; ++seg)
-  {
+  for (int32 seg = 0; seg < prefetching; ++seg) {
     const int32 yOffset = seg * row;
 
     // clampedCount: min(words, 空きマス) に 1..requestedCount でクランプ
@@ -193,89 +178,77 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     shuffledWords.shuffle();
 
     auto getEmptyCells = [&](Array<Vec2i>& out)
-    {
-      out.clear();
-      out.reserve(static_cast<size_t>(row * column));
-      for (int32 y = 0; y < row; ++y)
       {
-        for (int32 x = 0; x < column; ++x)
-        {
-          const int32 gy = yOffset + y;
-          if (grid[gy][x].isEmpty())
-          {
-            out << Vec2i{ gy, x };
+        out.clear();
+        out.reserve(static_cast<size_t>(row * column));
+        for (int32 y = 0; y < row; ++y) {
+          for (int32 x = 0; x < column; ++x) {
+            const int32 gy = yOffset + y;
+            if (grid[gy][x].isEmpty()) {
+              out << Vec2i{ gy, x };
+            }
           }
         }
-      }
-    };
+      };
 
     auto placeWordAlongPath = [&](const String& word) -> bool
-    {
-      if (word.isEmpty()) return false;
-
-      // 文字配列（正規化せず、そのまま配置）
-      Array<char32> letters;
-      letters.reserve(word.size());
-      for (const char32 ch : word)
       {
-        letters << ch;
-      }
+        if (word.isEmpty()) return false;
 
-      Array<Vec2i> empties;
-      getEmptyCells(empties);
-
-      if (letters.size() > empties.size() || empties.isEmpty())
-      {
-        return false;
-      }
-
-      const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
-      Array<Vec2i> placements;
-      placements << start;
-      grid[start.y][start.x] = String(1, letters[0]);
-
-      for (size_t i = 1; i < letters.size(); ++i)
-      {
-        const Vec2i prev = placements.back();
-
-        // 近傍（下・左右）をランダム順に走査し、最初の空きに置く
-        bool moved = false;
-        for (const auto dir : NextSteps())
-        {
-          const int32 ny = prev.y + dir.y;
-          const int32 nx = prev.x + dir.x;
-          if (InBounds(ny, nx, totalRows, totalColumns)
-            && ny >= yOffset && ny < yOffset + row
-            && grid[ny][nx].isEmpty())
-          {
-            grid[ny][nx] = String(1, letters[i]);
-            placements << Vec2i{ ny, nx };
-            moved = true;
-            break;
-          }
+        // 文字配列（正規化せず、そのまま配置）
+        Array<char32> letters;
+        letters.reserve(word.size());
+        for (const char32 ch : word) {
+          letters << ch;
         }
 
-        if (!moved)
-        {
-          // ロールバック
-          for (const auto& cell : placements)
-          {
-            grid[cell.y][cell.x].clear();
-          }
+        Array<Vec2i> empties;
+        getEmptyCells(empties);
+
+        if (letters.size() > empties.size() || empties.isEmpty()) {
           return false;
         }
-      }
 
-      return true;
-    };
+        const Vec2i start = empties[static_cast<size_t>(Random(0, static_cast<int32>(empties.size() - 1)))];
+        Array<Vec2i> placements;
+        placements << start;
+        grid[start.y][start.x] = String(1, letters[0]);
 
-    while (remainingQuota > 0 && !shuffledWords.isEmpty())
-    {
+        for (size_t i = 1; i < letters.size(); ++i) {
+          const Vec2i prev = placements.back();
+
+          // 近傍（下・左右）をランダム順に走査し、最初の空きに置く
+          bool moved = false;
+          for (const auto dir : NextSteps()) {
+            const int32 ny = prev.y + dir.y;
+            const int32 nx = prev.x + dir.x;
+            if (InBounds(ny, nx, totalRows, totalColumns)
+              && ny >= yOffset && ny < yOffset + row
+              && grid[ny][nx].isEmpty()) {
+              grid[ny][nx] = String(1, letters[i]);
+              placements << Vec2i{ ny, nx };
+              moved = true;
+              break;
+            }
+          }
+
+          if (!moved) {
+            // ロールバック
+            for (const auto& cell : placements) {
+              grid[cell.y][cell.x].clear();
+            }
+            return false;
+          }
+        }
+
+        return true;
+      };
+
+    while (remainingQuota > 0 && !shuffledWords.isEmpty()) {
       // セグメント内の空きが無ければ終了
       Array<Vec2i> empties;
       getEmptyCells(empties);
-      if (empties.isEmpty())
-      {
+      if (empties.isEmpty()) {
         break;
       }
 
@@ -283,10 +256,8 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
       shuffledWords.pop_back();
 
       bool placed = false;
-      for (int32 attempt = 0; attempt < attemptLimit; ++attempt)
-      {
-        if (placeWordAlongPath(candidate))
-        {
+      for (int32 attempt = 0; attempt < attemptLimit; ++attempt) {
+        if (placeWordAlongPath(candidate)) {
           placed = true;
           segmentPlacedWords[seg] << candidate;
           break;
@@ -299,12 +270,9 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
   }
 
   // 未充填マスはランダムひらがな
-  for (int32 y = 0; y < totalRows; ++y)
-  {
-    for (int32 x = 0; x < totalColumns; ++x)
-    {
-      if (grid[y][x].isEmpty())
-      {
+  for (int32 y = 0; y < totalRows; ++y) {
+    for (int32 x = 0; x < totalColumns; ++x) {
+      if (grid[y][x].isEmpty()) {
         grid[y][x] = U"*";
       }
     }
@@ -316,13 +284,11 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
     if (!v.isEmpty()) { anyPlaced = true; break; }
   }
 
-  if (anyPlaced)
-  {
+  if (anyPlaced) {
     Console.open();
     Console.writeln(U"[GenerateBlockGrid] Prefetch segments: {}"_fmt(prefetching));
 
-    for (int32 seg = 0; seg < prefetching; ++seg)
-    {
+    for (int32 seg = 0; seg < prefetching; ++seg) {
       const int32 yOffset = seg * row;
       const int32 fromRow = yOffset;
       const int32 toRow = yOffset + row - 1;
@@ -333,8 +299,7 @@ Array<Array<String>> BlockManager::GenerateBlockGrid(const int32 row, const int3
       words.erase(newEnd, words.end());
 
       Console.writeln(U"--- Segment {}/{} [rows {}..{}] : {} word(s) ---"_fmt(seg + 1, prefetching, fromRow, toRow, words.size()));
-      for (const auto& w : words)
-      {
+      for (const auto& w : words) {
         Console.writeln(U"  - {}"_fmt(w));
       }
     }
