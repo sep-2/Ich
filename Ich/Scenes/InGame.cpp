@@ -191,6 +191,21 @@ namespace InGameConstants {
   const ColorF kWallPatternColor{ 0.2, 0.2, 0.2, 0.3 }; // パターンの色
   constexpr double kWallPatternLineSpacing = 15.0; // 壁パターンの線間隔
   constexpr double kWallPatternLineThickness = 1.5; // 壁パターンの線の太さ
+
+  /// <summary>
+  /// エア最大値
+  /// </summary>
+  const float kAirMax = 1.0f;
+
+  /// <summary>
+  /// 1ブロック当たりのエア消費量
+  /// </summary>
+  const float kAirConsumeRate = 0.05f;
+
+  /// <summary>
+  /// 単語を作成したときのエア回復量
+  /// </summary>
+  const float kAirRecoverRate = 0.1f;
 }
 
 Game::Game(const InitData& init)
@@ -215,13 +230,6 @@ Game::Game(const InitData& init)
       continue;
     }
     block_textures_ << texture;
-  }
-  for (const auto& emoji : emojis) {
-    // 絵文字の画像から形状情報を作成する
-    polygons << Emoji::CreateImage(emoji).alphaToPolygonsCentered().simplified(2.0);
-
-    // 絵文字の画像からテクスチャを作成する
-    textures << Texture{ Emoji{ emoji } };
   }
 
   auto& data = getData<SaveData>();
@@ -436,6 +444,12 @@ void Game::DestroyBlockUnderPlayer()
         // ブロックを破壊
         block.is_destroyed = true;
         PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
+
+        // エアを消費
+        air_amount_ -= InGameConstants::kAirConsumeRate;
+        if (air_amount_ < 0.0f) {
+          air_amount_ = 0.0f;
+        }
 
         // 文字を追加
         have_words_.push_back(block.value);
@@ -760,21 +774,28 @@ void Game::update()
   for (const auto& word : have_words_) {
     concatenated += word;
   }
-  PRINT << U"Concatenated: " << concatenated;
 
   // 単語が完成したかチェック
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   if (!result.isEmpty()) {
     // resultの各単語について処理
-    for (const auto& hitWord : result) {
+    for (const auto& hit_word : result) {
       // 完成した単語をcompleted_words_に追加（重複チェック）
-      if (!completed_words_.includes(hitWord)) {
-        completed_words_.push_back(hitWord);
+      if (!completed_words_.includes(hit_word)) {
+        completed_words_.push_back(hit_word);
         // HitEffect をプレイヤーの少し上に生成
         if (player_) {
           const Vec2 pos = player_->GetPosition() + Vec2{ 0.0, -60.0 };
-          hit_effect_.Add(pos, hitWord);
+          hit_effect_.Add(pos, hit_word);
         }
+        
+        // 単語を完成させたらエアを回復
+        const size_t word_length = hit_word.length();
+        air_amount_ += static_cast<float>(word_length) * InGameConstants::kAirRecoverRate;
+        if (air_amount_ > InGameConstants::kAirMax) {
+          air_amount_ = InGameConstants::kAirMax;
+        }
+        
         // 効果音など入れるならここ
       }
     }
@@ -797,19 +818,6 @@ void Game::update()
   if (ui_) {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
 
-    // デモ用：時間経過でエアが減少
-    air_amount_ -= static_cast<float>(Scene::DeltaTime() * InGameConstants::kAirDecreaseRate);
-    if (air_amount_ < 0.0f) {
-      air_amount_ = 0.0f;
-    }
-
-    // スペースキーでエア回復（デモ用）
-    if (KeySpace.pressed()) {
-      air_amount_ += static_cast<float>(Scene::DeltaTime() * InGameConstants::kAirIncreaseRate);
-      if (air_amount_ > 1.0f) {
-        air_amount_ = 1.0f;
-      }
-    }
 
     ui_->SetAirGauge(air_amount_);
   }
@@ -990,7 +998,7 @@ void Game::draw() const
     }
 
     // デバッグ情報の描画（カメラオフセット適用範囲内）
-    DrawDebugInfo();
+    // DrawDebugInfo();
 
     // 最前面にヒット演出を描画
     hit_effect_.Draw();

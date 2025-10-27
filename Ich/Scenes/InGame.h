@@ -31,26 +31,6 @@ public:
 
 private:
 
-  // 代表的な絵文字ブロックから単一コードポイント絵文字を収集
-  static Array<String> BuildAllEmojis()
-  {
-    Array<String> e;
-
-    auto addRange = [&](uint32 start, uint32 end)
-      {
-        for (uint32 cp = start; cp <= end; ++cp) {
-          String s;
-          s.push_back(static_cast<char32_t>(cp));
-          e << s;
-        }
-      };
-  
-    // 主な絵文字ブロック
-    addRange(0x1F600, 0x1F64F);  // Emoticons
-
-    return e;
-  }
-
   /// <summary>
   /// プレイヤーの足元のブロックを破壊する
   /// </summary>
@@ -126,7 +106,6 @@ private:
 
   Stopwatch m_stopwatch_;
 
-  bool is_begin_ = false;
   bool is_paused_ = false;  // ゲーム一時停止フラグ
 
   // メニュー
@@ -138,12 +117,7 @@ private:
   // プレイヤー
   std::shared_ptr<Player> player_;
 
-  // 登場する絵文字
-  const Array<String> emojis = BuildAllEmojis();
-
-  Array<MultiPolygon> polygons;
-
-  Array<Texture> textures;
+  Array<Texture> textures_;
 
   Array<Texture> block_textures_;
 
@@ -170,25 +144,28 @@ private:
     bool is_destroyed;      // ブロックが破壊されているか
     Vec2 position;          // ブロックのピクセル位置（左上）
     Type type;              // ブロックの種類
-    
-    Block() 
+
+    Block()
       : value(U"")
       , is_destroyed(false)
       , type(Type::kEmpty)
-    {}
-    
-    Block(const String& val) 
+    {
+    }
+
+    Block(const String& val)
       : value(val)
       , is_destroyed(false)
       , type(Type::kNormal)
-    {}
+    {
+    }
 
     Block(Type blockType)
       : value(U"")
       , is_destroyed(false)
       , type(blockType)
-    {}
-    
+    {
+    }
+
     // ブロックが空かどうか
     bool isEmpty() const
     {
@@ -227,6 +204,9 @@ private:
   // プレイヤーの移動入力
   Vec2 player_move_input_ = Vec2::Zero();
 
+  /// <summary>
+  /// 今まで完成した単語
+  /// </summary>
   Array<String> have_words_;
 
   // 最大文字数
@@ -253,13 +233,3 @@ private:
   static constexpr bool kDebugMode = false;
 #endif
 };
-
-
-
-
-
-
-
-
-
-
