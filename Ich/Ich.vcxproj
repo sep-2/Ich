@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InGame\BlockDestroyEffect.cpp" />
+    <ClCompile Include="InGame\BubbleEffect.cpp" />
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -347,6 +348,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InGame\BlockDestroyEffect.h" />
+    <ClInclude Include="InGame\BubbleEffect.h" />
     <ClInclude Include="InGame\Ui.h" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Scenes\Enum.h" />
