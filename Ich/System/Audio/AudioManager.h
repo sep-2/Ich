@@ -11,6 +11,7 @@
 enum class SeKind {
   kDestroyBlock,
   kCompleteWord,
+  kGameOver,
 };
 
 /// <summary>
@@ -27,6 +28,7 @@ private:
   static inline const std::map<SeKind, std::string> kSeFilepaths = {
     {SeKind::kDestroyBlock, "Assets/Audio/Se/DestroyBlock.mp3"},
     {SeKind::kCompleteWord, "Assets/Audio/Se/CompleteWord.mp3"},
+    {SeKind::kGameOver, "Assets/Audio/Se/GameOver.mp3"},
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {

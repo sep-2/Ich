@@ -8,6 +8,7 @@
 #include "System/Menu/Menu.h"
 #include "InGame/Ui.h"
 #include "InGame/BlockDestroyEffect.h"
+#include "InGame/BubbleEffect.h"
 #include "InGame/HitEffect.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
@@ -97,7 +98,15 @@ private:
   /// </summary>
   void DrawDebugInfo() const;
 
+  /// <summary>
+  /// ヒントを更新
+  /// </summary>
   void UpdateHint();
+
+  /// <summary>
+  /// ゲームオーバー処理を開始
+  /// </summary>
+  void StartGameOver();
 
   /// <summary>
   /// ブロックのテクスチャ
@@ -107,6 +116,8 @@ private:
   Stopwatch m_stopwatch_;
 
   bool is_paused_ = false;  // ゲーム一時停止フラグ
+  bool is_game_over_ = false; // ゲームオーバーフラグ
+  double game_over_timer_ = 0.0; // ゲームオーバー演出時間
 
   // メニュー
   std::unique_ptr<Menu> menu_;
@@ -202,6 +213,9 @@ private:
   // デバッグ用フォント
   Font debug_font_;
 
+  // ゲームオーバー用フォント
+  Font game_over_font_;
+
   // プレイヤーの落下速度
   float player_fall_velocity_ = 0.0f;
 
@@ -226,6 +240,9 @@ private:
 
   // ブロック破壊演出
   std::unique_ptr<BlockDestroyEffect> block_destroy_effect_;
+
+  // 泡エフェクト（ゲームオーバー演出）
+  std::unique_ptr<BubbleEffect> bubble_effect_;
 
   // ヒット演出（取得単語表示）
   HitEffect hit_effect_;

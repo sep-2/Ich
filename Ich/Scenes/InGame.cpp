@@ -6,10 +6,10 @@
 #include "System/SaveData/SaveData.hpp"
 #include "System/Menu/GameSettings.h"
 #include "System/System/BlockManager.h"
-#include "System/Audio/AudioManager.h"
 #include "Keywords.hpp"
 
-namespace InGameConstants {
+namespace InGameConstants
+{
   const Vec2 kStartBlock{ 200, 200 };
 
   // ブロックサイズ
@@ -154,6 +154,11 @@ namespace InGameConstants {
   constexpr int32 kHintFontSize = 20;
   constexpr int32 kDebugFontSize = 16;
 
+  // ゲームオーバーパラメータ
+  constexpr double kGameOverDuration = 3.0;       // ゲームオーバー演出の持続時間
+  constexpr int32 kGameOverFontSize = 60;         // ゲームオーバーフォントサイズ
+  const ColorF kGameOverTextColor{ 1.0, 0.2, 0.2 };  // ゲームオーバーテキスト色
+
   /// <summary>
   /// ブロックのイメージパス
   /// </summary>
@@ -201,7 +206,7 @@ namespace InGameConstants {
   /// <summary>
   /// 1ブロック当たりのエア消費量
   /// </summary>
-  const float kAirConsumeRate = 0.05f;
+  const float kAirConsumeRate = 0.08f;
 
   /// <summary>
   /// 単語を作成したときのエア回復量
@@ -216,11 +221,15 @@ Game::Game(const InitData& init)
   , ui_(std::make_shared<Ui>())
   , player_(std::make_shared<Player>())
   , block_destroy_effect_(std::make_unique<BlockDestroyEffect>())
+  , bubble_effect_(std::make_unique<BubbleEffect>())
   , air_amount_(1.0f)
+  , is_game_over_(false)
+  , game_over_timer_(0.0)
   , block_font_{ InGameConstants::kBlockFontSize, Typeface::Bold }
   , completed_word_font_{ InGameConstants::kCompletedWordFontSize }
   , hint_font_{ InGameConstants::kHintFontSize }
   , debug_font_{ InGameConstants::kDebugFontSize }
+  , game_over_font_{ InGameConstants::kGameOverFontSize, Typeface::Bold }
 {
   //PRINT << U"Game::Game()";
 
@@ -741,13 +750,17 @@ void Game::UpdatePlayerMovement(float delta_time)
 void Game::update()
 {
   // Esc キーでメニュー開閉
-  if (KeyEscape.down()) {
+  if (KeyEscape.down())
+  {
     PRINT << U"Toggle Menu";
-    if (menu_->IsOpen()) {
+    if (menu_->IsOpen())
+    {
       menu_->Close();
       is_paused_ = false;
       PRINT << U"Close";
-    } else {
+    }
+    else
+    {
       menu_->Open();
       is_paused_ = true;
       PRINT << U"Open";
@@ -781,10 +794,32 @@ void Game::update()
     return;  // ゲームロジックは更新しない
   }
 
+  // ゲームオーバー処理
+  if (is_game_over_)
+  {
+    game_over_timer_ += Scene::DeltaTime();
+
+    // 泡エフェクトの更新
+    if (bubble_effect_)
+    {
+      bubble_effect_->Update(Scene::DeltaTime());
+    }
+
+    // 一定時間経過後にタイトルに戻る
+    if (game_over_timer_ >= InGameConstants::kGameOverDuration)
+    {
+      changeScene(EnumScene::kTitle, 1s);
+    }
+
+    return;  // ゲームオーバー中は通常の更新処理をスキップ
+  }
+
   // ブロック破壊演出を更新
-  if (block_destroy_effect_) {
+  if (block_destroy_effect_)
+  {
     block_destroy_effect_->Update(Scene::DeltaTime());
   }
+  
   // ヒット演出の更新
   hit_effect_.Update(Scene::DeltaTime());
 
@@ -821,24 +856,32 @@ void Game::update()
     }
   }
 
+  // エア残量がゼロになったらゲームオーバー
+  if (air_amount_ <= 0.0f && !is_game_over_)
+  {
+    StartGameOver();
+  }
+
   // Zキーでブロック破壊
-  if (KeyZ.down()) {
+  if (KeyZ.down())
+  {
     DestroyBlockUnderPlayer();
   }
 
-
-  if (!is_paused_) {
+  if (!is_paused_)
+  {
     hint_timer_ += Scene::DeltaTime();
-    if (hint_timer_ >= InGameConstants::kHintUpdateInterval) {
+    if (hint_timer_ >= InGameConstants::kHintUpdateInterval)
+    {
       hint_timer_ = 0.0;
       UpdateHint();
     }
   }
+  
   // UIの更新（メニューが閉じている時のみ）
-  if (ui_) {
+  if (ui_)
+  {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
-
-
     ui_->SetAirGauge(air_amount_);
   }
 
@@ -850,7 +893,8 @@ void Game::update()
 
   // プレイヤーの更新（メニューが閉じている時のみ）
   // 注：移動処理は上で行っているため、ここではアニメーションのみ更新
-  if (player_) {
+  if (player_)
+  {
     player_->Update(static_cast<float>(Scene::DeltaTime()));
   }
 
@@ -911,7 +955,8 @@ void Game::draw() const
 {
   Scene::SetBackground(InGameConstants::kBackgroundColor);
 
-  if (!block_bg_texture_.isEmpty()) {
+  if (!block_bg_texture_.isEmpty())
+  {
     block_bg_texture_.resized(Scene::Size()).draw(0, 0);
   }
 
@@ -991,23 +1036,44 @@ void Game::draw() const
     }
 
     // ブロック破壊演出の描画（カメラオフセット適用範囲内）
-    if (block_destroy_effect_) {
+    if (block_destroy_effect_)
+    {
       block_destroy_effect_->Draw();
     }
 
+    // 泡エフェクトの描画（ゲームオーバー演出）
+    if (bubble_effect_ && is_game_over_)
+    {
+      bubble_effect_->Draw();
+    }
+
     // プレイヤーの描画（カメラオフセット適用範囲内）
-    // Rendererシステムを使わずに直接描画してカメラに追従させる
-    if (player_) {
+    // ゲームオーバー時は徐々に透明にする
+    if (player_)
+    {
       const Vec2 player_pos = player_->GetPosition();
       const auto texture = player_->GetTexture();
 
-      if (texture) {
+      if (texture)
+      {
         const float scale_x = player_->GetScaleX();
         const float scale_y = player_->GetScaleY();
-        texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
+        
+        if (is_game_over_)
+        {
+          // ゲームオーバー時はフェードアウト
+          const double alpha = Max(0.0, 1.0 - (game_over_timer_ / (InGameConstants::kGameOverDuration * 0.5)));
+          texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y, ColorF{ 1.0, 1.0, 1.0, alpha });
+        }
+        else
+        {
+          texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
+        }
       }
 
-      if (player_->IsWeaponVisible()) {
+      // ゲームオーバー時は武器を非表示
+      if (!is_game_over_ && player_->IsWeaponVisible())
+      {
         const Vec2 weapon_pos = player_->GetWeaponPosition();
         const SizeF weapon_size = player_->GetWeaponSize();
         const double weapon_rotation = player_->GetWeaponRotation();
@@ -1017,7 +1083,9 @@ void Game::draw() const
         RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
       }
 
-      if (!current_hint_.isEmpty()) {
+      // ゲームオーバー時はヒント非表示
+      if (!is_game_over_ && !current_hint_.isEmpty())
+      {
         const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
         const RectF text_region = hint_font_(current_hint_).region();
         const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
@@ -1040,13 +1108,28 @@ void Game::draw() const
   // カメラオフセット適用範囲ここまで
 
   // UI の描画（カメラの影響を受けない、画面固定）
-  if (ui_) {
+  if (ui_)
+  {
     ui_->Render();
   }
 
   // メニューが開いている場合は描画
-  if (menu_->IsOpen()) {
+  if (menu_->IsOpen())
+  {
     menu_->Draw();
+  }
+
+  // ゲームオーバー時の表示
+  if (is_game_over_)
+  {
+    // 半透明の黒背景
+    Scene::Rect().draw(ColorF{ 0.0, 0.0, 0.0, Min(0.7, game_over_timer_ * 0.5) });
+
+    // ゲームオーバーテキスト（フェードイン）
+    const double text_alpha = Min(1.0, game_over_timer_);
+    ColorF text_color = InGameConstants::kGameOverTextColor;
+    text_color.a = text_alpha;
+    game_over_font_(U"GAME OVER").drawAt(Scene::Center(), text_color);
   }
 
   // 明るさ設定を適用
@@ -1181,35 +1264,65 @@ void Game::UpdateHint()
 {
   const Array<std::pair<String, String>> reach_words = block_manager_.GetReachWords(have_words_, keywords);
 
-  if (reach_words.isEmpty()) {
+  if (reach_words.isEmpty())
+  {
     current_hint_.clear();
     return;
   }
 
   Array<String> candidates;
   candidates.reserve(reach_words.size());
-  for (const auto& entry : reach_words) {
-    if (entry.first.isEmpty()) {
+  for (const auto& entry : reach_words)
+  {
+    if (entry.first.isEmpty())
+    {
       continue;
     }
-    if (!entry.second.isEmpty()) {
+    if (!entry.second.isEmpty())
+    {
       String masked = entry.first;
-      for (char32& ch : masked) {
-        if (ch == entry.second.front()) {
+      for (char32& ch : masked)
+      {
+        if (ch == entry.second.front())
+        {
           ch = U'〇';
         }
       }
       candidates << masked;
-    } else {
+    }
+    else
+    {
       candidates << entry.first;
     }
   }
 
-  if (candidates.isEmpty()) {
+  if (candidates.isEmpty())
+  {
     current_hint_.clear();
     return;
   }
 
   const size_t index = static_cast<size_t>(Random(0, static_cast<int32>(candidates.size() - 1)));
   current_hint_ = candidates[index];
+}
+
+void Game::StartGameOver()
+{
+  is_game_over_ = true;
+  game_over_timer_ = 0.0;
+
+  // プレイヤーのポーズをゲームオーバーに設定
+  if (player_)
+  {
+    player_->SetPose(Player::Pose::kGameOver);
+  }
+
+  // プレイヤーの位置に泡エフェクトを発生
+  if (player_ && bubble_effect_)
+  {
+    bubble_effect_->AddEffect(player_->GetPosition());
+  }
+
+  // ゲームオーバー効果音を再生
+  AudioManager::GetInstance()->PlaySe(SeKind::kGameOver);
 }
