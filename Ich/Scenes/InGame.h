@@ -109,6 +109,11 @@ private:
   void StartGameOver();
 
   /// <summary>
+  /// ゲームクリア処理を開始
+  /// </summary>
+  void StartGameClear();
+
+  /// <summary>
   /// ブロックのテクスチャ
   /// </summary>
   Texture block_bg_texture_;
@@ -117,7 +122,9 @@ private:
 
   bool is_paused_ = false;  // ゲーム一時停止フラグ
   bool is_game_over_ = false; // ゲームオーバーフラグ
+  bool is_game_clear_ = false; // ゲームクリアフラグ
   double game_over_timer_ = 0.0; // ゲームオーバー演出時間
+  double game_clear_timer_ = 0.0; // ゲームクリア演出時間
 
   // メニュー
   std::unique_ptr<Menu> menu_;
