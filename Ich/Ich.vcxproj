@@ -124,6 +124,7 @@
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Messages.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Scenes\InGame.cpp" />
@@ -350,6 +351,7 @@
     <ClInclude Include="InGame\BlockDestroyEffect.h" />
     <ClInclude Include="InGame\BubbleEffect.h" />
     <ClInclude Include="InGame\Ui.h" />
+    <ClInclude Include="Messages.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Scenes\Enum.h" />
     <ClInclude Include="Scenes\InGame.h" />
