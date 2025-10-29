@@ -7,6 +7,7 @@
 #include "System/Menu/GameSettings.h"
 #include "System/System/BlockManager.h"
 #include "Keywords.hpp"
+#include "Messages.hpp"
 
 namespace InGameConstants
 {
@@ -59,6 +60,7 @@ namespace InGameConstants
   constexpr int32 kCompletedBoardLineHeight = 18;
 
   constexpr double kHintUpdateInterval = 3.0;
+  constexpr double kMessageDisplayDuration = 3.0;
 
   // ブロック破壊判定パラメータ
   constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // 上下のブロック破壊判定の閾値
@@ -122,9 +124,9 @@ namespace InGameConstants
   constexpr double kHintBubbleFrameThickness2 = 1.2;
 
   // ヒントバブルパラメータ
-  const Vec2 kHintBoxOffset{ -80.0, -70.0 }; // 20px 下へ
-  const Vec2 kHintBubbleAnchorOffset{ -50.0, -30.0 }; // 20px 下へ
-  const Vec2 kHintBubble2Offset{ 15.0, 15.0 };
+  const Vec2 kHintBoxOffset{ 80.0, -70.0 }; // 20px 下へ
+  const Vec2 kHintBubbleAnchorOffset{ 50.0, -30.0 }; // 20px 下へ
+  const Vec2 kHintBubble2Offset{ -15.0, 15.0 };
   constexpr double kHintBoxPadding = 18.0;
   constexpr double kHintBubble1Radius = 8.0;
   constexpr double kHintBubble2Radius = 5.0;
@@ -872,6 +874,12 @@ void Game::update()
       // 完成した単語をcompleted_words_に追加（重複チェック）
       if (!completed_words_.includes(hit_word)) {
         completed_words_.push_back(hit_word);
+        const auto messageIt = messages.find(hit_word);
+        if (messageIt != messages.end() && !messageIt->second.isEmpty())
+        {
+          current_message_ = messageIt->second;
+          message_timer_ = 0.0;
+        }
         // HitEffect をプレイヤーの少し上に生成
         if (player_) {
           const Vec2 pos = player_->GetPosition() + Vec2{ 0.0, -60.0 };
@@ -916,6 +924,16 @@ void Game::update()
     {
       hint_timer_ = 0.0;
       UpdateHint();
+    }
+
+    if (!current_message_.isEmpty())
+    {
+      message_timer_ += Scene::DeltaTime();
+      if (message_timer_ >= InGameConstants::kMessageDisplayDuration)
+      {
+        current_message_.clear();
+        message_timer_ = 0.0;
+      }
     }
   }
   
@@ -1126,6 +1144,27 @@ void Game::draw() const
         RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
       }
 
+      // ゲームオーバー時は吹き出し非表示
+      if (!is_game_over_)
+      {
+        String bubble_text;
+        if (!current_message_.isEmpty())
+        {
+          bubble_text = current_message_;
+        }
+        else if (!current_hint_.isEmpty())
+        {
+          bubble_text = current_hint_;
+        }
+
+        if (!bubble_text.isEmpty()) {
+          const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
+          const RectF text_region = hint_font_(bubble_text).region();
+          const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
+          hint_rect.draw(InGameConstants::kHintBackgroundColor);
+          hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
+          hint_font_(bubble_text).drawAt(hint_center, InGameConstants::kHintTextColor);
+        }
       // ゲームオーバー時・ゲームクリア時はヒント非表示
       if (!is_game_over_ && !is_game_clear_ && !current_hint_.isEmpty())
       {
@@ -1136,9 +1175,10 @@ void Game::draw() const
         hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
         hint_font_(current_hint_).drawAt(hint_center, InGameConstants::kHintTextColor);
 
-        const Vec2 bubble_anchor = player_pos + InGameConstants::kHintBubbleAnchorOffset;
-        Circle{ bubble_anchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
-        Circle{ bubble_anchor + InGameConstants::kHintBubble2Offset, InGameConstants::kHintBubble2Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness2, InGameConstants::kHintBorderColor);
+          const Vec2 bubble_anchor = player_pos + InGameConstants::kHintBubbleAnchorOffset;
+          Circle{ bubble_anchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
+          Circle{ bubble_anchor + InGameConstants::kHintBubble2Offset, InGameConstants::kHintBubble2Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness2, InGameConstants::kHintBorderColor);
+        }
       }
     }
 

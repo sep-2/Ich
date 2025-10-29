@@ -241,6 +241,8 @@ private:
   Array<String> completed_words_;
   double hint_timer_ = 0.0;
   String current_hint_;
+  double message_timer_ = 0.0;
+  String current_message_;
 
   // カメラオフセット（ワールド座標からスクリーン座標への変換）
   Vec2 camera_offset_ = Vec2::Zero();
