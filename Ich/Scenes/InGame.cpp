@@ -665,6 +665,11 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   // 横移動がない場合は早期リターン
   if (move_input.x == 0.0f) {
+    if (is_on_block) {
+      player_->SetPose(Player::Pose::kIdle);
+    } else {
+      player_->SetPose(Player::Pose::kFall);
+    }
     return;
   }
 
@@ -711,6 +716,8 @@ void Game::UpdatePlayerMovement(float delta_time)
 
       // 左に移動する場合
       if (move_input.x < 0) {
+        player_->SetPose(Player::Pose::kStrafeLeft);
+
         // プレイヤーの左端がブロックの右端より左にあり、かつ衝突する場合
         if (player_left < block_right && player_right > block_right) {
           // ブロックの右端にプレイヤーの左端を配置
@@ -721,6 +728,8 @@ void Game::UpdatePlayerMovement(float delta_time)
       }
       // 右に移動する場合
       else if (move_input.x > 0) {
+        player_->SetPose(Player::Pose::kStrafeRight);
+
         // プレイヤーの右端がブロックの左端より右にあり、かつ衝突する場合
         if (player_right > block_left && player_left < block_left) {
           // ブロックの左端にプレイヤーの右端を配置
@@ -884,9 +893,6 @@ void Game::update()
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
     ui_->SetAirGauge(air_amount_);
   }
-
-  // プレイヤーの落下更新
-  UpdatePlayerFall(static_cast<float>(Scene::DeltaTime()));
 
   // プレイヤーの左右移動更新（衝突判定付き）
   UpdatePlayerMovement(static_cast<float>(Scene::DeltaTime()));
