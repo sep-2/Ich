@@ -5,7 +5,8 @@
 #include "System/Renderer/Priority.h"
 #include <cmath>
 
-namespace PlayerConstants {
+namespace PlayerConstants
+{
   // 初期位置
   constexpr Vec2 kInitialPosition{ 100.0f, 200.0f };
 
@@ -29,9 +30,9 @@ namespace PlayerConstants {
   // 各配列の順番はアニメーションの周期（0.2秒単位）で順番に再生される。
   const Array<PoseAnimationResource> kPoseAnimationResources = {
     { Player::Pose::kIdle,             { U"Assets/Image/Player/Idle1.png",    U"Assets/Image/Player/Idle2.png" } },
-    { Player::Pose::kStrafeLeft,       { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/Left2.png" } },
-    { Player::Pose::kStrafeRight,      { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/Left2.png" } }, // 右は左右反転
-    { Player::Pose::kWalkForwardLeft,  { U"Assets/Image/Player/WalkA1.png",   U"Assets/Image/Player/WalkA2.png" } },
+    { Player::Pose::kStrafeLeft,       { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/WalkA2.png" } },
+    { Player::Pose::kStrafeRight,      { U"Assets/Image/Player/Left1.png",    U"Assets/Image/Player/WalkA2.png" } }, // 右は左右反転
+    { Player::Pose::kWalkForwardLeft,  { U"Assets/Image/Player/WalkA1.png",   U"Assets/Image/Player/WalkB2.png" } },
     { Player::Pose::kWalkForwardRight, { U"Assets/Image/Player/WalkA1.png",   U"Assets/Image/Player/WalkA2.png" } }, // 右は左右反転
     { Player::Pose::kFall,             { U"Assets/Image/Player/Fall1.png",    U"Assets/Image/Player/Fall2.png" } },
     { Player::Pose::kGameOver,         { U"Assets/Image/Player/GameOver1.png",U"Assets/Image/Player/GameOver2.png" } },
@@ -105,9 +106,9 @@ Player::Player()
   // 2) 初期ポーズに応じたテクスチャをTextureWrapperへ設定する
   LoadPoseTextures();
 
-  const auto* initialFrames = FindPoseFrames(pose_);
-  if (initialFrames && !initialFrames->isEmpty()) {
-    player_wrapper_ = std::make_shared<TextureWrapper>(initialFrames->front(),
+  const auto* initial_frames = FindPoseFrames(pose_);
+  if (initial_frames && !initial_frames->isEmpty()) {
+    player_wrapper_ = std::make_shared<TextureWrapper>(initial_frames->front(),
       static_cast<int>(position_.x), static_cast<int>(position_.y));
     player_wrapper_->SetIsCenter(true);
   }
@@ -232,8 +233,8 @@ float Player::GetWidth() const
     }
   }
 
-  const float fallbackScale = kTargetHeight / static_cast<float>(kSpriteHeight);
-  return kSpriteWidth * fallbackScale;
+  const float fallback_scale = kTargetHeight / static_cast<float>(kSpriteHeight);
+  return kSpriteWidth * fallback_scale;
 }
 
 /// <summary>
@@ -340,6 +341,7 @@ void Player::SetPose(const Pose pose)
 /// </summary>
 void Player::RefreshPoseFromMovement()
 {
+  //PRINT << "RefreshPoseFromMovement";
   ApplyPoseFromMovement(true); // 落下終了など強制的に移動ポーズへ戻したい時はこちらを使用
 }
 
@@ -380,11 +382,11 @@ void Player::UpdateWeapon(float delta_time)
     break;
   }
 
-  const double directionLength = direction.length();
-  if (directionLength <= 0.0) {
+  const double direction_length = direction.length();
+  if (direction_length <= 0.0) {
     weapon_forward_dir_ = Vec2{ 0.0, 1.0 };
   } else {
-    weapon_forward_dir_ = direction / directionLength;
+    weapon_forward_dir_ = direction / direction_length;
   }
 
   weapon_base_position_ = position_ + weapon_forward_dir_ * kWeaponForwardOffset;
@@ -416,26 +418,36 @@ void Player::UpdateWeapon(float delta_time)
 void Player::UpdateAnimation(float delta_time)
 {
   const auto* frames = FindPoseFrames(pose_);
-  if (!frames || frames->isEmpty()) {
-    animation_timer_ = 0.0f;
-    current_pose_frame_ = 0;
-    return;
-  }
+  //PRINT << static_cast<int>(pose_);
+  //PRINT << frames->size();
+  //if (!frames || frames->isEmpty()) {
+  //  animation_timer_ = 0.0f;
+  //  current_pose_frame_ = 0;
+  //  return;
+  //}
 
-  const size_t frameCount = frames->size();
-  if (frameCount <= 1) {
+  const size_t frame_count = frames->size();
+  if (frame_count <= 1) {
     // 単一フレームの場合はループさせず、初期フレームのまま維持する
     animation_timer_ = 0.0f;
-    current_pose_frame_ = 0;
+    //current_pose_frame_ = 0;
     return;
   }
 
   animation_timer_ += delta_time;
-  while (animation_timer_ >= frame_interval_seconds_) {
-    animation_timer_ -= frame_interval_seconds_;
-    current_pose_frame_ = (current_pose_frame_ + 1) % static_cast<int>(frameCount);
+  //PRINT << animation_timer_;
+  //PRINT << frame_interval_seconds_;
+  if (animation_timer_ >= frame_interval_seconds_) {
+    animation_timer_ = 0;
+    current_pose_frame_ = (current_pose_frame_ + 1) % static_cast<int>(frame_count);
+    PRINT << current_pose_frame_;
     UpdateTextureForPose();
   }
+  //while (animation_timer_ >= frame_interval_seconds_) {
+  //  animation_timer_ -= frame_interval_seconds_;
+  //  current_pose_frame_ = (current_pose_frame_ + 1) % static_cast<int>(frame_count);
+  //  UpdateTextureForPose();
+  //}
 }
 
 /// <summary>
@@ -470,11 +482,15 @@ void Player::ApplyPoseFromMovement(const bool force)
     return;
   }
 
-  const Pose newPose = CalculateMovementPose();
-  if (force || pose_ != newPose) {
-    current_pose_frame_ = 0;
-    animation_timer_ = 0.0f;
-    pose_ = newPose;
+  const Pose new_pose = CalculateMovementPose();
+  if (pose_ != new_pose) {
+    PRINT << U"CalculateMovementPose changed pose:" << force;
+  }
+  if (force || pose_ != new_pose) {
+    //PRINT << U"ApplyPoseFromMovement:" << force;
+    //current_pose_frame_ = 0;
+    //animation_timer_ = 0.0f;
+    pose_ = new_pose;
     UpdateTextureForPose(); // 画像・スケール・反転を即時更新
   }
 }
@@ -514,13 +530,13 @@ void Player::UpdateTextureForPose()
     return;
   }
 
-  const size_t frameCount = frames->size();
-  size_t frameIndex = 0;
-  if (frameCount > 0) {
-    frameIndex = static_cast<size_t>(current_pose_frame_) % frameCount;
+  const size_t frame_count = frames->size();
+  size_t frame_index = 0;
+  if (frame_count > 0) {
+    frame_index = static_cast<size_t>(current_pose_frame_) % frame_count;
   }
 
-  const auto texture = (*frames)[frameIndex];
+  const auto texture = (*frames)[frame_index];
   if (!texture) {
     return;
   }
@@ -535,29 +551,29 @@ void Player::UpdateTextureForPose()
 
   player_wrapper_->SetPosition(static_cast<int>(position_.x), static_cast<int>(position_.y));
 
-  const float textureHeight = static_cast<float>(texture->height());
+  const float texture_height = static_cast<float>(texture->height());
   // 目標とする見た目の高さ(kTargetHeight)から縮尺を逆算。
   // 画像サイズが想定外でも最終的には「おおむね既定の大きさ」で描画できる。
-  float scaleY = (textureHeight > 0.0f) ? (kTargetHeight / textureHeight) : kScale;
-  if (!std::isfinite(scaleY) || scaleY <= 0.0f) {
-    scaleY = kScale;
+  float scale_y = (texture_height > 0.0f) ? (kTargetHeight / texture_height) : kScale;
+  if (!std::isfinite(scale_y) || scale_y <= 0.0f) {
+    scale_y = kScale;
   }
 
-  float scaleX = scaleY;
+  float scale_x = scale_y;
 
   switch (pose_) {
   case Pose::kStrafeRight:
-    scaleX = -scaleY;
+    scale_x = -scale_y;
     break;
   case Pose::kWalkForwardRight:
-    scaleX = -scaleY;
+    scale_x = -scale_y;
     break;
   default:
-    scaleX = scaleY;
+    scale_x = scale_y;
     break;
   }
 
   // TextureWrapper へ反映。左右反転した場合もCollider計算のため絶対値を保持している。
-  player_wrapper_->SetScale(scaleX, scaleY);
+  player_wrapper_->SetScale(scale_x, scale_y);
 }
 
