@@ -159,6 +159,11 @@ namespace InGameConstants
   constexpr int32 kGameOverFontSize = 60;         // ゲームオーバーフォントサイズ
   const ColorF kGameOverTextColor{ 1.0, 0.2, 0.2 };  // ゲームオーバーテキスト色
 
+  // ゲームクリアパラメータ
+  constexpr double kGameClearDuration = 8.0;      // ゲームクリア演出の持続時間
+  constexpr int32 kGameClearFontSize = 60;        // ゲームクリアフォントサイズ
+  const ColorF kGameClearTextColor{ 1.0, 0.8, 0.2 };  // ゲームクリアテキスト色（金色）
+
   /// <summary>
   /// ブロックのイメージパス
   /// </summary>
@@ -212,6 +217,11 @@ namespace InGameConstants
   /// 単語を作成したときのエア回復量
   /// </summary>
   const float kAirRecoverRate = 0.1f;
+
+  /// <summary>
+  /// クリアまでの単語の完成数
+  /// </summary>
+  const int kClearEvaluationCount = 3;
 }
 
 Game::Game(const InitData& init)
@@ -224,7 +234,9 @@ Game::Game(const InitData& init)
   , bubble_effect_(std::make_unique<BubbleEffect>())
   , air_amount_(1.0f)
   , is_game_over_(false)
+  , is_game_clear_(false)
   , game_over_timer_(0.0)
+  , game_clear_timer_(0.0)
   , block_font_{ InGameConstants::kBlockFontSize, Typeface::Bold }
   , completed_word_font_{ InGameConstants::kCompletedWordFontSize }
   , hint_font_{ InGameConstants::kHintFontSize }
@@ -823,6 +835,20 @@ void Game::update()
     return;  // ゲームオーバー中は通常の更新処理をスキップ
   }
 
+  // ゲームクリア処理
+  if (is_game_clear_)
+  {
+    game_clear_timer_ += Scene::DeltaTime();
+
+    // 一定時間経過後にタイトルに戻る
+    if (game_clear_timer_ >= InGameConstants::kGameClearDuration)
+    {
+      changeScene(EnumScene::kTitle, 1s);
+    }
+
+    return;  // ゲームクリア中は通常の更新処理をスキップ
+  }
+
   // ブロック破壊演出を更新
   if (block_destroy_effect_)
   {
@@ -861,6 +887,12 @@ void Game::update()
         
         // 効果音など入れるならここ
         AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+
+        // クリア条件チェック
+        if (completed_words_.size() >= static_cast<size_t>(InGameConstants::kClearEvaluationCount))
+        {
+          StartGameClear();
+        }
       }
     }
   }
@@ -1071,14 +1103,19 @@ void Game::draw() const
           const double alpha = Max(0.0, 1.0 - (game_over_timer_ / (InGameConstants::kGameOverDuration * 0.5)));
           texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y, ColorF{ 1.0, 1.0, 1.0, alpha });
         }
+        else if (is_game_clear_)
+        {
+          // ゲームクリア時は通常表示（フェードなし）
+          texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
+        }
         else
         {
           texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
         }
       }
 
-      // ゲームオーバー時は武器を非表示
-      if (!is_game_over_ && player_->IsWeaponVisible())
+      // ゲームオーバー時・ゲームクリア時は武器を非表示
+      if (!is_game_over_ && !is_game_clear_ && player_->IsWeaponVisible())
       {
         const Vec2 weapon_pos = player_->GetWeaponPosition();
         const SizeF weapon_size = player_->GetWeaponSize();
@@ -1089,8 +1126,8 @@ void Game::draw() const
         RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
       }
 
-      // ゲームオーバー時はヒント非表示
-      if (!is_game_over_ && !current_hint_.isEmpty())
+      // ゲームオーバー時・ゲームクリア時はヒント非表示
+      if (!is_game_over_ && !is_game_clear_ && !current_hint_.isEmpty())
       {
         const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
         const RectF text_region = hint_font_(current_hint_).region();
@@ -1136,6 +1173,19 @@ void Game::draw() const
     ColorF text_color = InGameConstants::kGameOverTextColor;
     text_color.a = text_alpha;
     game_over_font_(U"GAME OVER").drawAt(Scene::Center(), text_color);
+  }
+
+  // ゲームクリア時の表示
+  if (is_game_clear_)
+  {
+    // 半透明の白背景
+    Scene::Rect().draw(ColorF{ 1.0, 1.0, 1.0, Min(0.7, game_clear_timer_ * 0.5) });
+
+    // ゲームクリアテキスト（フェードイン）
+    const double text_alpha = Min(1.0, game_clear_timer_);
+    ColorF text_color = InGameConstants::kGameClearTextColor;
+    text_color.a = text_alpha;
+    game_over_font_(U"GAME CLEAR!").drawAt(Scene::Center(), text_color);
   }
 
   // 明るさ設定を適用
@@ -1331,4 +1381,19 @@ void Game::StartGameOver()
 
   // ゲームオーバー効果音を再生
   AudioManager::GetInstance()->PlaySe(SeKind::kGameOver);
+}
+
+void Game::StartGameClear()
+{
+  is_game_clear_ = true;
+  game_clear_timer_ = 0.0;
+
+  // プレイヤーのポーズを待機に設定
+  if (player_)
+  {
+    player_->SetPose(Player::Pose::kIdle);
+  }
+
+  // ゲームクリア効果音を再生（完成単語と同じ音を使用）
+  AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
 }
