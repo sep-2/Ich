@@ -33,7 +33,7 @@ private:
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {
-    {BgmKind::kMain, "Assets/Audio/BGM.mp3"},
+    {BgmKind::kMain, "Assets/Audio/BGM.m4a"},
   };
 
 public:
