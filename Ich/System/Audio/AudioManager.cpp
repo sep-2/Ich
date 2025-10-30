@@ -45,7 +45,8 @@ AudioManager::~AudioManager() {
 /// 初期処理
 /// </summary>
 void AudioManager::InitAudioManager() {
-
+  // メインBGMをプリロード
+  LoadBgm(BgmKind::kMain);
 }
 
 /// <summary>
@@ -99,7 +100,7 @@ void AudioManager::LoadBgm(BgmKind kind) {
 /// </summary>
 void AudioManager::PlayBgm(BgmKind kind) {
   LoadBgm(kind);
-  bgm_.at(kind).setVolume(1.0);
+  bgm_.at(kind).setVolume(0.3); // 少し小さめに設定
   bgm_.at(kind).setLoop(true);
   bgm_.at(kind).play();
 }
@@ -125,26 +126,12 @@ void AudioManager::StopBgm() {
 /// BGMのフェードアウト
 /// </summary>
 void AudioManager::FadeOutBgm() {
-  //for (std::pair<BgmKind, s3d::Audio> handle : bgm_) {
-  //  double volume = handle.second.volume();
-  //  volume -= kFadeSpeed * 0.01;
-  //  if (volume < 0) {
-  //    volume = 0;
-  //  }
-  //  handle.second.setVolume(volume);
-  //}
+  // TODO: 実装
 }
 
 /// <summary>
 /// BGMのフェードイン
 /// </summary>
 void AudioManager::FadeInBgm() {
-  //for (std::pair<BgmKind, s3d::Audio> handle : bgm_) {
-  //  double volume = handle.second.volume();
-  //  volume += kFadeSpeed * 0.01;
-  //  if (volume > kVolumePal) {
-  //    volume = kVolumePal;
-  //  }
-  //  handle.second.setVolume(volume);
-  //}
+  // TODO: 実装
 }
