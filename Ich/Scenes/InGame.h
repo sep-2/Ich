@@ -176,12 +176,14 @@ private:
     Vec2 position;          // ブロックのピクセル位置（左上）
     Type type;              // ブロックの種類
     bool is_first;          // 単語の先頭文字フラグ
+    ColorF color = Palette::White; // ブロックの色
     
     Block() 
       : value(U"")
       , is_destroyed(false)
       , type(Type::kEmpty)
       , is_first(false)
+      , color(Palette::White)
     {}
     
     Block(const String& val, bool first = false) 
@@ -189,6 +191,7 @@ private:
       , is_destroyed(false)
       , type(Type::kNormal)
       , is_first(first)
+      , color(Palette::White)
     {}
 
     Block(Type blockType)
@@ -196,6 +199,7 @@ private:
       , is_destroyed(false)
       , type(blockType)
       , is_first(false)
+      , color(Palette::White)
     {}
     
     // ブロックが空かどうか

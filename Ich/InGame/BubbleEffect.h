@@ -14,7 +14,8 @@ public:
   /// 泡エフェクトを追加
   /// </summary>
   /// <param name="position">発生位置</param>
-  void AddEffect(const Vec2& position);
+  /// <param name="baseColor">泡の基本色（オプション、デフォルトは薄い青）</param>
+  void AddEffect(const Vec2& position, const ColorF& baseColor = ColorF{ 0.8, 0.9, 1.0 });
 
   /// <summary>
   /// 更新処理

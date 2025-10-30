@@ -47,6 +47,14 @@ void BlockDestroyEffect::AddEffect(const Vec2& position, const ColorF& color, co
   effect.blockColor = color;
   effect.blockText = text;
 
+  // ブロックの色をパーティクル用に調整
+  // 元のブロックの色を保持しつつ、若干明るくしてエフェクトらしく
+  ColorF particle_color = color;
+  const double lighten_factor = 0.2;  // 明るくする度合い（パーティクルは控えめに）
+  particle_color.r = Math::Lerp(particle_color.r, 1.0, lighten_factor);
+  particle_color.g = Math::Lerp(particle_color.g, 1.0, lighten_factor);
+  particle_color.b = Math::Lerp(particle_color.b, 1.0, lighten_factor);
+
   // パーティクルを生成
   for (int32 i = 0; i < BlockDestroyEffectConstants::kParticleCount; ++i) {
     Particle particle;
@@ -60,9 +68,9 @@ void BlockDestroyEffect::AddEffect(const Vec2& position, const ColorF& color, co
       Math::Sin(angle) * speed + BlockDestroyEffectConstants::kParticleUpwardBias  // 上方向にバイアス
     };
 
-    // サイズと色
+    // サイズと色（調整済みの色を使用）
     particle.size = Random(BlockDestroyEffectConstants::kParticleMinSize, BlockDestroyEffectConstants::kParticleMaxSize);
-    particle.color = color;
+    particle.color = particle_color;  // 調整済みの色を使用
     particle.lifetime = 0.0;
     particle.maxLifetime = BlockDestroyEffectConstants::kParticleLifetime;
 
@@ -132,7 +140,8 @@ void BlockDestroyEffect::Draw() const
     if (effect.elapsed < BlockDestroyEffectConstants::kExplosionDuration) {
       const double explosion_alpha = 1.0 - (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
       const double explosion_radius = BlockDestroyEffectConstants::kExplosionMaxRadius * (effect.elapsed / BlockDestroyEffectConstants::kExplosionDuration);
-      ColorF explosion_color = BlockDestroyEffectConstants::kExplosionColor;
+      //ColorF explosion_color = BlockDestroyEffectConstants::kExplosionColor;
+      ColorF explosion_color = effect.blockColor;
       explosion_color.a = explosion_alpha * BlockDestroyEffectConstants::kExplosionAlphaMultiplier;
       Circle{ effect.position, explosion_radius }.drawFrame(BlockDestroyEffectConstants::kExplosionFrameThickness, explosion_color);
     }
