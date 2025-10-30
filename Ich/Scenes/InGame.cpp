@@ -647,6 +647,7 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   const float player_bottom_y = next_pos.y + player_->GetHeight() / 2.0f;
   const float player_top = next_pos.y - player_->GetHeight() / 2.0f;
+  const float player_half_width = player_->GetWidth() / 2.0f;
   bool is_on_block = false;
 
   // 重力による落下とブロック衝突判定
@@ -687,6 +688,53 @@ void Game::UpdatePlayerMovement(float delta_time)
       break;
     }
   }
+  
+  // 落下中にブロックにめり込んでいないかチェック（横方向の押し出し）
+  if (!is_on_block) {
+    const float player_left = next_pos.x - player_half_width;
+    const float player_right = next_pos.x + player_half_width;
+    
+    for (int i = 0; i < block_grid_.size(); i++) {
+      for (int j = 0; j < block_grid_[i].size(); j++) {
+        const Block& block = block_grid_[i][j];
+        
+        // 空または破壊されたブロックはスキップ（壁は衝突対象）
+        if (block.isEmpty() && !block.isWall()) {
+          continue;
+        }
+        
+        const Vec2 block_pos = block.position;
+        const float block_left = block_pos.x;
+        const float block_right = block_pos.x + InGameConstants::kBlockSize;
+        const float block_top = block_pos.y;
+        const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
+        
+        // Y方向の重なりをチェック
+        const bool y_overlap = !(player_bottom_y <= block_top || player_top >= block_bottom);
+        
+        if (y_overlap) {
+          // X方向の重なりをチェック
+          const bool x_overlap = !(player_right <= block_left || player_left >= block_right);
+          
+          if (x_overlap) {
+            // めり込み量を計算
+            const float overlap_left = player_right - block_left;   // 左側からのめり込み
+            const float overlap_right = block_right - player_left;  // 右側からのめり込み
+            
+            // めり込み量が少ない方向に押し出す
+            if (overlap_left < overlap_right) {
+              // 左に押し出す
+              next_pos.x = block_left - player_half_width - 1.0f;  // 1px余裕を持たせる
+            } else {
+              // 右に押し出す
+              next_pos.x = block_right + player_half_width + 1.0f;  // 1px余裕を持たせる
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
 
   player_->SetPosition(next_pos.x, next_pos.y);
 
@@ -710,7 +758,6 @@ void Game::UpdatePlayerMovement(float delta_time)
   horizontal_next_pos.x += move_input.x * move_distance;
 
   // プレイヤーの左右端を計算
-  const float player_half_width = player_->GetWidth() / 2.0f;
   const float player_left_h = horizontal_next_pos.x - player_half_width;
   const float player_right_h = horizontal_next_pos.x + player_half_width;
   const float player_top_h = horizontal_next_pos.y - player_->GetHeight() / 2.0f;
