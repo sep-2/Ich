@@ -12,18 +12,30 @@ namespace BubbleEffectConstants
   constexpr double kBubbleLifetime = 2.5;        // 泡の寿命（秒）
   constexpr double kBubbleUpwardBias = -120.0;   // 上方向バイアス
   constexpr double kEffectDuration = 3.0;        // 演出全体の持続時間（秒）
-  
+
   // 泡の色
   const ColorF kBubbleColor{ 0.8, 0.9, 1.0 };    // 薄い青色
   const ColorF kBubbleInnerColor{ 1.0, 1.0, 1.0 }; // 内側の色
-  
+
   // 物理パラメータ
   constexpr double kBubbleFloatAccel = -50.0;    // 浮力加速度
   constexpr double kBubbleDrag = 0.95;           // 抵抗係数
-  
+
   // 描画設定
   constexpr double kBubbleFrameThickness = 2.0;  // 泡の枠線の太さ
   constexpr double kBubbleInnerRadiusRatio = 0.4; // 内側のハイライト半径比
+
+  // 横揺れ効果パラメータ
+  constexpr double kSwayFrequency = 3.0;         // 横揺れの周波数
+  constexpr double kSwayAmplitude = 2.0;         // 横揺れの振幅
+
+  // 透明度パラメータ
+  constexpr double kBubbleBodyAlpha = 0.7;       // 泡本体の透明度係数
+  constexpr double kBubbleFrameAlpha = 0.9;      // 泡枠線の透明度係数
+  constexpr double kBubbleHighlightAlpha = 0.5;  // ハイライトの透明度係数
+
+  // ハイライト位置オフセット係数
+  constexpr double kHighlightOffsetRatio = 0.3;  // ハイライト位置のオフセット比率
 }
 
 BubbleEffect::BubbleEffect()
@@ -34,14 +46,13 @@ BubbleEffect::~BubbleEffect()
 {
 }
 
-void BubbleEffect::AddEffect(const Vec2& position)
+void BubbleEffect::AddEffect(const Vec2& position, const ColorF& baseColor)
 {
   Effect effect;
   effect.elapsed = 0.0;
 
   // 泡を生成
-  for (int32 i = 0; i < BubbleEffectConstants::kBubbleCount; ++i)
-  {
+  for (int32 i = 0; i < BubbleEffectConstants::kBubbleCount; ++i) {
     Bubble bubble;
     bubble.position = position;
 
@@ -53,9 +64,9 @@ void BubbleEffect::AddEffect(const Vec2& position)
       Math::Sin(angle) * speed + BubbleEffectConstants::kBubbleUpwardBias
     };
 
-    // サイズと色
+    // サイズと色（指定された色を使用）
     bubble.radius = Random(BubbleEffectConstants::kBubbleMinRadius, BubbleEffectConstants::kBubbleMaxRadius);
-    bubble.color = BubbleEffectConstants::kBubbleColor;
+    bubble.color = baseColor;  // 引数で受け取った色を使用
     bubble.lifetime = 0.0;
     bubble.maxLifetime = BubbleEffectConstants::kBubbleLifetime;
 
@@ -68,20 +79,17 @@ void BubbleEffect::AddEffect(const Vec2& position)
 void BubbleEffect::Update(double delta_time)
 {
   // 各演出を更新
-  for (auto it = effects_.begin(); it != effects_.end();)
-  {
+  for (auto it = effects_.begin(); it != effects_.end();) {
     it->elapsed += delta_time;
 
     // 演出時間が終了したら削除
-    if (it->elapsed >= BubbleEffectConstants::kEffectDuration)
-    {
+    if (it->elapsed >= BubbleEffectConstants::kEffectDuration) {
       it = effects_.erase(it);
       continue;
     }
 
     // 泡を更新
-    for (auto& bubble : it->bubbles)
-    {
+    for (auto& bubble : it->bubbles) {
       bubble.lifetime += delta_time;
 
       // 浮力を適用
@@ -94,7 +102,7 @@ void BubbleEffect::Update(double delta_time)
       bubble.position += bubble.velocity * delta_time;
 
       // 横揺れ効果
-      bubble.position.x += Math::Sin(bubble.lifetime * 3.0) * 2.0 * delta_time;
+      bubble.position.x += Math::Sin(bubble.lifetime * BubbleEffectConstants::kSwayFrequency) * BubbleEffectConstants::kSwayAmplitude * delta_time;
     }
 
     ++it;
@@ -103,30 +111,30 @@ void BubbleEffect::Update(double delta_time)
 
 void BubbleEffect::Draw() const
 {
-  for (const auto& effect : effects_)
-  {
+  for (const auto& effect : effects_) {
     // 泡を描画
-    for (const auto& bubble : effect.bubbles)
-    {
+    for (const auto& bubble : effect.bubbles) {
       // フェードアウト
       const double alpha = Max(0.0, 1.0 - (bubble.lifetime / bubble.maxLifetime));
-      if (alpha > 0.0)
-      {
+      if (alpha > 0.0) {
         ColorF draw_color = bubble.color;
-        draw_color.a = alpha * 0.7;
+        draw_color.a = alpha * BubbleEffectConstants::kBubbleBodyAlpha;
 
         // 泡の本体
         Circle{ bubble.position, bubble.radius }.draw(draw_color);
 
         // 泡の枠線
         ColorF frame_color = bubble.color;
-        frame_color.a = alpha * 0.9;
+        frame_color.a = alpha * BubbleEffectConstants::kBubbleFrameAlpha;
         Circle{ bubble.position, bubble.radius }.drawFrame(BubbleEffectConstants::kBubbleFrameThickness, frame_color);
 
         // ハイライト（泡の光沢）
-        const Vec2 highlight_offset{ -bubble.radius * 0.3, -bubble.radius * 0.3 };
+        const Vec2 highlight_offset{ 
+          -bubble.radius * BubbleEffectConstants::kHighlightOffsetRatio, 
+          -bubble.radius * BubbleEffectConstants::kHighlightOffsetRatio 
+        };
         ColorF highlight_color = BubbleEffectConstants::kBubbleInnerColor;
-        highlight_color.a = alpha * 0.5;
+        highlight_color.a = alpha * BubbleEffectConstants::kBubbleHighlightAlpha;
         Circle{ bubble.position + highlight_offset, bubble.radius * BubbleEffectConstants::kBubbleInnerRadiusRatio }.draw(highlight_color);
       }
     }

@@ -186,16 +186,11 @@ namespace InGameConstants
   /// ブロックCOLOR
   /// </summary>
   const Array<ColorF> kBlockColors = {
-  ColorF{ 1.0, 0.3, 0.3 },  // 赤
-  ColorF{ 0.3, 1.0, 0.3 },  // 緑
-  ColorF{ 0.3, 0.3, 1.0 },  // 青
-  ColorF{ 1.0, 1.0, 0.3 },  // 黄色
-  ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
-  ColorF{ 0.3, 1.0, 1.0 },  // シアン
-  ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
-  ColorF{ 0.6, 0.3, 1.0 },  // 紫
-  ColorF{ 0.3, 1.0, 0.6 },  // 緑青
-  ColorF{ 1.0, 0.8, 0.3 },  // 金色
+    ColorF{ 0.0, 0.909, 1.0 },  // 青
+    ColorF{ 0.3, 1.0, 0.3 },  // 緑
+    ColorF{ 1.0, 0.6, 0.3 },  // オレンジ
+    ColorF{ 1.0, 0.3, 1.0 },  // マゼンタ
+    ColorF{ 1.0, 1.0, 0.3 },  // 黄色
   };
 
   // 壁ブロックの色
@@ -324,6 +319,9 @@ Game::Game(const InitData& init)
           const float block_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
           const float block_y = InGameConstants::kStartY + static_cast<int32>(actual_row) * InGameConstants::kBlockSize;
           block_grid_[row][col].position = Vec2{ block_x, block_y };
+          const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
+          block_grid_[row][col].color = InGameConstants::kBlockColors[seed % InGameConstants::kBlockColors.size()];
+          //block_grid_[row][col].color = InGameConstants::kBlockColors[(actual_row + actual_col) % InGameConstants::kBlockColors.size()];
         }
         else {
           // 通常ブロック領域外は空ブロック
@@ -470,7 +468,7 @@ void Game::DestroyBlockUnderPlayer()
         // ブロックの色を決定（位置依存のシード）
         const size_t seed = (i * InGameConstants::kSeedMultiplierRow + j * InGameConstants::kSeedMultiplierCol);
         const size_t color_count = InGameConstants::kBlockColors.size();
-        const ColorF block_color = InGameConstants::kBlockColors[seed % color_count];
+        const ColorF block_color = block_grid_[i][j].color;
 
         // 破壊演出を追加
         if (block_destroy_effect_) {
@@ -1080,8 +1078,7 @@ void Game::draw() const
             const TextureRegion block_region = block_texture.resized(InGameConstants::kBlockSize, InGameConstants::kBlockSize);
             block_shape(block_region).draw();
           } else {
-            const ColorF block_color = InGameConstants::kBlockColors[seed % color_count];
-            block_shape.draw(block_color);
+            block_shape.draw(block_grid_[row][col].color);
           }
 
           // ブロックの枠線を描画
