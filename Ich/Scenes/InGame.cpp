@@ -284,12 +284,18 @@ Game::Game(const InitData& init)
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
 
-  // 壁ブロックの高さを計算（画面最上部から通常ブロック領域の下端まで）
-  const int32 wall_height = static_cast<int32>(std::ceil((InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
+  // 初期の壁の高さ（画面最上部から最初のブロック塊の下端まで）
+  const int32 initial_wall_height = static_cast<int32>(std::ceil((InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
 
-  block_grid_.resize(wall_height);
+  // 現在のブロック塊の下端Y座標を記録
+  current_chunk_bottom_y_ = InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize;
+  
+  // 次のブロック塊を生成するトリガー位置を設定
+  next_chunk_trigger_y_ = current_chunk_bottom_y_ - kChunkSpacing;
 
-  for (size_t row = 0; row < static_cast<size_t>(wall_height); ++row) {
+  block_grid_.resize(initial_wall_height);
+
+  for (size_t row = 0; row < static_cast<size_t>(initial_wall_height); ++row) {
     block_grid_[row].resize(total_columns);
 
     for (size_t col = 0; col < static_cast<size_t>(total_columns); ++col) {
@@ -947,6 +953,9 @@ void Game::update()
   // プレイヤーの左右移動更新（衝突判定付き）
   UpdatePlayerMovement(static_cast<float>(Scene::DeltaTime()));
 
+  // スクロール更新（新しいブロック塊の生成判定）
+  UpdateScroll();
+
   // プレイヤーの更新（メニューが閉じている時のみ）
   // 注：移動処理は上で行っているため、ここではアニメーションのみ更新
   if (player_)
@@ -1436,4 +1445,103 @@ void Game::StartGameClear()
 
   // ゲームクリア効果音を再生（完成単語と同じ音を使用）
   AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+}
+
+void Game::UpdateScroll()
+{
+  if (!player_)
+  {
+    return;
+  }
+
+  const Vec2 player_pos = player_->GetPosition();
+  
+  // プレイヤーがトリガー位置を超えたら次のブロック塊を生成
+  if (player_pos.y >= next_chunk_trigger_y_)
+  {
+    GenerateNextBlockChunk();
+  }
+}
+
+void Game::GenerateNextBlockChunk()
+{
+  // 新しいブロック塊を生成
+  const Array<Array<std::pair<String, bool>>> new_string_grid = block_manager_.GenerateBlockGrid(
+    InGameConstants::kGridRows,
+    InGameConstants::kGridColumns,
+    30,
+    10,
+    keywords,
+    3
+  );
+
+  const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
+  const int32 new_chunk_rows = static_cast<int32>(new_string_grid.size());
+  
+  // 新しいブロック塊の開始Y座標（前の塊から500px離す）
+  const float new_chunk_start_y = current_chunk_bottom_y_ + kChunkSpacing;
+  
+  // 壁を含めた新しい行数を計算
+  const int32 wall_rows_before_chunk = static_cast<int32>((new_chunk_start_y - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
+  const int32 total_new_rows = wall_rows_before_chunk + new_chunk_rows;
+  
+  // グリッドを拡張
+  const size_t old_size = block_grid_.size();
+  if (static_cast<size_t>(total_new_rows) > old_size)
+  {
+    block_grid_.resize(total_new_rows);
+    
+    // 新しく追加された行を初期化
+    for (size_t row = old_size; row < static_cast<size_t>(total_new_rows); ++row)
+    {
+      block_grid_[row].resize(total_columns);
+      
+      for (size_t col = 0; col < static_cast<size_t>(total_columns); ++col)
+      {
+        const bool is_wall_column = (col < InGameConstants::kWallThickness || 
+                                     col >= static_cast<size_t>(InGameConstants::kGridColumns + InGameConstants::kWallThickness));
+        
+        if (is_wall_column)
+        {
+          // 壁ブロックを配置
+          block_grid_[row][col] = Block(Block::Type::kWall);
+          const float wall_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+          const float wall_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
+          block_grid_[row][col].position = Vec2{ wall_x, wall_y };
+        }
+        else
+        {
+          // 新しいブロック塊の範囲内かチェック
+          if (static_cast<int32>(row) >= wall_rows_before_chunk && 
+              static_cast<int32>(row) < wall_rows_before_chunk + new_chunk_rows)
+          {
+            const size_t chunk_row = static_cast<size_t>(static_cast<int32>(row) - wall_rows_before_chunk);
+            const size_t chunk_col = static_cast<size_t>(static_cast<int32>(col) - InGameConstants::kWallThickness);
+            const auto& cell = new_string_grid[chunk_row][chunk_col];
+            
+            block_grid_[row][col] = Block(cell.first, cell.second);
+            const float block_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+            const float block_y = new_chunk_start_y + chunk_row * InGameConstants::kBlockSize;
+            block_grid_[row][col].position = Vec2{ block_x, block_y };
+          }
+          else
+          {
+            // 空ブロック
+            block_grid_[row][col] = Block();
+            const float empty_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
+            const float empty_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
+            block_grid_[row][col].position = Vec2{ empty_x, empty_y };
+          }
+        }
+      }
+    }
+  }
+  
+  // 現在のブロック塊の下端を更新
+  current_chunk_bottom_y_ = new_chunk_start_y + new_chunk_rows * InGameConstants::kBlockSize;
+  
+  // 次のトリガー位置を更新
+  next_chunk_trigger_y_ = current_chunk_bottom_y_ - kChunkSpacing;
+  
+  PRINT << U"Generated new block chunk at Y: " << new_chunk_start_y << U", trigger: " << next_chunk_trigger_y_;
 }
