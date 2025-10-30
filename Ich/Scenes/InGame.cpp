@@ -1093,8 +1093,29 @@ void Game::draw() const
             const bool within_one = (dx <= InGameConstants::kBlockSize && dy <= InGameConstants::kBlockSize);
             if (within_one && !sparkle_tex_.isEmpty())
             {
-              const Vec2 sparkle_pos = block_top_left + Vec2{ InGameConstants::kBlockSize * 0.75f, InGameConstants::kBlockSize * 0.25f };
-              sparkle_tex_.scaled(0.25).drawAt(sparkle_pos);
+              // 位置（少し上に浮かせる）
+              const Vec2 base_pos = block_top_left + Vec2{ InGameConstants::kBlockSize * 0.75f, InGameConstants::kBlockSize * 0.25f };
+
+              // キラキラのパラメータ（時間で脈動＋回転）
+              const double t = Scene::Time();
+              const double pulse = 1.0 + 0.25 * Sin(t * 8.0);
+              const double rot = t * 2.5;
+              const double baseScale = 0.28; // 全体サイズを少し小さく
+              const double scale = baseScale * pulse;
+              const Vec2 pos = base_pos + Vec2{ 0.0, Sin(t * 4.0) * 2.0 }; // わずかに上下に揺れる
+
+              // 加算合成で光彩を重ねて目立たせる
+              const ScopedRenderStates2D addBlend{ BlendState::Additive };
+
+              // 外側の淡い光（大きく、透明）
+              sparkle_tex_.scaled(scale * 1.7).rotated(rot * 0.5)
+                .drawAt(pos, ColorF{ 1.0, 0.95, 0.4, 0.18 });
+              // 中間の光
+              sparkle_tex_.scaled(scale * 1.3).rotated(-rot * 0.8)
+                .drawAt(pos, ColorF{ 1.0, 0.95, 0.6, 0.28 });
+              // 本体（白っぽく強い光）
+              sparkle_tex_.scaled(scale).rotated(rot)
+                .drawAt(pos, ColorF{ 1.0, 1.0, 1.0, 0.95 });
             }
           }
         }
