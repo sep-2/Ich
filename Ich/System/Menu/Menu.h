@@ -57,6 +57,11 @@ public:
   /// ゲーム再起動がリクエストされたか
   /// </summary>
   bool IsRestartRequested() const { return restart_requested_; }
+
+  /// <summary>
+  /// エア無限フラグを取得
+  /// </summary>
+  bool IsInfiniteAirEnabled() const { return infinite_air_; }
 #endif
 
 private:
@@ -69,6 +74,8 @@ private:
   
 #if _DEBUG
   Rect restart_button_;  // ゲーム再起動ボタン（DEBUGのみ）
+  Rect infinite_air_toggle_;  // エア無限トグルボタン（DEBUGのみ）
+  bool infinite_air_ = false;  // エア無限フラグ
 #endif
   
   // 終了確認ダイアログ用

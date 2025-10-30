@@ -17,8 +17,9 @@ namespace MenuConstants
   // DEBUG専用ボタンY座標
 #if _DEBUG
   constexpr int32 kRestartButtonY = 260;
-  constexpr int32 kOptionButtonYDebug = 340;
-  constexpr int32 kQuitButtonYDebug = 420;
+  constexpr int32 kInfiniteAirToggleY = 340;
+  constexpr int32 kOptionButtonYDebug = 420;
+  constexpr int32 kQuitButtonYDebug = 500;
 #else
   constexpr int32 kOptionButtonYRelease = 260;
   constexpr int32 kQuitButtonYRelease = 340;
@@ -58,8 +59,10 @@ Menu::Menu()
   , resume_button_(MenuConstants::kButtonX, MenuConstants::kResumeButtonY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
 #if _DEBUG
   , restart_button_(MenuConstants::kButtonX, MenuConstants::kRestartButtonY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , infinite_air_toggle_(MenuConstants::kButtonX, MenuConstants::kInfiniteAirToggleY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , infinite_air_(false)
 #else
   , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
@@ -106,6 +109,7 @@ bool Menu::Update()
   static bool was_no_hovering = false;
 #if _DEBUG
   static bool was_restart_hovering = false;
+  static bool was_infinite_air_hovering = false;
 #endif
 
   if (state_ == MenuState::kMain)
@@ -140,6 +144,20 @@ bool Menu::Update()
       restart_requested_ = true;
       Close();
       return true;
+    }
+
+    // エア無限トグルボタン（DEBUGのみ）
+    bool infinite_air_hovering = infinite_air_toggle_.mouseOver();
+    if (infinite_air_hovering && !was_infinite_air_hovering)
+    {
+      sound->PlaySe(MenuSeKind::kHover);
+    }
+    was_infinite_air_hovering = infinite_air_hovering;
+
+    if (infinite_air_toggle_.leftClicked())
+    {
+      sound->PlaySe(MenuSeKind::kClick);
+      infinite_air_ = !infinite_air_;
     }
 #endif
 
@@ -192,6 +210,7 @@ bool Menu::Update()
       was_quit_hovering = false;
 #if _DEBUG
       was_restart_hovering = false;
+      was_infinite_air_hovering = false;
 #endif
     }
   }
@@ -290,6 +309,23 @@ void Menu::Draw() const
       const ColorF button_color = ColorF(Palette::Darkblue).lerp(Palette::Blue, pulse);
       restart_button_.draw(button_color);
       font_(U"再起動").drawAt(restart_button_.center(), Palette::White);
+    }
+
+    // エア無限トグルボタン（DEBUGのみ）
+    if (infinite_air_toggle_.mouseOver())
+    {
+      infinite_air_toggle_.draw(Palette::Lightgray);
+      const String toggle_text = infinite_air_ ? U"エア無限: ON" : U"エア無限: OFF";
+      font_(toggle_text).drawAt(infinite_air_toggle_.center(), Palette::Black);
+    }
+    else
+    {
+      const ColorF button_color = infinite_air_ 
+        ? ColorF(Palette::Darkgreen).lerp(Palette::Green, pulse)
+        : ColorF(Palette::Darkgray).lerp(Palette::Gray, pulse);
+      infinite_air_toggle_.draw(button_color);
+      const String toggle_text = infinite_air_ ? U"エア無限: ON" : U"エア無限: OFF";
+      font_(toggle_text).drawAt(infinite_air_toggle_.center(), Palette::White);
     }
 #endif
 

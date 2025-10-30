@@ -482,9 +482,15 @@ void Game::DestroyBlockUnderPlayer()
         //PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
 
         // エアを消費
-        air_amount_ -= InGameConstants::kAirConsumeRate;
-        if (air_amount_ < 0.0f) {
-          air_amount_ = 0.0f;
+#if _DEBUG
+        // デバッグモードでエア無限が有効な場合はエアを消費しない
+        if (!menu_ || !menu_->IsInfiniteAirEnabled())
+#endif
+        {
+          air_amount_ -= InGameConstants::kAirConsumeRate;
+          if (air_amount_ < 0.0f) {
+            air_amount_ = 0.0f;
+          }
         }
 
         // 文字を追加
@@ -555,6 +561,7 @@ void Game::UpdatePlayerFall(float delta_time)
         const float block_left = block_pos.x;
         const float block_right = block_pos.x + InGameConstants::kBlockSize;
         const float block_top = block_pos.y;
+        const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
         // プレイヤーの中心がブロックのX範囲内にあるかチェック
         if (player_pos.x >= block_left && player_pos.x <= block_right) {
@@ -641,6 +648,7 @@ void Game::UpdatePlayerMovement(float delta_time)
   next_pos.y += InGameConstants::kSimpleGravity;
 
   const float player_bottom_y = next_pos.y + player_->GetHeight() / 2.0f;
+  const float player_top = next_pos.y - player_->GetHeight() / 2.0f;
   bool is_on_block = false;
 
   // 重力による落下とブロック衝突判定
@@ -705,10 +713,10 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   // プレイヤーの左右端を計算
   const float player_half_width = player_->GetWidth() / 2.0f;
-  const float player_left = horizontal_next_pos.x - player_half_width;
-  const float player_right = horizontal_next_pos.x + player_half_width;
-  const float player_top = horizontal_next_pos.y - player_->GetHeight() / 2.0f;
-  const float player_bottom = horizontal_next_pos.y + player_->GetHeight() / 2.0f;
+  const float player_left_h = horizontal_next_pos.x - player_half_width;
+  const float player_right_h = horizontal_next_pos.x + player_half_width;
+  const float player_top_h = horizontal_next_pos.y - player_->GetHeight() / 2.0f;
+  const float player_bottom_h = horizontal_next_pos.y + player_->GetHeight() / 2.0f;
 
   // ブロックとの左右衝突判定
   bool can_move = true;
@@ -729,7 +737,7 @@ void Game::UpdatePlayerMovement(float delta_time)
       const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
       // プレイヤーとブロックのY座標が重なっているかチェック
-      const bool y_overlap = !(player_bottom <= block_top || player_top >= block_bottom);
+      const bool y_overlap = !(player_bottom_h <= block_top || player_top_h >= block_bottom);
 
       if (!y_overlap) {
         continue;
@@ -740,7 +748,7 @@ void Game::UpdatePlayerMovement(float delta_time)
         player_->SetPose(Player::Pose::kStrafeLeft);
 
         // プレイヤーの左端がブロックの右端より左にあり、かつ衝突する場合
-        if (player_left < block_right && player_right > block_right) {
+        if (player_left_h < block_right && player_right_h > block_right) {
           // ブロックの右端にプレイヤーの左端を配置
           horizontal_next_pos.x = block_right + player_half_width;
           can_move = false;
@@ -752,7 +760,7 @@ void Game::UpdatePlayerMovement(float delta_time)
         player_->SetPose(Player::Pose::kStrafeRight);
 
         // プレイヤーの右端がブロックの左端より右にあり、かつ衝突する場合
-        if (player_right > block_left && player_left < block_left) {
+        if (player_right_h > block_left && player_left_h < block_left) {
           // ブロックの左端にプレイヤーの右端を配置
           horizontal_next_pos.x = block_left - player_half_width;
           can_move = false;
@@ -1191,7 +1199,7 @@ void Game::draw() const
         if (!bubble_text.isEmpty()) {
           const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
           const RectF text_region = hint_font_(bubble_text).region();
-          const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
+          const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBubble1Radius + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
           hint_rect.draw(InGameConstants::kHintBackgroundColor);
           hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
           hint_font_(bubble_text).drawAt(hint_center, InGameConstants::kHintTextColor);
