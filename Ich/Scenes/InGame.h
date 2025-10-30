@@ -114,6 +114,16 @@ private:
   void StartGameClear();
 
   /// <summary>
+  /// 次のブロック塊を生成
+  /// </summary>
+  void GenerateNextBlockChunk();
+
+  /// <summary>
+  /// スクロール更新（新しいブロック塊の生成判定）
+  /// </summary>
+  void UpdateScroll();
+
+  /// <summary>
   /// ブロックのテクスチャ
   /// </summary>
   Texture block_bg_texture_;
@@ -255,6 +265,15 @@ private:
 
   // ヒット演出（取得単語表示）
   HitEffect hit_effect_;
+
+  // 現在のブロック塊のY座標（下端）
+  float current_chunk_bottom_y_ = 0.0f;
+  
+  // 次のブロック塊を生成するトリガー位置
+  float next_chunk_trigger_y_ = 0.0f;
+  
+  // ブロック塊間の距離
+  static constexpr float kChunkSpacing = 500.0f;
 
   // デバッグモード
 #if _DEBUG
