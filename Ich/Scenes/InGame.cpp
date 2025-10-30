@@ -245,7 +245,8 @@ Game::Game(const InitData& init)
   , debug_font_{ InGameConstants::kDebugFontSize }
   , game_over_font_{ InGameConstants::kGameOverFontSize, Typeface::Bold }
 {
-  //PRINT << U"Game::Game()";
+  // BGM 再生（シーン開始時）
+  AudioManager::GetInstance()->PlayBgm(BgmKind::kMain);
 
   // ✨ テクスチャを生成（絵文字）
   sparkle_tex_ = Texture{ Emoji{ U"✨" } };

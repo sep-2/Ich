@@ -18,6 +18,7 @@ enum class SeKind {
 /// BGMの種類
 /// </summary>
 enum class BgmKind {
+  kMain,
 };
 
 /// <summary>
@@ -32,6 +33,7 @@ private:
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {
+    {BgmKind::kMain, "Assets/Audio/BGM.mp3"},
   };
 
 public:
