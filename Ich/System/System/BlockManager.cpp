@@ -296,28 +296,5 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
     if (!v.isEmpty()) { anyPlaced = true; break; }
   }
 
-  if (anyPlaced) {
-    Console.open();
-    Console.writeln(U"[GenerateBlockGrid] Prefetch segments: {}"_fmt(segmentCount));
-
-    for (int32 seg = 0; seg < segmentCount; ++seg)
-    {
-      const int32 yOffset = seg * row;
-      const int32 fromRow = yOffset;
-      const int32 toRow = yOffset + row - 1;
-
-      Array<String> words = segmentPlacedWords[seg];
-      words.sort();
-      auto newEnd = std::unique(words.begin(), words.end());
-      words.erase(newEnd, words.end());
-
-      Console.writeln(U"--- Segment {}/{} [rows {}..{}] : {} word(s) ---"_fmt(seg + 1, segmentCount, fromRow, toRow, words.size()));
-      for (const auto& w : words)
-      {
-        Console.writeln(U"  - {}"_fmt(w));
-      }
-    }
-  }
-
   return grid;
 }
