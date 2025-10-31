@@ -69,7 +69,13 @@ private:
   int32 box_size_;                     // ボックスサイズ
   int32 box_spacing_;                  // ボックス間の隙間
 
-  // 定数
+  // デフォルト値の定数
+  static constexpr int32 kDefaultPositionX = 50;
+  static constexpr int32 kDefaultPositionY = 20;
+  static constexpr int32 kDefaultBoxSize = 50;
+  static constexpr int32 kDefaultBoxSpacing = 5;
+
+  // 描画用定数
   static constexpr double kRoundRadius = 5.0;
   static constexpr double kFrameThickness = 3.0;
   static constexpr Vec2 kTextShadowOffset{ 2.0, 2.0 };
