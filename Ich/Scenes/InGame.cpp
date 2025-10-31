@@ -53,8 +53,8 @@ namespace InGameConstants
   constexpr int32 kCharBoxStartY = 20;            // 開始Y位置
 
   // 完成した単語ボードパラメータ
-  constexpr int32 kCompletedBoardX = 720;
-  constexpr int32 kCompletedBoardY = 120;
+  constexpr int32 kCompletedBoardX = 750;
+  constexpr int32 kCompletedBoardY = 80;
   constexpr int32 kCompletedBoardWidth = 500;
   constexpr int32 kCompletedBoardHeight = 550;
   constexpr int32 kCompletedBoardLineHeight = 18;

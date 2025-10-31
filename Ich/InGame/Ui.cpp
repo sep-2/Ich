@@ -16,6 +16,14 @@ namespace UiConstants {
   
   // サイドボックス用の画像パス
   const String kSideBoxImagePath = U"Assets/Image/Ui/SideBox.png";
+  
+  // 操作説明テキストの設定
+  constexpr int32 kControlHelpFontSize = 40;
+  const String kControlHelpText = U"Z:掘る、←↓→:移動";
+  const Vec2 kControlHelpMargin{ 24.0, 20.0 };
+  const Vec2 kControlHelpShadowOffset{ 2.0, 2.0 };
+  const ColorF kControlHelpTextColor{ 1.0, 1.0, 1.0 };
+  const ColorF kControlHelpShadowColor{ 0.0, 0.0, 0.0, 0.6 };
 }
 
 /// <summary>
@@ -23,6 +31,7 @@ namespace UiConstants {
 /// </summary>
 Ui::Ui()
   : Task()
+  , control_help_font_(UiConstants::kControlHelpFontSize, Typeface::Bold)
   , air_ratio_(1.0f)
   , gauge_x_(500)
   , gauge_y_(50)
@@ -223,6 +232,19 @@ void Ui::Render()
     //  if (side_box_bottom_center_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_center_wrapper_));
     //  if (side_box_bottom_right_wrapper_) renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(side_box_bottom_right_wrapper_));
     //}
+  }
+
+  // 操作説明の描画
+  const auto control_text = UiConstants::kControlHelpText;
+  if (!control_text.isEmpty()) {
+    const auto glyph = control_help_font_(control_text);
+    const auto region = glyph.region();
+    const Vec2 draw_pos{
+      Scene::Width() - UiConstants::kControlHelpMargin.x - region.w,
+      Scene::Height() - UiConstants::kControlHelpMargin.y - region.h
+    };
+    glyph.draw(draw_pos + UiConstants::kControlHelpShadowOffset, UiConstants::kControlHelpShadowColor);
+    glyph.draw(draw_pos, UiConstants::kControlHelpTextColor);
   }
 }
 

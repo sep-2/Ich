@@ -207,6 +207,11 @@ private:
     std::shared_ptr<TextureWrapper> side_box_bottom_right_wrapper_;
 
     /// <summary>
+    /// 操作説明テキスト描画用フォント
+    /// </summary>
+    Font control_help_font_;
+
+    /// <summary>
     /// エアゲージの現在値（0.0〜1.0）
     /// </summary>
     float air_ratio_;
