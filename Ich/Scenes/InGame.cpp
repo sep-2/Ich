@@ -218,7 +218,7 @@ namespace InGameConstants
   /// <summary>
   /// クリアまでの単語の完成数
   /// </summary>
-  const int kClearEvaluationCount = 3;
+  const int kClearEvaluationCount = 30;
 }
 
 Game::Game(const InitData& init)
@@ -939,6 +939,9 @@ void Game::update()
         {
           current_message_ = messageIt->second;
           message_timer_ = 0.0;
+        }
+        else {
+          current_message_ = U"";
         }
         // HitEffect をプレイヤーの少し上に生成
         if (player_) {
