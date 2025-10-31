@@ -229,6 +229,7 @@ Game::Game(const InitData& init)
   , player_(std::make_shared<Player>())
   , block_destroy_effect_(std::make_unique<BlockDestroyEffect>())
   , bubble_effect_(std::make_unique<BubbleEffect>())
+  , word_display_box_(std::make_unique<WordDisplayBox>())
   , air_amount_(1.0f)
   , is_game_over_(false)
   , is_game_clear_(false)
@@ -348,6 +349,14 @@ Game::Game(const InitData& init)
 
   for (size_t i = 0; i < max_string_; i++) {
     have_words_.push_back(U"");
+  }
+
+  // WordDisplayBoxの設定
+  if (word_display_box_)
+  {
+    word_display_box_->SetPosition(InGameConstants::kCharBoxStartX, InGameConstants::kCharBoxStartY);
+    word_display_box_->SetBoxSize(InGameConstants::kCharBoxSize);
+    word_display_box_->SetBoxSpacing(InGameConstants::kCharBoxSpacing);
   }
 
   UpdateHint();
@@ -687,7 +696,7 @@ void Game::UpdatePlayerMovement(float delta_time)
     }
   }
   
-  // 落下中にブロックにめり込んでいないかチェック（横方向の押し出し）
+  // 落下中にブロックにめり込みがないかチェック
   if (!is_on_block) {
     const float player_left = next_pos.x - player_half_width;
     const float player_right = next_pos.x + player_half_width;
@@ -917,6 +926,14 @@ void Game::update()
   
   // ヒット演出の更新
   hit_effect_.Update(Scene::DeltaTime());
+
+  // 文字表示ボックスの更新
+  if (word_display_box_)
+  {
+    word_display_box_->Update(Scene::DeltaTime());
+    word_display_box_->SetWords(have_words_);
+    word_display_box_->SetCompletedWords(completed_words_);
+  }
 
   // have_words_を連結して1行で表示
   String concatenated;
@@ -1312,42 +1329,10 @@ void Game::draw() const
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
 
-  //------- 文字表示（上部：現在収集中の文字）- もじぴったん風のボックス表示
-  Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
-
-  for (int i = 0; i < have_words_.size(); i++) {
-    const String& word = have_words_[i];
-
-    // この文字が完成した単語に含まれているかチェック
-    bool is_in_completed_word = false;
-
-    for (const auto& completed_word : completed_words_) {
-      if (completed_word.includes(word)) {
-        is_in_completed_word = true;
-        break;
-      }
-    }
-
-    // ボックスの位置を計算（縦方向に配置：上から下）
-    const int32 box_x = InGameConstants::kCharBoxStartX;
-    const int32 box_y = InGameConstants::kCharBoxStartY + i * (InGameConstants::kCharBoxSize + InGameConstants::kCharBoxSpacing);
-
-    // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
-    const ColorF box_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedBoxColor : InGameConstants::kCharBoxDefaultBoxColor;
-    const ColorF border_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedBorderColor : InGameConstants::kCharBoxDefaultBorderColor;
-
-    // ボックスを描画（角丸四角形）
-    RoundRect{ box_x, box_y, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.draw(box_color);
-    RoundRect{ box_x, box_y, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxSize, InGameConstants::kCharBoxRoundRadius }.drawFrame(InGameConstants::kCharBoxFrameThickness, border_color);
-
-    // 文字を中央に描画（影付き）
-    const Vec2 text_center{ box_x + InGameConstants::kCharBoxSize / 2.0, box_y + InGameConstants::kCharBoxSize / 2.0 };
-
-    // 影
-    block_font_(word).drawAt(text_center + InGameConstants::kCharBoxTextShadowOffset, InGameConstants::kCharBoxTextShadowColor);
-    // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
-    const ColorF text_color = is_in_completed_word ? InGameConstants::kCharBoxCompletedTextColor : InGameConstants::kCharBoxDefaultTextColor;
-    block_font_(word).drawAt(text_center, text_color);
+  // 文字表示ボックスの描画（もじぴったん風UI）
+  if (word_display_box_)
+  {
+    word_display_box_->Draw(block_font_);
   }
 
   //------- 右側のボード：完成した単語を表示 - 画面固定
