@@ -17,6 +17,10 @@ namespace UiConstants {
   // サイドボックス用の画像パス
   const String kSideBoxImagePath = U"Assets/Image/Ui/SideBox.png";
   
+  // エア残量警告の設定
+  constexpr float kLowAirThreshold = 0.2f;
+  const ColorF kLowAirOverlayColor{ 1.0, 0.0, 0.0, 0.20 };
+
   // 操作説明テキストの設定
   constexpr int32 kControlHelpFontSize = 40;
   const String kControlHelpText = U"Z:掘る、←↓→:移動";
@@ -234,6 +238,11 @@ void Ui::Render()
     //}
   }
 
+
+  // エア残量警告のレイヤー
+  if (air_ratio_ <= UiConstants::kLowAirThreshold) {
+    Scene::Rect().draw(UiConstants::kLowAirOverlayColor);
+  }
   // 操作説明の描画
   const auto control_text = UiConstants::kControlHelpText;
   if (!control_text.isEmpty()) {
