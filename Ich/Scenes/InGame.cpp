@@ -257,7 +257,6 @@ Game::Game(const InitData& init)
 
   auto& data = getData<SaveData>();
 
-  PRINT << data.click_count_;
 
   // UIの初期設定（1280x720対応）
   ui_->SetAirGaugePosition(InGameConstants::kAirGaugeX, InGameConstants::kAirGaugeY);
@@ -497,7 +496,6 @@ void Game::DestroyBlockUnderPlayer()
         // max_string_を超えたら先頭から削除
         while (have_words_.size() > max_string_) {
           have_words_.erase(have_words_.begin());
-          PRINT << U"Removed oldest character. Current size: " << have_words_.size();
         }
 
         hint_timer_ = 0.0;
@@ -1616,6 +1614,4 @@ void Game::GenerateNextBlockChunk()
   
   // 次のトリガー位置を更新
   next_chunk_trigger_y_ = current_chunk_bottom_y_ - kChunkSpacing;
-  
-  PRINT << U"Generated new block chunk at Y: " << new_chunk_start_y << U", trigger: " << next_chunk_trigger_y_;
 }

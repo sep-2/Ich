@@ -440,7 +440,6 @@ void Player::UpdateAnimation(float delta_time)
   if (animation_timer_ >= frame_interval_seconds_) {
     animation_timer_ = 0;
     current_pose_frame_ = (current_pose_frame_ + 1) % static_cast<int>(frame_count);
-    PRINT << current_pose_frame_;
     UpdateTextureForPose();
   }
   //while (animation_timer_ >= frame_interval_seconds_) {
@@ -484,7 +483,6 @@ void Player::ApplyPoseFromMovement(const bool force)
 
   const Pose new_pose = CalculateMovementPose();
   if (pose_ != new_pose) {
-    PRINT << U"CalculateMovementPose changed pose:" << force;
   }
   if (force || pose_ != new_pose) {
     //PRINT << U"ApplyPoseFromMovement:" << force;
