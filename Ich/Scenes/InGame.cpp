@@ -927,14 +927,6 @@ void Game::update()
   // ヒット演出の更新
   hit_effect_.Update(Scene::DeltaTime());
 
-  // 文字表示ボックスの更新
-  if (word_display_box_)
-  {
-    word_display_box_->Update(Scene::DeltaTime());
-    word_display_box_->SetWords(have_words_);
-    word_display_box_->SetCompletedWords(completed_words_);
-  }
-
   // have_words_を連結して1行で表示
   String concatenated;
   for (const auto& word : have_words_) {
@@ -1303,6 +1295,38 @@ void Game::draw() const
     menu_->Draw();
   }
 
+  // 文字表示ボックスの描画（もじぴったん風UI）
+  if (word_display_box_)
+  {
+    word_display_box_->SetWords(have_words_);
+    word_display_box_->SetCompletedWords(completed_words_);
+    word_display_box_->Draw(block_font_);
+  }
+
+  //------- 右側のボード：完成した単語を表示 - 画面固定
+  // ボードの背景を描画
+  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.draw(InGameConstants::kCompletedBoardBackgroundColor);
+  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
+
+  // タイトルを描画
+  block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
+
+  // 完成した単語を4列グリッドで配置
+  const double column_width = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
+  const double row_start_y = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
+  const double row_height = InGameConstants::kCompletedBoardLineHeight;
+
+  for (size_t index = 0; index < completed_words_.size(); ++index) {
+    const size_t column = index % InGameConstants::kCompletedBoardColumns;
+    const size_t row = index / InGameConstants::kCompletedBoardColumns;
+    const double text_x = InGameConstants::kCompletedBoardX + column * column_width + InGameConstants::kCompletedBoardColumnPadding;
+    const double text_y = row_start_y + row * row_height;
+    completed_word_font_(completed_words_[index]).draw(text_x, text_y, InGameConstants::kCompletedWordTextColor);
+  }
+
+  // 完成した単語の数を表示
+  debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
+
   // ゲームオーバー時の表示
   if (is_game_over_)
   {
@@ -1331,36 +1355,6 @@ void Game::draw() const
 
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
-
-  // 文字表示ボックスの描画（もじぴったん風UI）
-  if (word_display_box_)
-  {
-    word_display_box_->Draw(block_font_);
-  }
-
-  //------- 右側のボード：完成した単語を表示 - 画面固定
-  // ボードの背景を描画
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.draw(InGameConstants::kCompletedBoardBackgroundColor);
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
-
-  // タイトルを描画
-  block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
-
-  // 完成した単語を4列グリッドで配置
-  const double column_width = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
-  const double row_start_y = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
-  const double row_height = InGameConstants::kCompletedBoardLineHeight;
-
-  for (size_t index = 0; index < completed_words_.size(); ++index) {
-    const size_t column = index % InGameConstants::kCompletedBoardColumns;
-    const size_t row = index / InGameConstants::kCompletedBoardColumns;
-    const double text_x = InGameConstants::kCompletedBoardX + column * column_width + InGameConstants::kCompletedBoardColumnPadding;
-    const double text_y = row_start_y + row * row_height;
-    completed_word_font_(completed_words_[index]).draw(text_x, text_y, InGameConstants::kCompletedWordTextColor);
-  }
-
-  // 完成した単語の数を表示
-  debug_font_(U"完成数: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
 }
 
 //void Game::drawFadeIn(double t) const
