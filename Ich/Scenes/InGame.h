@@ -10,6 +10,7 @@
 #include "InGame/BlockDestroyEffect.h"
 #include "InGame/BubbleEffect.h"
 #include "InGame/HitEffect.h"
+#include "InGame/WordDisplayBox.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -269,6 +270,9 @@ private:
 
   // ヒット演出（取得単語表示）
   HitEffect hit_effect_;
+
+  // 文字表示ボックス（もじぴったん風UI）
+  std::unique_ptr<WordDisplayBox> word_display_box_;
 
   // 現在のブロック塊のY座標（下端）
   float current_chunk_bottom_y_ = 0.0f;
