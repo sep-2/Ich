@@ -980,6 +980,12 @@ void Game::update()
           hit_effect_.Add(pos, hit_word);
         }
         
+        // 単語完成エフェクトをトリガー（もじぴったん風の拡大アニメーション）
+        if (word_display_box_)
+        {
+          word_display_box_->TriggerCompletionEffect(hit_word);
+        }
+        
         // 単語を完成させたらエアを回復
         const size_t word_length = hit_word.length();
         air_amount_ += static_cast<float>(word_length) * InGameConstants::kAirRecoverRate;
@@ -1063,6 +1069,12 @@ void Game::update()
   {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
     ui_->SetAirGauge(air_amount_);
+  }
+
+  // WordDisplayBoxの更新
+  if (word_display_box_)
+  {
+    word_display_box_->Update(Scene::DeltaTime());
   }
 
   // プレイヤーの左右移動更新（衝突判定付き）
