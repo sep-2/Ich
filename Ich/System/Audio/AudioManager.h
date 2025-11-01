@@ -21,6 +21,7 @@ enum class SeKind {
 /// </summary>
 enum class BgmKind {
   kMain,
+  kTitle,
 };
 
 /// <summary>
@@ -37,7 +38,8 @@ private:
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {
-    {BgmKind::kMain, "Assets/Audio/BGM.m4a"},
+    {BgmKind::kMain, "Assets/Audio/Bgm/BGM.m4a"},
+    {BgmKind::kTitle, "Assets/Audio/Bgm/TitleBgm.mp3"},
   };
 
 public:

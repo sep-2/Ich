@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "Result.h"
+#include "System/Audio/AudioManager.h"
 
 namespace ResultConstants {
   const String kGameClearImagePath = U"Assets/Image/Player/GameClear.png";
@@ -36,6 +37,7 @@ Result::Result(const InitData& init)
 void Result::update()
 {
   if (IsAnyKeyTriggered()) {
+    AudioManager::GetInstance()->StopBgm();
     changeScene(EnumScene::kTitle, 0s);
   }
 }

@@ -126,7 +126,7 @@ Title::Title(const InitData& init)
   stopwatch_.start();
 
   // BGM再生（タイトル用のBGMがあれば）
-  // AudioManager::GetInstance()->PlayBgm(BgmKind::kTitle);
+  AudioManager::GetInstance()->PlayBgm(BgmKind::kTitle);
 }
 
 Title::~Title()
@@ -186,6 +186,7 @@ void Title::update()
     switch (current_menu_item_) {
       case MenuItem::kGameStart:
         // ゲーム開始
+        AudioManager::GetInstance()->StopBgm();
         changeScene(EnumScene::kInGame);
         AudioManager::GetInstance()->PlaySe(SeKind::kTitleDecide);
         break;
