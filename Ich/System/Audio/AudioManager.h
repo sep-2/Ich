@@ -12,6 +12,8 @@ enum class SeKind {
   kDestroyBlock,
   kCompleteWord,
   kGameOver,
+  kTitleDecide,
+  kTitleCursorMove,
 };
 
 /// <summary>
@@ -30,6 +32,8 @@ private:
     {SeKind::kDestroyBlock, "Assets/Audio/Se/DestroyBlock.mp3"},
     {SeKind::kCompleteWord, "Assets/Audio/Se/CompleteWord.mp3"},
     {SeKind::kGameOver, "Assets/Audio/Se/GameOver.mp3"},
+    {SeKind::kTitleDecide, "Assets/Audio/Se/Decide.mp3"},
+    {SeKind::kTitleCursorMove, "Assets/Audio/Se/CursorMove.mp3"},
   };
 
   static inline const std::map<BgmKind, std::string> kBgmFilepaths = {

@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "Scenes/Enum.h"
-#include "System/Renderer/TextureWrapper.h"
-#include "System/Renderer/Renderer.h"
 #include "System/SaveData/SaveData.hpp"
 
 // タイトルシーン
@@ -24,17 +22,29 @@ public:
   void drawFadeOut(double t) const override;
 
 private:
+  // メニュー項目
+  enum class MenuItem
+  {
+    kGameStart,   // ゲーム開始
+    kCredits,     // クレジット
+    kExit         // ゲーム終了
+  };
 
-  std::shared_ptr<Texture> title_texture_;
-
-  /// <summary>
-  /// イメージ
-  /// </summary>
-  std::shared_ptr<TextureWrapper> title_wrapper_;
-
-  std::shared_ptr<Texture> animals_texture_;
-
-  std::shared_ptr<TextureWrapper> animals_;
-
-  Stopwatch m_stopwatch_;
+  // タイトルロゴ用フォント
+  Font title_font_;
+  
+  // サブタイトル用フォント
+  Font subtitle_font_;
+  
+  // メニュー用フォント
+  Font menu_font_;
+  
+  // アニメーション用タイマー
+  Stopwatch stopwatch_;
+  
+  // 現在選択中のメニュー項目
+  MenuItem current_menu_item_;
+  
+  // クレジット表示フラグ
+  bool show_credits_;
 };
