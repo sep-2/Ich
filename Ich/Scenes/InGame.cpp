@@ -1448,31 +1448,21 @@ void Game::UpdateCamera()
   // 縦方向の見た目オフセット（ブロック2個分、主人公を画面内で高く見せる）
   const float y_bias = static_cast<float>(InGameConstants::kBlockSize * InGameConstants::kCameraVerticalBiasBlocks);
 
-  // カメラの目標位置を計算（プレイヤーを画面中央より上に配置）
+  // カメラの目標位置を計算（横移動は無効、縦方向のみプレイヤーを画面中央より上に配置）
   const Vec2 target_camera_pos = Vec2{
-    player_pos.x - Scene::Width() / 2.0f,
+    0.0f,  // 横方向は固定（常に0）
     player_pos.y - Scene::Height() / 2.0f + y_bias
   };
 
-  // カメラ位置をスムーズに更新（線形補間）
-  camera_offset_ += (target_camera_pos - camera_offset_) * InGameConstants::kCameraFollowSpeed;
 
-  // カメラの移動範囲を制限（必要に応じて）
-  // 例：左端より左には移動しない
-  if (camera_offset_.x < 0) {
-    camera_offset_.x = 0;
-  }
+
+  // カメラ位置をスムーズに更新（線形補間）- 横方向は無効
+  camera_offset_.x = 0.0f;  // 横方向は常に0
+  camera_offset_.y += (target_camera_pos.y - camera_offset_.y) * InGameConstants::kCameraFollowSpeed;
 
   // 上端より上には移動しない（壁の最上部を考慮）
   if (camera_offset_.y < InGameConstants::kWallStartY) {
     camera_offset_.y = InGameConstants::kWallStartY;
-  }
-
-  // 右端の制限（ブロックグリッドのサイズに応じて）
-  const float world_width = InGameConstants::kStartX + block_grid_[0].size() * InGameConstants::kBlockSize;
-  const float max_camera_x = world_width - Scene::Width();
-  if (camera_offset_.x > max_camera_x && max_camera_x > 0) {
-    camera_offset_.x = max_camera_x;
   }
 
   // 下端の制限（ブロックグリッドのサイズに応じて）
