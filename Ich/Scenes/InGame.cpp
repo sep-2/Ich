@@ -530,7 +530,7 @@ void Game::DestroyBlockUnderPlayer()
     }
   }
 
-  PRINT << U"No block found to destroy near player";
+  // PRINT << U"No block found to destroy near player";
 }
 
 void Game::UpdatePlayerFall(float delta_time)

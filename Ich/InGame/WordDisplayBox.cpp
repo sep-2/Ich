@@ -41,8 +41,8 @@ void WordDisplayBox::Draw(const Font& blockFont) const
     const int32 box_y = position_y_ + i * (box_size_ + box_spacing_);
 
     // ボックスの背景色（完成した単語に含まれる場合は明るい赤、それ以外は白）
-    const ColorF box_color = is_completed ? kCompletedBoxColor : kDefaultBoxColor;
-    const ColorF border_color = is_completed ? kCompletedBorderColor : kDefaultBorderColor;
+    const ColorF box_color = kDefaultBoxColor;
+    const ColorF border_color = kDefaultBorderColor;
 
     // ボックスを描画（角丸四角形）
     RoundRect{ box_x, box_y, box_size_, box_size_, kRoundRadius }.draw(box_color);
@@ -55,7 +55,7 @@ void WordDisplayBox::Draw(const Font& blockFont) const
     blockFont(word).drawAt(text_center + kTextShadowOffset, kTextShadowColor);
     
     // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
-    const ColorF text_color = is_completed ? kCompletedTextColor : kDefaultTextColor;
+    const ColorF text_color = kDefaultTextColor;
     blockFont(word).drawAt(text_center, text_color);
   }
 }
@@ -88,6 +88,12 @@ void WordDisplayBox::SetBoxSpacing(int32 spacing)
 
 bool WordDisplayBox::IsInCompletedWord(const String& word) const
 {
+  // 空文字列の場合は完成していないと判断
+  if (word.isEmpty())
+  {
+    return false;
+  }
+
   for (const auto& completed_word : completed_words_)
   {
     if (completed_word.includes(word))
