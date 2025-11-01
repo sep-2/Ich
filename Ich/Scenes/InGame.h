@@ -295,6 +295,7 @@ private:
   
   // ブロック塊間の距離
   static constexpr float kChunkSpacing = 500.0f;
+  int32 stage_ = 1;
 
   // デバッグモード
 #if _DEBUG

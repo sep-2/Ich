@@ -152,7 +152,7 @@ namespace InGameConstants
   /// <summary>
   /// エア回復単位
   /// </summary>
-  constexpr float kAirDecreaseRate = 0.01f;
+  constexpr float kAirDecreaseRate = 0.005f;
 
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
@@ -1007,7 +1007,7 @@ void Game::update()
     if (!menu_ || !menu_->IsInfiniteAirEnabled())
 #endif
     {
-      air_amount_ -= InGameConstants::kAirDecreaseRate * static_cast<float>(Scene::DeltaTime());
+      air_amount_ -= InGameConstants::kAirDecreaseRate * static_cast<float>(Scene::DeltaTime()) * static_cast<float>(std::sqrt(static_cast<float>(stage_)));
       if (air_amount_ < 0.0f) {
         air_amount_ = 0.0f;
       }
@@ -1574,6 +1574,8 @@ void Game::UpdateScroll()
 
 void Game::GenerateNextBlockChunk()
 {
+  ++stage_;
+
   // 新しいブロック塊を生成
   const Array<Array<std::pair<String, bool>>> new_string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
