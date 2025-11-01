@@ -12,6 +12,7 @@
 #include "InGame/HitEffect.h"
 #include "InGame/WordDisplayBox.h"
 #include "InGame/CollectedCharacters.h"
+#include "InGame/WaveBackgroundEffect.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -286,6 +287,9 @@ private:
 
   // 文字表示ボックス（もじぴったん風UI）
   std::unique_ptr<WordDisplayBox> word_display_box_;
+
+  // 波背景エフェクト（夢の世界の雰囲気）
+  std::unique_ptr<WaveBackgroundEffect> wave_background_effect_;
 
   // 現在のブロック塊のY座標（下端）
   float current_chunk_bottom_y_ = 0.0f;

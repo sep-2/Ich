@@ -123,6 +123,7 @@
     <ClCompile Include="InGame\BubbleEffect.cpp" />
     <ClCompile Include="InGame\CollectedCharacters.cpp" />
     <ClCompile Include="InGame\Ui.cpp" />
+    <ClCompile Include="InGame\WaveBackgroundEffect.cpp" />
     <ClCompile Include="InGame\WordDisplayBox.cpp" />
     <ClCompile Include="Keywords.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -355,6 +356,7 @@
     <ClInclude Include="InGame\BubbleEffect.h" />
     <ClInclude Include="InGame\CollectedCharacters.h" />
     <ClInclude Include="InGame\Ui.h" />
+    <ClInclude Include="InGame\WaveBackgroundEffect.h" />
     <ClInclude Include="InGame\WordDisplayBox.h" />
     <ClInclude Include="Messages.hpp" />
     <ClInclude Include="Player.hpp" />
