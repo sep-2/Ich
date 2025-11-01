@@ -1656,6 +1656,10 @@ void Game::GenerateNextBlockChunk()
             const float block_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
             const float block_y = new_chunk_start_y + chunk_row * InGameConstants::kBlockSize;
             block_grid_[row][col].position = Vec2{ block_x, block_y };
+            
+            // ゲーム開始時と同じようにシードベースで色を設定
+            const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
+            block_grid_[row][col].color = InGameConstants::kBlockColors[seed % InGameConstants::kBlockColors.size()];
           }
           else
           {
