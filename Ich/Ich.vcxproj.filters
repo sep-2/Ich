@@ -237,6 +237,9 @@
     <ClCompile Include="InGame\WordDisplayBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InGame\CollectedCharacters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -966,6 +969,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InGame\WordDisplayBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InGame\CollectedCharacters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

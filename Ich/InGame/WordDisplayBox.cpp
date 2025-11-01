@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "WordDisplayBox.h"
 
-// 定数の定義
+// 色定数の定義
 const ColorF WordDisplayBox::kTextShadowColor{ 0.0, 0.0, 0.0, 0.3 };
 const ColorF WordDisplayBox::kDefaultTextColor{ 0.0, 0.0, 0.0 };
 const ColorF WordDisplayBox::kCompletedTextColor{ 0.8, 0.0, 0.0 };
@@ -11,10 +11,10 @@ const ColorF WordDisplayBox::kDefaultBorderColor{ 0.3, 0.3, 0.3 };
 const ColorF WordDisplayBox::kCompletedBorderColor{ 1.0, 0.0, 0.0 };
 
 WordDisplayBox::WordDisplayBox()
-  : position_x_(50)
-  , position_y_(20)
-  , box_size_(50)
-  , box_spacing_(5)
+  : position_x_(kDefaultPositionX)
+  , position_y_(kDefaultPositionY)
+  , box_size_(kDefaultBoxSize)
+  , box_spacing_(kDefaultBoxSpacing)
 {
 }
 
@@ -29,7 +29,8 @@ void WordDisplayBox::Update(double deltaTime)
 
 void WordDisplayBox::Draw(const Font& blockFont) const
 {
-  for (int i = 0; i < words_.size(); i++) {
+  for (int i = 0; i < words_.size(); i++)
+  {
     const String& word = words_[i];
 
     // この文字が完成した単語に含まれているかチェック
@@ -52,7 +53,7 @@ void WordDisplayBox::Draw(const Font& blockFont) const
 
     // 影
     blockFont(word).drawAt(text_center + kTextShadowOffset, kTextShadowColor);
-
+    
     // 文字本体（完成した単語に含まれる場合は赤、それ以外は黒）
     const ColorF text_color = is_completed ? kCompletedTextColor : kDefaultTextColor;
     blockFont(word).drawAt(text_center, text_color);
@@ -87,8 +88,10 @@ void WordDisplayBox::SetBoxSpacing(int32 spacing)
 
 bool WordDisplayBox::IsInCompletedWord(const String& word) const
 {
-  for (const auto& completed_word : completed_words_) {
-    if (completed_word.includes(word)) {
+  for (const auto& completed_word : completed_words_)
+  {
+    if (completed_word.includes(word))
+    {
       return true;
     }
   }

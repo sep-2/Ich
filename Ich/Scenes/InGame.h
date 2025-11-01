@@ -11,6 +11,7 @@
 #include "InGame/BubbleEffect.h"
 #include "InGame/HitEffect.h"
 #include "InGame/WordDisplayBox.h"
+#include "InGame/CollectedCharacters.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -245,11 +246,16 @@ private:
   Vec2 player_move_input_ = Vec2::Zero();
 
   /// <summary>
-  /// 今まで完成した単語
+  /// 獲得した文字を管理
+  /// </summary>
+  std::unique_ptr<CollectedCharacters> collected_characters_;
+
+  /// <summary>
+  /// 今まで完成した単語（廃止予定：collected_characters_を使用）
   /// </summary>
   Array<String> have_words_;
 
-  // 最大文字数
+  // 最大文字数（廃止予定：CollectedCharactersで管理）
   size_t max_string_ = 7;
 
   // 完成した単語のリスト
