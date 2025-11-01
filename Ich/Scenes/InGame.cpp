@@ -167,7 +167,7 @@ namespace InGameConstants
   const ColorF kGameOverTextColor{ 1.0, 0.2, 0.2 };  // ゲームオーバーテキスト色
 
   // ゲームクリアパラメータ
-  constexpr double kGameClearDuration = 8.0;      // ゲームクリア演出の持続時間
+  constexpr double kGameClearDuration = 3.0;      // ゲームクリア演出の持続時間
   constexpr int32 kGameClearFontSize = 60;        // ゲームクリアフォントサイズ
   const ColorF kGameClearTextColor{ 1.0, 0.8, 0.2 };  // ゲームクリアテキスト色（金色）
 
@@ -223,7 +223,7 @@ namespace InGameConstants
   /// <summary>
   /// クリアまでの単語の完成数
   /// </summary>
-  const int kClearEvaluationCount = 30;
+  const int kClearEvaluationCount = 1;
 }
 
 Game::Game(const InitData& init)
@@ -251,7 +251,7 @@ Game::Game(const InitData& init)
   AudioManager::GetInstance()->PlayBgm(BgmKind::kMain);
 
   // ? テクスチャを生成（絵文字）
-  sparkle_tex_ = Texture{ Emoji{ U"?" } };
+  sparkle_tex_ = Texture{ Emoji{ U"✨" } };
   // 武器テクスチャを読み込み
   weapon_texture_ = Texture{ U"Assets/Image/pen.png" };
 
