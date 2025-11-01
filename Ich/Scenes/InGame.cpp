@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 #include "InGame.h"
 
@@ -13,46 +13,46 @@ namespace InGameConstants
 {
   const Vec2 kStartBlock{ 200, 200 };
 
-  // ƒuƒƒbƒNƒTƒCƒY
+  // ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚º
   constexpr int32 kBlockSize = 100;
   constexpr int32 kStartX = 20;
   constexpr int32 kStartY = 250;
-  constexpr int32 kWallStartY = 0;               // •ÇƒuƒƒbƒN‚ÌŠJnYÀ•Wi‰æ–ÊÅã•”j
+  constexpr int32 kWallStartY = 0;               // å£ãƒ–ãƒ­ãƒƒã‚¯ã®é–‹å§‹Yåº§æ¨™ï¼ˆç”»é¢æœ€ä¸Šéƒ¨ï¼‰
 
-  // ƒvƒŒƒCƒ„[‚Ì•¨—ƒpƒ‰ƒ[ƒ^
-  constexpr float kGravity = 800.0f;              // ƒsƒNƒZƒ‹/•b^2
-  constexpr float kMaxFallSpeed = 600.0f;         // Å‘å—‰º‘¬“x
-  constexpr float kPlayerMoveSpeed = 200.0f;      // ƒvƒŒƒCƒ„[‚ÌˆÚ“®‘¬“x
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç‰©ç†ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr float kGravity = 800.0f;              // ãƒ”ã‚¯ã‚»ãƒ«/ç§’^2
+  constexpr float kMaxFallSpeed = 600.0f;         // æœ€å¤§è½ä¸‹é€Ÿåº¦
+  constexpr float kPlayerMoveSpeed = 200.0f;      // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•é€Ÿåº¦
 
-  // ƒJƒƒ‰ƒpƒ‰ƒ[ƒ^
-  constexpr float kCameraFollowSpeed = 0.1f;      // ƒJƒƒ‰’Ç]‘¬“xi0.0`1.0j
-  // ƒvƒŒƒCƒ„[‚Ì‰ºŒÀ‚ÌŒ©‚¦•û‚ğã‚°‚é‚½‚ß‚ÌcƒoƒCƒAƒXiƒuƒƒbƒN”j
-  constexpr int32 kCameraVerticalBiasBlocks = 2;  // ƒuƒƒbƒN2ŒÂ•ª‚¾‚¯ã‚°‚é
+  // ã‚«ãƒ¡ãƒ©ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr float kCameraFollowSpeed = 0.1f;      // ã‚«ãƒ¡ãƒ©è¿½å¾“é€Ÿåº¦ï¼ˆ0.0ï½1.0ï¼‰
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸‹é™ã®è¦‹ãˆæ–¹ã‚’ä¸Šã’ã‚‹ãŸã‚ã®ç¸¦ãƒã‚¤ã‚¢ã‚¹ï¼ˆãƒ–ãƒ­ãƒƒã‚¯æ•°ï¼‰
+  constexpr int32 kCameraVerticalBiasBlocks = 2;  // ãƒ–ãƒ­ãƒƒã‚¯2å€‹åˆ†ã ã‘ä¸Šã’ã‚‹
 
-  // •¶šûWƒpƒ‰ƒ[ƒ^
-  constexpr size_t kMaxCharacters = 5;            // Å‘å•¶š”
-  // UIƒpƒ‰ƒ[ƒ^
-  constexpr int32 kAirGaugeX = 900;               // ƒGƒAƒQ[ƒWXÀ•W
-  constexpr int32 kAirGaugeY = 50;                // ƒGƒAƒQ[ƒWYÀ•W
-  constexpr int32 kSideBoxX = 880;                // ƒTƒCƒhƒ{ƒbƒNƒXXÀ•W
-  constexpr int32 kSideBoxY = 120;                // ƒTƒCƒhƒ{ƒbƒNƒXYÀ•W
+  // æ–‡å­—åé›†ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr size_t kMaxCharacters = 5;            // æœ€å¤§æ–‡å­—æ•°
+  // UIãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr int32 kAirGaugeX = 900;               // ã‚¨ã‚¢ã‚²ãƒ¼ã‚¸Xåº§æ¨™
+  constexpr int32 kAirGaugeY = 50;                // ã‚¨ã‚¢ã‚²ãƒ¼ã‚¸Yåº§æ¨™
+  constexpr int32 kSideBoxX = 880;                // ã‚µã‚¤ãƒ‰ãƒœãƒƒã‚¯ã‚¹Xåº§æ¨™
+  constexpr int32 kSideBoxY = 120;                // ã‚µã‚¤ãƒ‰ãƒœãƒƒã‚¯ã‚¹Yåº§æ¨™
 
-  // ƒuƒƒbƒNƒOƒŠƒbƒhƒpƒ‰ƒ[ƒ^
-  constexpr int32 kGridRows = 6;                 // ƒOƒŠƒbƒhs”
-  constexpr int32 kGridColumns = 6;               // ƒOƒŠƒbƒh—ñ”
-  constexpr int32 kWallThickness = 1;             // •Ç‚ÌŒú‚³iƒuƒƒbƒN”j
+  // ãƒ–ãƒ­ãƒƒã‚¯ã‚°ãƒªãƒƒãƒ‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr int32 kGridRows = 6;                 // ã‚°ãƒªãƒƒãƒ‰è¡Œæ•°
+  constexpr int32 kGridColumns = 6;               // ã‚°ãƒªãƒƒãƒ‰åˆ—æ•°
+  constexpr int32 kWallThickness = 1;             // å£ã®åšã•ï¼ˆãƒ–ãƒ­ãƒƒã‚¯æ•°ï¼‰
 
-  // ƒvƒŒƒCƒ„[‰ŠúˆÊ’u
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åˆæœŸä½ç½®
   constexpr int32 kPlayerInitialX = 200;
   constexpr int32 kPlayerInitialY = 20;
 
-  // ‚à‚¶‚Ò‚Á‚½‚ñ•—UIƒpƒ‰ƒ[ƒ^
-  constexpr int32 kCharBoxSize = 50;              // Še•¶šƒ{ƒbƒNƒX‚ÌƒTƒCƒY
-  constexpr int32 kCharBoxSpacing = 5;            // ƒ{ƒbƒNƒXŠÔ‚ÌŒ„ŠÔ
-  constexpr int32 kCharBoxStartX = 50;            // ŠJnXˆÊ’u
-  constexpr int32 kCharBoxStartY = 20;            // ŠJnYˆÊ’u
+  // ã‚‚ã˜ã´ã£ãŸã‚“é¢¨UIãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr int32 kCharBoxSize = 50;              // å„æ–‡å­—ãƒœãƒƒã‚¯ã‚¹ã®ã‚µã‚¤ã‚º
+  constexpr int32 kCharBoxSpacing = 5;            // ãƒœãƒƒã‚¯ã‚¹é–“ã®éš™é–“
+  constexpr int32 kCharBoxStartX = 50;            // é–‹å§‹Xä½ç½®
+  constexpr int32 kCharBoxStartY = 20;            // é–‹å§‹Yä½ç½®
 
-  // Š®¬‚µ‚½’PŒêƒ{[ƒhƒpƒ‰ƒ[ƒ^
+  // å®Œæˆã—ãŸå˜èªãƒœãƒ¼ãƒ‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
   constexpr int32 kCompletedBoardX = 850;
   constexpr int32 kCompletedBoardY = 80;
   constexpr int32 kCompletedBoardWidth = 400;
@@ -62,26 +62,26 @@ namespace InGameConstants
   constexpr double kHintUpdateInterval = 3.0;
   constexpr double kMessageDisplayDuration = 3.0;
 
-  // ƒuƒƒbƒN”j‰ó”»’èƒpƒ‰ƒ[ƒ^
-  constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // ã‰º‚ÌƒuƒƒbƒN”j‰ó”»’è‚Ìè‡’l
+  // ãƒ–ãƒ­ãƒƒã‚¯ç ´å£Šåˆ¤å®šãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // ä¸Šä¸‹ã®ãƒ–ãƒ­ãƒƒã‚¯ç ´å£Šåˆ¤å®šã®é–¾å€¤
 
-  // •¨—‰‰Zƒpƒ‰ƒ[ƒ^
-  constexpr float kSimpleGravity = 4.0f;          // ŠÈˆÕd—ÍiUpdatePlayerMovement—pj
-  constexpr float kGravityMargin = 5.0f;          // d—Í“K—p‚Ìƒ}[ƒWƒ“
+  // ç‰©ç†æ¼”ç®—ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr float kSimpleGravity = 4.0f;          // ç°¡æ˜“é‡åŠ›ï¼ˆUpdatePlayerMovementç”¨ï¼‰
+  constexpr float kGravityMargin = 5.0f;          // é‡åŠ›é©ç”¨æ™‚ã®ãƒãƒ¼ã‚¸ãƒ³
 
-  // ‰æ–ÊƒTƒCƒY
+  // ç”»é¢ã‚µã‚¤ã‚º
   constexpr int32 kScreenWidth = 1280;
   constexpr int32 kScreenHeight = 720;
 
-  // ƒV[ƒhŒvZ—p‚Ì’è”
+  // ã‚·ãƒ¼ãƒ‰è¨ˆç®—ç”¨ã®å®šæ•°
   constexpr uint64 kSeedMultiplierRow = 982451653ULL;
   constexpr uint64 kSeedMultiplierCol = 1572869ULL;
 
-  // ‰eƒIƒtƒZƒbƒg
+  // å½±ã‚ªãƒ•ã‚»ãƒƒãƒˆ
   const Vec2 kBlockTextShadowOffset{ 3.0, 3.0 };
   const Vec2 kCharBoxTextShadowOffset{ 2.0, 2.0 };
 
-  // F’è‹`
+  // è‰²å®šç¾©
   const ColorF kBlockTextShadowColor{ 0.0, 0.0, 0.0, 0.9 };
   const ColorF kBlockTextColor{ 1.0 };
   const ColorF kCharBoxTextShadowColor{ 0.0, 0.0, 0.0, 0.3 };
@@ -107,14 +107,14 @@ namespace InGameConstants
   const ColorF kDebugCircleColorRed = Palette::Red;
   const ColorF kDebugTextColorWhite = Palette::White;
 
-  // ŠpŠÛ”¼Œa
+  // è§’ä¸¸åŠå¾„
   constexpr double kBlockRoundRadius = 15.0;
   constexpr double kCharBoxRoundRadius = 5.0;
   constexpr double kCompletedBoardRoundRadius = 10.0;
   constexpr double kHintBoxRoundRadius = 18.0;
   constexpr double kWeaponRoundRadius = 10.0;
 
-  // ü‚Ì‘¾‚³
+  // ç·šã®å¤ªã•
   constexpr double kBlockFrameThickness = 2.0;
   constexpr double kCharBoxFrameThickness = 3.0;
   constexpr double kCompletedBoardFrameThickness = 3.0;
@@ -124,22 +124,22 @@ namespace InGameConstants
   constexpr double kHintBubbleFrameThickness1 = 1.5;
   constexpr double kHintBubbleFrameThickness2 = 1.2;
 
-  // ƒqƒ“ƒgƒoƒuƒ‹ƒpƒ‰ƒ[ƒ^
-  const Vec2 kHintBoxOffset{ 80.0, -70.0 }; // 20px ‰º‚Ö
-  const Vec2 kHintBubbleAnchorOffset{ 50.0, -30.0 }; // 20px ‰º‚Ö
+  // ãƒ’ãƒ³ãƒˆãƒãƒ–ãƒ«ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  const Vec2 kHintBoxOffset{ 80.0, -70.0 }; // 20px ä¸‹ã¸
+  const Vec2 kHintBubbleAnchorOffset{ 50.0, -30.0 }; // 20px ä¸‹ã¸
   const Vec2 kHintBubble2Offset{ -15.0, 15.0 };
   constexpr double kHintBoxPadding = 18.0;
   constexpr double kHintBubble1Radius = 8.0;
   constexpr double kHintBubble2Radius = 5.0;
 
-  // ƒfƒoƒbƒO•\¦ƒpƒ‰ƒ[ƒ^
+  // ãƒ‡ãƒãƒƒã‚°è¡¨ç¤ºãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
   constexpr int32 kDebugTextX = 20;
   constexpr int32 kDebugTextY1 = 20;
   constexpr int32 kDebugTextY2 = 40;
   constexpr int32 kDebugTextY3 = 60;
   constexpr double kDebugCircleRadius = 3.0;
 
-  // Š®¬’PŒêƒ{[ƒhƒpƒ‰ƒ[ƒ^
+  // å®Œæˆå˜èªãƒœãƒ¼ãƒ‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
   constexpr int32 kCompletedBoardColumns = 4;
   constexpr double kCompletedBoardColumnPadding = 12.0;
   constexpr int32 kCompletedBoardTitleOffsetY = 30;
@@ -148,28 +148,28 @@ namespace InGameConstants
   constexpr int32 kCompletedBoardCountOffsetY = 25;
   constexpr double kCompletedBoardOverlayScale = 3.6;
 
-  // ƒGƒA—Ê’²®ƒpƒ‰ƒ[ƒ^
-  constexpr float kAirDecreaseRate = 0.1f;        // ƒGƒAŒ¸­—¦i10•b‚Å‹ó‚É‚È‚éj
-  constexpr float kAirIncreaseRate = 0.5f;        // ƒGƒA‰ñ•œ—¦i2•b‚Å–ƒ^ƒ“j
+  // ã‚¨ã‚¢é‡èª¿æ•´ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr float kAirDecreaseRate = 0.1f;        // ã‚¨ã‚¢æ¸›å°‘ç‡ï¼ˆ10ç§’ã§ç©ºã«ãªã‚‹ï¼‰
+  constexpr float kAirIncreaseRate = 0.5f;        // ã‚¨ã‚¢å›å¾©ç‡ï¼ˆ2ç§’ã§æº€ã‚¿ãƒ³ï¼‰
 
-  // ƒtƒHƒ“ƒgƒTƒCƒY
+  // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
   constexpr int32 kBlockFontSize = 40;
   constexpr int32 kCompletedWordFontSize = 16;
   constexpr int32 kHintFontSize = 20;
   constexpr int32 kDebugFontSize = 16;
 
-  // ƒQ[ƒ€ƒI[ƒo[ƒpƒ‰ƒ[ƒ^
-  constexpr double kGameOverDuration = 3.0;       // ƒQ[ƒ€ƒI[ƒo[‰‰o‚Ì‘±ŠÔ
-  constexpr int32 kGameOverFontSize = 60;         // ƒQ[ƒ€ƒI[ƒo[ƒtƒHƒ“ƒgƒTƒCƒY
-  const ColorF kGameOverTextColor{ 1.0, 0.2, 0.2 };  // ƒQ[ƒ€ƒI[ƒo[ƒeƒLƒXƒgF
+  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr double kGameOverDuration = 3.0;       // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ¼”å‡ºã®æŒç¶šæ™‚é–“
+  constexpr int32 kGameOverFontSize = 60;         // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
+  const ColorF kGameOverTextColor{ 1.0, 0.2, 0.2 };  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ãƒ†ã‚­ã‚¹ãƒˆè‰²
 
-  // ƒQ[ƒ€ƒNƒŠƒAƒpƒ‰ƒ[ƒ^
-  constexpr double kGameClearDuration = 8.0;      // ƒQ[ƒ€ƒNƒŠƒA‰‰o‚Ì‘±ŠÔ
-  constexpr int32 kGameClearFontSize = 60;        // ƒQ[ƒ€ƒNƒŠƒAƒtƒHƒ“ƒgƒTƒCƒY
-  const ColorF kGameClearTextColor{ 1.0, 0.8, 0.2 };  // ƒQ[ƒ€ƒNƒŠƒAƒeƒLƒXƒgFi‹àFj
+  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+  constexpr double kGameClearDuration = 3.0;      // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢æ¼”å‡ºã®æŒç¶šæ™‚é–“
+  constexpr int32 kGameClearFontSize = 60;        // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
+  const ColorF kGameClearTextColor{ 1.0, 0.8, 0.2 };  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ãƒ†ã‚­ã‚¹ãƒˆè‰²ï¼ˆé‡‘è‰²ï¼‰
 
   /// <summary>
-  /// ƒuƒƒbƒN‚ÌƒCƒ[ƒWƒpƒX
+  /// ãƒ–ãƒ­ãƒƒã‚¯ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ‘ã‚¹
   /// </summary>
   const Array<String> kBlockTexturePaths = {
     U"Assets/Image/block_blue.jpg",
@@ -180,47 +180,47 @@ namespace InGameConstants
   };
 
   /// <summary>
-  /// ƒuƒƒbƒN‚ÌƒCƒ[ƒWƒpƒX
+  /// ãƒ–ãƒ­ãƒƒã‚¯ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ‘ã‚¹
   /// </summary>
   const String kBlockBgTexturePath = U"Assets/Image/block_bg.png";
 
   /// <summary>
-  /// ƒuƒƒbƒNCOLOR
+  /// ãƒ–ãƒ­ãƒƒã‚¯COLOR
   /// </summary>
   const Array<ColorF> kBlockColors = {
-    ColorF{ 0.0, 0.909, 1.0 },  // Â
-    ColorF{ 0.3, 1.0, 0.3 },  // —Î
-    ColorF{ 1.0, 0.6, 0.3 },  // ƒIƒŒƒ“ƒW
-    ColorF{ 1.0, 0.3, 1.0 },  // ƒ}ƒ[ƒ“ƒ^
-    ColorF{ 1.0, 1.0, 0.3 },  // ‰©F
+    ColorF{ 0.0, 0.909, 1.0 },  // é’
+    ColorF{ 0.3, 1.0, 0.3 },  // ç·‘
+    ColorF{ 1.0, 0.6, 0.3 },  // ã‚ªãƒ¬ãƒ³ã‚¸
+    ColorF{ 1.0, 0.3, 1.0 },  // ãƒã‚¼ãƒ³ã‚¿
+    ColorF{ 1.0, 1.0, 0.3 },  // é»„è‰²
   };
 
-  // •ÇƒuƒƒbƒN‚ÌF
-  const ColorF kWallBlockColor{ 0.3, 0.3, 0.3 };  // ƒ_[ƒNƒOƒŒ[
-  const ColorF kWallBlockFrameColor{ 0.15, 0.15, 0.15, 0.8 }; // ‚æ‚èˆÃ‚¢ƒOƒŒ[
-  const ColorF kWallPatternColor{ 0.2, 0.2, 0.2, 0.3 }; // ƒpƒ^[ƒ“‚ÌF
-  constexpr double kWallPatternLineSpacing = 15.0; // •Çƒpƒ^[ƒ“‚ÌüŠÔŠu
-  constexpr double kWallPatternLineThickness = 1.5; // •Çƒpƒ^[ƒ“‚Ìü‚Ì‘¾‚³
+  // å£ãƒ–ãƒ­ãƒƒã‚¯ã®è‰²
+  const ColorF kWallBlockColor{ 0.3, 0.3, 0.3 };  // ãƒ€ãƒ¼ã‚¯ã‚°ãƒ¬ãƒ¼
+  const ColorF kWallBlockFrameColor{ 0.15, 0.15, 0.15, 0.8 }; // ã‚ˆã‚Šæš—ã„ã‚°ãƒ¬ãƒ¼
+  const ColorF kWallPatternColor{ 0.2, 0.2, 0.2, 0.3 }; // ãƒ‘ã‚¿ãƒ¼ãƒ³ã®è‰²
+  constexpr double kWallPatternLineSpacing = 15.0; // å£ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ç·šé–“éš”
+  constexpr double kWallPatternLineThickness = 1.5; // å£ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ç·šã®å¤ªã•
 
   /// <summary>
-  /// ƒGƒAÅ‘å’l
+  /// ã‚¨ã‚¢æœ€å¤§å€¤
   /// </summary>
   const float kAirMax = 1.0f;
 
   /// <summary>
-  /// 1ƒuƒƒbƒN“–‚½‚è‚ÌƒGƒAÁ”ï—Ê
+  /// 1ãƒ–ãƒ­ãƒƒã‚¯å½“ãŸã‚Šã®ã‚¨ã‚¢æ¶ˆè²»é‡
   /// </summary>
   const float kAirConsumeRate = 0.08f;
 
   /// <summary>
-  /// ’PŒê‚ğì¬‚µ‚½‚Æ‚«‚ÌƒGƒA‰ñ•œ—Ê
+  /// å˜èªã‚’ä½œæˆã—ãŸã¨ãã®ã‚¨ã‚¢å›å¾©é‡
   /// </summary>
   const float kAirRecoverRate = 0.1f;
 
   /// <summary>
-  /// ƒNƒŠƒA‚Ü‚Å‚Ì’PŒê‚ÌŠ®¬”
+  /// ã‚¯ãƒªã‚¢ã¾ã§ã®å˜èªã®å®Œæˆæ•°
   /// </summary>
-  const int kClearEvaluationCount = 30;
+  const int kClearEvaluationCount = 1;
 }
 
 Game::Game(const InitData& init)
@@ -244,12 +244,12 @@ Game::Game(const InitData& init)
   , debug_font_{ InGameConstants::kDebugFontSize }
   , game_over_font_{ InGameConstants::kGameOverFontSize, Typeface::Bold }
 {
-  // BGM Ä¶iƒV[ƒ“ŠJnj
+  // BGM å†ç”Ÿï¼ˆã‚·ãƒ¼ãƒ³é–‹å§‹æ™‚ï¼‰
   AudioManager::GetInstance()->PlayBgm(BgmKind::kMain);
 
-  // ? ƒeƒNƒXƒ`ƒƒ‚ğ¶¬iŠG•¶šj
-  sparkle_tex_ = Texture{ Emoji{ U"?" } };
-  // •ŠíƒeƒNƒXƒ`ƒƒ‚ğ“Ç‚İ‚İ
+  // ? ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ç”Ÿæˆï¼ˆçµµæ–‡å­—ï¼‰
+  sparkle_tex_ = Texture{ Emoji{ U"âœ¨" } };
+  // æ­¦å™¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’èª­ã¿è¾¼ã¿
   weapon_texture_ = Texture{ U"Assets/Image/pen.png" };
 
   for (const auto& path : InGameConstants::kBlockTexturePaths) {
@@ -264,15 +264,15 @@ Game::Game(const InitData& init)
   auto& data = getData<SaveData>();
 
 
-  // UI‚Ì‰Šúİ’èi1280x720‘Î‰j
+  // UIã®åˆæœŸè¨­å®šï¼ˆ1280x720å¯¾å¿œï¼‰
   ui_->SetAirGaugePosition(InGameConstants::kAirGaugeX, InGameConstants::kAirGaugeY);
   ui_->SetAirGauge(air_amount_);
 
-  // ƒTƒCƒhƒ{ƒbƒNƒX‚ğ‰æ–Ê‰E‰º‚É”z’ui1280x720‘Î‰j
+  // ã‚µã‚¤ãƒ‰ãƒœãƒƒã‚¯ã‚¹ã‚’ç”»é¢å³ä¸‹ã«é…ç½®ï¼ˆ1280x720å¯¾å¿œï¼‰
   ui_->SetSideBoxPosition(InGameConstants::kSideBoxX, InGameConstants::kSideBoxY);
   ui_->SetSideBoxVisible(true);
 
-  // ƒuƒƒbƒNƒOƒŠƒbƒh‚ğ¶¬i10sx6—ñAƒoƒbƒ`ƒTƒCƒY20j
+  // ãƒ–ãƒ­ãƒƒã‚¯ã‚°ãƒªãƒƒãƒ‰ã‚’ç”Ÿæˆï¼ˆ10è¡Œx6åˆ—ã€ãƒãƒƒãƒã‚µã‚¤ã‚º20ï¼‰
   const Array<Array<std::pair<String, bool>>> string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
@@ -282,16 +282,16 @@ Game::Game(const InitData& init)
     3
   );
 
-  // String”z—ñ‚ğBlock”z—ñ‚É•ÏŠ·i•Ç‚ğŠÜ‚ŞŠg’£ƒOƒŠƒbƒh‚ğì¬j
+  // Stringé…åˆ—ã‚’Blocké…åˆ—ã«å¤‰æ›ï¼ˆå£ã‚’å«ã‚€æ‹¡å¼µã‚°ãƒªãƒƒãƒ‰ã‚’ä½œæˆï¼‰
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
 
-  // ‰Šú‚Ì•Ç‚Ì‚‚³i‰æ–ÊÅã•”‚©‚çÅ‰‚ÌƒuƒƒbƒN‰ò‚Ì‰º’[‚Ü‚Åj
+  // åˆæœŸã®å£ã®é«˜ã•ï¼ˆç”»é¢æœ€ä¸Šéƒ¨ã‹ã‚‰æœ€åˆã®ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®ä¸‹ç«¯ã¾ã§ï¼‰
   const int32 initial_wall_height = static_cast<int32>(std::ceil((InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize - InGameConstants::kWallStartY) / static_cast<float>(InGameConstants::kBlockSize)));
 
-  // Œ»İ‚ÌƒuƒƒbƒN‰ò‚Ì‰º’[YÀ•W‚ğ‹L˜^
+  // ç¾åœ¨ã®ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®ä¸‹ç«¯Yåº§æ¨™ã‚’è¨˜éŒ²
   current_chunk_bottom_y_ = InGameConstants::kStartY + string_grid.size() * InGameConstants::kBlockSize;
   
-  // Ÿ‚ÌƒuƒƒbƒN‰ò‚ğ¶¬‚·‚éƒgƒŠƒK[ˆÊ’u‚ğİ’è
+  // æ¬¡ã®ãƒ–ãƒ­ãƒƒã‚¯å¡Šã‚’ç”Ÿæˆã™ã‚‹ãƒˆãƒªã‚¬ãƒ¼ä½ç½®ã‚’è¨­å®š
   next_chunk_trigger_y_ = current_chunk_bottom_y_ - kChunkSpacing;
 
   block_grid_.resize(initial_wall_height);
@@ -302,17 +302,17 @@ Game::Game(const InitData& init)
     for (size_t col = 0; col < static_cast<size_t>(total_columns); ++col) {
       const bool is_wall_column = (col < InGameConstants::kWallThickness || col >= static_cast<size_t>(InGameConstants::kGridColumns + InGameConstants::kWallThickness));
       
-      // ¶‰E‚Ì•Çi‰æ–ÊÅã•”‚©‚çŠJnj
+      // å·¦å³ã®å£ï¼ˆç”»é¢æœ€ä¸Šéƒ¨ã‹ã‚‰é–‹å§‹ï¼‰
       if (is_wall_column) {
         block_grid_[row][col] = Block(Block::Type::kWall);
-        // •ÇƒuƒƒbƒN‚Í‰æ–ÊÅã•”‚©‚ç”z’u
+        // å£ãƒ–ãƒ­ãƒƒã‚¯ã¯ç”»é¢æœ€ä¸Šéƒ¨ã‹ã‚‰é…ç½®
         const float wall_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
         const float wall_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
         block_grid_[row][col].position = Vec2{ wall_x, wall_y };
       }
-      // ’Êí‚ÌƒuƒƒbƒN—Ìˆæ
+      // é€šå¸¸ã®ãƒ–ãƒ­ãƒƒã‚¯é ˜åŸŸ
       else {
-        // ’ÊíƒuƒƒbƒN—Ìˆæ‚ÌsƒCƒ“ƒfƒbƒNƒX‚ğŒvZ
+        // é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯é ˜åŸŸã®è¡Œã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’è¨ˆç®—
         const int32 normal_block_row_offset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
         
         if (static_cast<int32>(row) >= normal_block_row_offset && static_cast<int32>(row) < normal_block_row_offset + static_cast<int32>(string_grid.size())) {
@@ -320,7 +320,7 @@ Game::Game(const InitData& init)
           const size_t actual_col = static_cast<size_t>(static_cast<int32>(col) - InGameConstants::kWallThickness);
           const auto& cell = string_grid[actual_row][actual_col];
           block_grid_[row][col] = Block(cell.first, cell.second);
-          // ’ÊíƒuƒƒbƒN‚à•ÇÀ•WŒn‚ÅˆÊ’u‚ğİ’è
+          // é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯ã‚‚å£åº§æ¨™ç³»ã§ä½ç½®ã‚’è¨­å®š
           const float block_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
           const float block_y = InGameConstants::kStartY + static_cast<int32>(actual_row) * InGameConstants::kBlockSize;
           block_grid_[row][col].position = Vec2{ block_x, block_y };
@@ -329,7 +329,7 @@ Game::Game(const InitData& init)
           //block_grid_[row][col].color = InGameConstants::kBlockColors[(actual_row + actual_col) % InGameConstants::kBlockColors.size()];
         }
         else {
-          // ’ÊíƒuƒƒbƒN—ÌˆæŠO‚Í‹óƒuƒƒbƒN
+          // é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯é ˜åŸŸå¤–ã¯ç©ºãƒ–ãƒ­ãƒƒã‚¯
           block_grid_[row][col] = Block();
           const float empty_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
           const float empty_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
@@ -339,10 +339,10 @@ Game::Game(const InitData& init)
     }
   }
 
-  // ƒvƒŒƒCƒ„[‚Ì‰Šúİ’èiƒOƒŠƒbƒh‚Ìˆê”Ôã‚Ì’†‰›‚É”z’uj
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆæœŸè¨­å®šï¼ˆã‚°ãƒªãƒƒãƒ‰ã®ä¸€ç•ªä¸Šã®ä¸­å¤®ã«é…ç½®ï¼‰
   const int32 normal_block_row_offset = static_cast<int32>((InGameConstants::kStartY - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
-  const int32 initial_col = InGameConstants::kGridColumns / 2 + InGameConstants::kWallThickness;  // ’†‰›i•Ç‚ğl—¶j
-  const int32 initial_row = normal_block_row_offset;  // ’ÊíƒuƒƒbƒN—Ìˆæ‚Ìˆê”Ôã
+  const int32 initial_col = InGameConstants::kGridColumns / 2 + InGameConstants::kWallThickness;  // ä¸­å¤®ï¼ˆå£ã‚’è€ƒæ…®ï¼‰
+  const int32 initial_row = normal_block_row_offset;  // é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯é ˜åŸŸã®ä¸€ç•ªä¸Š
   const Vec2 initial_pos = Vec2{
     InGameConstants::kStartX + initial_col * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f,
     InGameConstants::kWallStartY + initial_row * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f
@@ -350,15 +350,15 @@ Game::Game(const InitData& init)
 
   //player_->SetPosition(initial_pos.x, initial_pos.y);
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
-  player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // ˆÚ“®‘¬“x‚ğ200ƒsƒNƒZƒ‹/•b‚Éİ’è
+  player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // ç§»å‹•é€Ÿåº¦ã‚’200ãƒ”ã‚¯ã‚»ãƒ«/ç§’ã«è¨­å®š
 
-  // CollectedCharacters‚Ì‰Šú‰»iŒİŠ·«‚Ì‚½‚ßhave_words_‚àˆÛj
+  // CollectedCharactersã®åˆæœŸåŒ–ï¼ˆäº’æ›æ€§ã®ãŸã‚have_words_ã‚‚ç¶­æŒï¼‰
   collected_characters_->SetMaxSize(max_string_);
   for (size_t i = 0; i < max_string_; i++) {
     have_words_.push_back(U"");
   }
 
-  // WordDisplayBox‚Ìİ’è
+  // WordDisplayBoxã®è¨­å®š
   if (word_display_box_)
   {
     word_display_box_->SetPosition(InGameConstants::kCharBoxStartX, InGameConstants::kCharBoxStartY);
@@ -375,14 +375,14 @@ Game::~Game()
 
 bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) const
 {
-  // ƒsƒNƒZƒ‹À•W‚©‚çƒOƒŠƒbƒhÀ•W‚ğŒvZi•Ç—p‚ÌÀ•WŒn‚ğg—pj
+  // ãƒ”ã‚¯ã‚»ãƒ«åº§æ¨™ã‹ã‚‰ã‚°ãƒªãƒƒãƒ‰åº§æ¨™ã‚’è¨ˆç®—ï¼ˆå£ç”¨ã®åº§æ¨™ç³»ã‚’ä½¿ç”¨ï¼‰
   const float relative_x = pixelPos.x - InGameConstants::kStartX;
   const float relative_y = pixelPos.y - InGameConstants::kWallStartY;
 
   gridCol = static_cast<int32>(relative_x / InGameConstants::kBlockSize);
   gridRow = static_cast<int32>(relative_y / InGameConstants::kBlockSize);
 
-  // ƒOƒŠƒbƒh‚Ì”ÍˆÍ“à‚©ƒ`ƒFƒbƒN
+  // ã‚°ãƒªãƒƒãƒ‰ã®ç¯„å›²å†…ã‹ãƒã‚§ãƒƒã‚¯
   if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
     return false;
   }
@@ -395,7 +395,7 @@ bool Game::PixelToGrid(const Vec2& pixelPos, int32& gridRow, int32& gridCol) con
 
 Vec2 Game::GridToPixel(int32 gridRow, int32 gridCol) const
 {
-  // ƒOƒŠƒbƒhÀ•W‚©‚çƒsƒNƒZƒ‹À•Wi’†Sj‚ğŒvZ
+  // ã‚°ãƒªãƒƒãƒ‰åº§æ¨™ã‹ã‚‰ãƒ”ã‚¯ã‚»ãƒ«åº§æ¨™ï¼ˆä¸­å¿ƒï¼‰ã‚’è¨ˆç®—
   const float pixel_x = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
   const float pixel_y = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize + InGameConstants::kBlockSize / 2.0f;
   return Vec2{ pixel_x, pixel_y };
@@ -403,7 +403,7 @@ Vec2 Game::GridToPixel(int32 gridRow, int32 gridCol) const
 
 Vec2 Game::GetGridTopLeft(int32 gridRow, int32 gridCol) const
 {
-  // ƒOƒŠƒbƒh‚Ì¶ãÀ•W‚ğæ“¾
+  // ã‚°ãƒªãƒƒãƒ‰ã®å·¦ä¸Šåº§æ¨™ã‚’å–å¾—
   const float pixel_x = InGameConstants::kStartX + gridCol * InGameConstants::kBlockSize;
   const float pixel_y = InGameConstants::kStartY + gridRow * InGameConstants::kBlockSize;
   return Vec2{ pixel_x, pixel_y };
@@ -423,12 +423,12 @@ void Game::DestroyBlockUnderPlayer()
   const float player_right = player_pos.x + player_->GetWidth() / 2.0f;
   const float player_top = player_pos.y - player_->GetHeight() / 2.0f;
 
-  // ƒvƒŒƒCƒ„[‚ÌüˆÍ‚ÌƒuƒƒbƒN‚ğ’T‚·
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‘¨å›²ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’æ¢ã™
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       Block& block = block_grid_[i][j];
 
-      // ‹óA”j‰óÏ‚İA‚Ü‚½‚Í•ÇƒuƒƒbƒN‚ÍƒXƒLƒbƒv
+      // ç©ºã€ç ´å£Šæ¸ˆã¿ã€ã¾ãŸã¯å£ãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—
       if (block.isEmpty() || block.isWall()) {
         continue;
       }
@@ -442,61 +442,61 @@ void Game::DestroyBlockUnderPlayer()
       bool can_destroy = false;
       String direction;
 
-      // ‰º‚ÌƒuƒƒbƒNi‘«Œ³j
+      // ä¸‹ã®ãƒ–ãƒ­ãƒƒã‚¯ï¼ˆè¶³å…ƒï¼‰
       if (player_pos.x >= block_left && player_pos.x <= block_right) {
         if (player_bottom_y >= block_top && player_bottom_y <= block_top + InGameConstants::kBlockDestroyVerticalThreshold) {
           if (!KeyLeft.pressed() && !KeyRight.pressed()) {
             can_destroy = true;
-            direction = U"‰º";
+            direction = U"ä¸‹";
           }
         }
       }
 
-      // ¶‚ÌƒuƒƒbƒN
+      // å·¦ã®ãƒ–ãƒ­ãƒƒã‚¯
       if (KeyLeft.pressed() && player_left >= block_left && player_left <= block_right) {
         if (player_pos.y >= block_top && player_pos.y <= block_bottom) {
           can_destroy = true;
-          direction = U"¶";
+          direction = U"å·¦";
         }
       }
 
-      // ‰E‚ÌƒuƒƒbƒN
+      // å³ã®ãƒ–ãƒ­ãƒƒã‚¯
       if (KeyRight.pressed() && player_right >= block_left && player_right <= block_right) {
         if (player_pos.y >= block_top && player_pos.y <= block_bottom) {
           can_destroy = true;
-          direction = U"‰E";
+          direction = U"å³";
         }
       }
 
-      // ã‚ÌƒuƒƒbƒNi“ªãj
+      // ä¸Šã®ãƒ–ãƒ­ãƒƒã‚¯ï¼ˆé ­ä¸Šï¼‰
       if (player_pos.x >= block_left && player_pos.x <= block_right) {
         if (player_top <= block_bottom && player_top >= block_bottom - InGameConstants::kBlockDestroyVerticalThreshold) {
           can_destroy = true;
-          direction = U"ã";
+          direction = U"ä¸Š";
         }
       }
 
       if (can_destroy) {
-        // ƒuƒƒbƒN‚Ì’†SˆÊ’u‚ğŒvZiblock.position‚©‚ç’¼ÚŒvZj
+        // ãƒ–ãƒ­ãƒƒã‚¯ã®ä¸­å¿ƒä½ç½®ã‚’è¨ˆç®—ï¼ˆblock.positionã‹ã‚‰ç›´æ¥è¨ˆç®—ï¼‰
         const Vec2 block_center = block_pos + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
 
-        // ƒuƒƒbƒN‚ÌF‚ğŒˆ’èiˆÊ’uˆË‘¶‚ÌƒV[ƒhj
+        // ãƒ–ãƒ­ãƒƒã‚¯ã®è‰²ã‚’æ±ºå®šï¼ˆä½ç½®ä¾å­˜ã®ã‚·ãƒ¼ãƒ‰ï¼‰
         const size_t seed = (i * InGameConstants::kSeedMultiplierRow + j * InGameConstants::kSeedMultiplierCol);
         const size_t color_count = InGameConstants::kBlockColors.size();
         const ColorF block_color = block_grid_[i][j].color;
 
-        // ”j‰ó‰‰o‚ğ’Ç‰Á
+        // ç ´å£Šæ¼”å‡ºã‚’è¿½åŠ 
         if (block_destroy_effect_) {
           block_destroy_effect_->AddEffect(block_center, block_color, block.value);
         }
 
-        // ƒuƒƒbƒN‚ğ”j‰ó
+        // ãƒ–ãƒ­ãƒƒã‚¯ã‚’ç ´å£Š
         block.is_destroyed = true;
         //PRINT << U"Block destroyed (" << direction << U") at row: " << i << U", col: " << j;
 
-        // ƒGƒA‚ğÁ”ï
+        // ã‚¨ã‚¢ã‚’æ¶ˆè²»
 #if _DEBUG
-        // ƒfƒoƒbƒOƒ‚[ƒh‚ÅƒGƒA–³ŒÀ‚ª—LŒø‚Èê‡‚ÍƒGƒA‚ğÁ”ï‚µ‚È‚¢
+        // ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ã§ã‚¨ã‚¢ç„¡é™ãŒæœ‰åŠ¹ãªå ´åˆã¯ã‚¨ã‚¢ã‚’æ¶ˆè²»ã—ãªã„
         if (!menu_ || !menu_->IsInfiniteAirEnabled())
 #endif
         {
@@ -506,16 +506,16 @@ void Game::DestroyBlockUnderPlayer()
           }
         }
 
-        // •¶š‚ğ’Ç‰ÁiV‚µ‚¢ƒVƒXƒeƒ€j
+        // æ–‡å­—ã‚’è¿½åŠ ï¼ˆæ–°ã—ã„ã‚·ã‚¹ãƒ†ãƒ ï¼‰
         if (collected_characters_)
         {
           collected_characters_->AddCharacter(block.value);
         }
 
-        // •¶š‚ğ’Ç‰ÁiŒİŠ·«‚Ì‚½‚ßŠù‘¶‚ÌƒVƒXƒeƒ€‚àˆÛj
+        // æ–‡å­—ã‚’è¿½åŠ ï¼ˆäº’æ›æ€§ã®ãŸã‚æ—¢å­˜ã®ã‚·ã‚¹ãƒ†ãƒ ã‚‚ç¶­æŒï¼‰
         have_words_.push_back(block.value);
 
-        // max_string_‚ğ’´‚¦‚½‚çæ“ª‚©‚çíœ
+        // max_string_ã‚’è¶…ãˆãŸã‚‰å…ˆé ­ã‹ã‚‰å‰Šé™¤
         while (have_words_.size() > max_string_) {
           have_words_.erase(have_words_.begin());
         }
@@ -525,7 +525,7 @@ void Game::DestroyBlockUnderPlayer()
 
         AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
 
-        return;  // 1‚Â‚¾‚¯”j‰ó‚µ‚ÄI—¹
+        return;  // 1ã¤ã ã‘ç ´å£Šã—ã¦çµ‚äº†
       }
     }
   }
@@ -540,19 +540,19 @@ void Game::UpdatePlayerFall(float delta_time)
     return;
   }
 
-  //// ƒvƒŒƒCƒ„[‚ÌŒ»İˆÊ’u‚ÌƒuƒƒbƒN‚ğƒ`ƒFƒbƒN
+  //// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç¾åœ¨ä½ç½®ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’ãƒã‚§ãƒƒã‚¯
   const bool is_on_block = HasBlockAt(grid_row, grid_col);
 
-  // ƒvƒŒƒCƒ„[‚Ì‰º‚ÌƒuƒƒbƒN‚ğƒ`ƒFƒbƒN
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸‹ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’ãƒã‚§ãƒƒã‚¯
   const int32 below_row = grid_row + 1;
   bool has_block_below = false;
 
   if (below_row >= 0 && below_row < static_cast<int32>(block_grid_.size()) &&
     grid_col >= 0 && grid_col < static_cast<int32>(block_grid_[below_row].size())) {
-    has_block_below = HasBlockAt(below_row, grid_col);  // isEmpty()‚Å‚Í‚È‚­HasBlockAt()‚ğg—p
+    has_block_below = HasBlockAt(below_row, grid_col);  // isEmpty()ã§ã¯ãªãHasBlockAt()ã‚’ä½¿ç”¨
   }
 
-  // ‰º‚ÉƒuƒƒbƒN‚ª‚È‚¢ê‡‚Í—‰º
+  // ä¸‹ã«ãƒ–ãƒ­ãƒƒã‚¯ãŒãªã„å ´åˆã¯è½ä¸‹
   if (!has_block_below && below_row < static_cast<int32>(block_grid_.size())) {
     player_fall_velocity_ += InGameConstants::kGravity * delta_time;
     player_fall_velocity_ = Min(player_fall_velocity_, InGameConstants::kMaxFallSpeed);
@@ -560,17 +560,17 @@ void Game::UpdatePlayerFall(float delta_time)
     Vec2 player_pos = player_->GetPosition();
     player_pos.y += player_fall_velocity_ * delta_time;
 
-    // ‰º‚ÉƒuƒƒbƒN‚ª‚ ‚é‚©‚Ç‚¤‚©‚ğAƒsƒNƒZƒ‹À•Wƒx[ƒX‚Å‚àŠm”F
+    // ä¸‹ã«ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹ã‹ã©ã†ã‹ã‚’ã€ãƒ”ã‚¯ã‚»ãƒ«åº§æ¨™ãƒ™ãƒ¼ã‚¹ã§ã‚‚ç¢ºèª
     const float player_bottom_y = player_pos.y + player_->GetHeight() / 2.0f;
     bool should_land = false;
     float landing_y = player_pos.y;
 
-    // ‘SƒuƒƒbƒN‚ğƒ`ƒFƒbƒN‚µ‚ÄÕ“Ë”»’è
+    // å…¨ãƒ–ãƒ­ãƒƒã‚¯ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦è¡çªåˆ¤å®š
     for (size_t i = 0; i < block_grid_.size(); i++) {
       for (size_t j = 0; j < block_grid_[i].size(); j++) {
         const Block& block = block_grid_[i][j];
 
-        // ‹ó‚Ü‚½‚Í”j‰ó‚³‚ê‚½ƒuƒƒbƒN‚ÍƒXƒLƒbƒvi•Ç‚ÍÕ“Ë‘ÎÛj
+        // ç©ºã¾ãŸã¯ç ´å£Šã•ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—ï¼ˆå£ã¯è¡çªå¯¾è±¡ï¼‰
         if (block.isEmpty() && !block.isWall()) {
           continue;
         }
@@ -581,9 +581,9 @@ void Game::UpdatePlayerFall(float delta_time)
         const float block_top = block_pos.y;
         const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
-        // ƒvƒŒƒCƒ„[‚Ì’†S‚ªƒuƒƒbƒN‚ÌX”ÍˆÍ“à‚É‚ ‚é‚©ƒ`ƒFƒbƒN
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸­å¿ƒãŒãƒ–ãƒ­ãƒƒã‚¯ã®Xç¯„å›²å†…ã«ã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
         if (player_pos.x >= block_left && player_pos.x <= block_right) {
-          // ƒvƒŒƒCƒ„[‚Ì‰º’[‚ªƒuƒƒbƒN‚Ìã–Ê‚É“’B‚Ü‚½‚Í’´‚¦‚½ê‡
+          // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸‹ç«¯ãŒãƒ–ãƒ­ãƒƒã‚¯ã®ä¸Šé¢ã«åˆ°é”ã¾ãŸã¯è¶…ãˆãŸå ´åˆ
           if (player_bottom_y >= block_top && player_pos.y < block_top) {
             should_land = true;
             landing_y = block_top - player_->GetHeight() / 2.0f;
@@ -606,7 +606,7 @@ void Game::UpdatePlayerFall(float delta_time)
       player_->SetPose(Player::Pose::kFall);
     }
   } else {
-    // ƒuƒƒbƒN‚ª‚ ‚éê‡‚Í—‰º‘¬“x‚ğƒŠƒZƒbƒg
+    // ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹å ´åˆã¯è½ä¸‹é€Ÿåº¦ã‚’ãƒªã‚»ãƒƒãƒˆ
     player_fall_velocity_ = 0.0f;
     player_->RefreshPoseFromMovement();
   }
@@ -614,7 +614,7 @@ void Game::UpdatePlayerFall(float delta_time)
 
 bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
 {
-  // ƒOƒŠƒbƒh‚Ì”ÍˆÍŠOƒ`ƒFƒbƒN
+  // ã‚°ãƒªãƒƒãƒ‰ã®ç¯„å›²å¤–ãƒã‚§ãƒƒã‚¯
   if (gridRow < 0 || gridRow >= static_cast<int32>(block_grid_.size())) {
     return false;
   }
@@ -624,13 +624,13 @@ bool Game::HasBlockAt(int32 gridRow, int32 gridCol) const
 
   const Block& block = block_grid_[gridRow][gridCol];
 
-  // •ÇƒuƒƒbƒN‚Ü‚½‚Í’Êí‚Ì–¢”j‰óƒuƒƒbƒN‚ª‘¶İ‚·‚éê‡true
+  // å£ãƒ–ãƒ­ãƒƒã‚¯ã¾ãŸã¯é€šå¸¸ã®æœªç ´å£Šãƒ–ãƒ­ãƒƒã‚¯ãŒå­˜åœ¨ã™ã‚‹å ´åˆtrue
   return block.isWall() || !block.isEmpty();
 }
 
 void Game::UpdatePlayerMovement(float delta_time)
 {
-  // ˆÚ“®“ü—Í‚ğæ“¾
+  // ç§»å‹•å…¥åŠ›ã‚’å–å¾—
   Vec2 move_input = Vec2::Zero();
   bool is_moving = false;
   bool facing_left = false;
@@ -638,7 +638,7 @@ void Game::UpdatePlayerMovement(float delta_time)
   const bool walk_forward_left = KeyUp.pressed() || KeyW.pressed();
   const bool walk_forward_right = KeyDown.pressed() || KeyS.pressed();
 
-  // ã‰º“ü—Í‚Íu‚»‚Ìê‚ÅŒü‚«‚ğ•Ï‚¦‚é‚¾‚¯v‚È‚Ì‚Å•àsƒAƒjƒ[ƒVƒ‡ƒ“‚É‚ÍˆÚs‚³‚¹‚¸A‘Ò‹@ƒ|[ƒY‚ğg—p‚·‚éB
+  // ä¸Šä¸‹å…¥åŠ›ã¯ã€Œãã®å ´ã§å‘ãã‚’å¤‰ãˆã‚‹ã ã‘ã€ãªã®ã§æ­©è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã«ã¯ç§»è¡Œã•ã›ãšã€å¾…æ©Ÿãƒãƒ¼ã‚ºã‚’ä½¿ç”¨ã™ã‚‹ã€‚
   if (walk_forward_left || walk_forward_right) {
     player_->SetMoving(false);
     player_->SetPose(Player::Pose::kIdle);
@@ -654,13 +654,13 @@ void Game::UpdatePlayerMovement(float delta_time)
     facing_left = false;
   }
 
-  // ƒvƒŒƒCƒ„[‚ÌˆÚ“®ó‘Ô‚ÆŒü‚«‚ğXV
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•çŠ¶æ…‹ã¨å‘ãã‚’æ›´æ–°
   player_->SetMoving(is_moving);
   if (is_moving) {
     player_->SetFacingLeft(facing_left);
   }
 
-  // ƒvƒŒƒCƒ„[‚ÌŒ»İˆÊ’u‚ğæ“¾
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç¾åœ¨ä½ç½®ã‚’å–å¾—
   Vec2 player_pos = player_->GetPosition();
   Vec2 next_pos = player_pos;
   next_pos.y += InGameConstants::kSimpleGravity;
@@ -670,12 +670,12 @@ void Game::UpdatePlayerMovement(float delta_time)
   const float player_half_width = player_->GetWidth() / 2.0f;
   bool is_on_block = false;
 
-  // d—Í‚É‚æ‚é—‰º‚ÆƒuƒƒbƒNÕ“Ë”»’è
+  // é‡åŠ›ã«ã‚ˆã‚‹è½ä¸‹ã¨ãƒ–ãƒ­ãƒƒã‚¯è¡çªåˆ¤å®š
   for (int i = 0; i < block_grid_.size(); i++) {
     for (int j = 0; j < block_grid_[i].size(); j++) {
       const Block& block = block_grid_[i][j];
 
-      // ‹ó‚Ü‚½‚Í”j‰ó‚³‚ê‚½ƒuƒƒbƒN‚ÍƒXƒLƒbƒvi•Ç‚ÍÕ“Ë‘ÎÛj
+      // ç©ºã¾ãŸã¯ç ´å£Šã•ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—ï¼ˆå£ã¯è¡çªå¯¾è±¡ï¼‰
       if (block.isEmpty() && !block.isWall()) {
         continue;
       }
@@ -686,17 +686,17 @@ void Game::UpdatePlayerMovement(float delta_time)
       const float block_top = block_pos.y;
       const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
-      // ƒfƒoƒbƒO—p‚Ìü•`‰æ
+      // ãƒ‡ãƒãƒƒã‚°ç”¨ã®ç·šæç”»
       if (kDebugMode) {
         Line{ block_left, block_top, block_left, block_bottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorBlue);
         Line{ block_right, block_top, block_right, block_bottom }.draw(InGameConstants::kDebugLineThickness, InGameConstants::kDebugLineColorOrange);
       }
 
-      // ƒvƒŒƒCƒ„[‚Ì’†S‚ªƒuƒƒbƒN‚ÌX”ÍˆÍ“à‚É‚ ‚é‚©ƒ`ƒFƒbƒN
+      // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸­å¿ƒãŒãƒ–ãƒ­ãƒƒã‚¯ã®Xç¯„å›²å†…ã«ã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
       if (next_pos.x >= block_left && next_pos.x <= block_right) {
-        // ƒvƒŒƒCƒ„[‚Ì‰º’[‚ªƒuƒƒbƒN‚Ìã–Ê•t‹ß‚É‚ ‚é‚©ƒ`ƒFƒbƒN
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸‹ç«¯ãŒãƒ–ãƒ­ãƒƒã‚¯ã®ä¸Šé¢ä»˜è¿‘ã«ã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
         if (player_bottom_y >= block_top && player_bottom_y <= block_top + InGameConstants::kSimpleGravity + InGameConstants::kGravityMargin) {
-          // ƒvƒŒƒCƒ„[‚ğƒuƒƒbƒN‚Ìã‚É”z’u
+          // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ãƒ–ãƒ­ãƒƒã‚¯ã®ä¸Šã«é…ç½®
           next_pos.y = block_top - player_->GetHeight() / 2.0f;
           is_on_block = true;
           break;
@@ -709,7 +709,7 @@ void Game::UpdatePlayerMovement(float delta_time)
     }
   }
   
-  // —‰º’†‚ÉƒuƒƒbƒN‚É‚ß‚è‚İ‚ª‚È‚¢‚©ƒ`ƒFƒbƒN
+  // è½ä¸‹ä¸­ã«ãƒ–ãƒ­ãƒƒã‚¯ã«ã‚ã‚Šè¾¼ã¿ãŒãªã„ã‹ãƒã‚§ãƒƒã‚¯
   if (!is_on_block) {
     const float player_left = next_pos.x - player_half_width;
     const float player_right = next_pos.x + player_half_width;
@@ -718,7 +718,7 @@ void Game::UpdatePlayerMovement(float delta_time)
       for (int j = 0; j < block_grid_[i].size(); j++) {
         const Block& block = block_grid_[i][j];
         
-        // ‹ó‚Ü‚½‚Í”j‰ó‚³‚ê‚½ƒuƒƒbƒN‚ÍƒXƒLƒbƒvi•Ç‚ÍÕ“Ë‘ÎÛj
+        // ç©ºã¾ãŸã¯ç ´å£Šã•ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—ï¼ˆå£ã¯è¡çªå¯¾è±¡ï¼‰
         if (block.isEmpty() && !block.isWall()) {
           continue;
         }
@@ -729,25 +729,25 @@ void Game::UpdatePlayerMovement(float delta_time)
         const float block_top = block_pos.y;
         const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
         
-        // Y•ûŒü‚Ìd‚È‚è‚ğƒ`ƒFƒbƒN
+        // Yæ–¹å‘ã®é‡ãªã‚Šã‚’ãƒã‚§ãƒƒã‚¯
         const bool y_overlap = !(player_bottom_y <= block_top || player_top >= block_bottom);
         
         if (y_overlap) {
-          // X•ûŒü‚Ìd‚È‚è‚ğƒ`ƒFƒbƒN
+          // Xæ–¹å‘ã®é‡ãªã‚Šã‚’ãƒã‚§ãƒƒã‚¯
           const bool x_overlap = !(player_right <= block_left || player_left >= block_right);
           
           if (x_overlap) {
-            // ‚ß‚è‚İ—Ê‚ğŒvZ
-            const float overlap_left = player_right - block_left;   // ¶‘¤‚©‚ç‚Ì‚ß‚è‚İ
-            const float overlap_right = block_right - player_left;  // ‰E‘¤‚©‚ç‚Ì‚ß‚è‚İ
+            // ã‚ã‚Šè¾¼ã¿é‡ã‚’è¨ˆç®—
+            const float overlap_left = player_right - block_left;   // å·¦å´ã‹ã‚‰ã®ã‚ã‚Šè¾¼ã¿
+            const float overlap_right = block_right - player_left;  // å³å´ã‹ã‚‰ã®ã‚ã‚Šè¾¼ã¿
             
-            // ‚ß‚è‚İ—Ê‚ª­‚È‚¢•ûŒü‚É‰Ÿ‚µo‚·
+            // ã‚ã‚Šè¾¼ã¿é‡ãŒå°‘ãªã„æ–¹å‘ã«æŠ¼ã—å‡ºã™
             if (overlap_left < overlap_right) {
-              // ¶‚É‰Ÿ‚µo‚·
-              next_pos.x = block_left - player_half_width - 1.0f;  // 1px—]—T‚ğ‚½‚¹‚é
+              // å·¦ã«æŠ¼ã—å‡ºã™
+              next_pos.x = block_left - player_half_width - 1.0f;  // 1pxä½™è£•ã‚’æŒãŸã›ã‚‹
             } else {
-              // ‰E‚É‰Ÿ‚µo‚·
-              next_pos.x = block_right + player_half_width + 1.0f;  // 1px—]—T‚ğ‚½‚¹‚é
+              // å³ã«æŠ¼ã—å‡ºã™
+              next_pos.x = block_right + player_half_width + 1.0f;  // 1pxä½™è£•ã‚’æŒãŸã›ã‚‹
             }
             break;
           }
@@ -758,7 +758,7 @@ void Game::UpdatePlayerMovement(float delta_time)
 
   player_->SetPosition(next_pos.x, next_pos.y);
 
-  // ‰¡ˆÚ“®‚ª‚È‚¢ê‡‚Í‘ŠúƒŠƒ^[ƒ“
+  // æ¨ªç§»å‹•ãŒãªã„å ´åˆã¯æ—©æœŸãƒªã‚¿ãƒ¼ãƒ³
   if (move_input.x == 0.0f) {
     if (is_on_block) {
       player_->SetPose(Player::Pose::kIdle);
@@ -768,29 +768,29 @@ void Game::UpdatePlayerMovement(float delta_time)
     return;
   }
 
-  // ƒvƒŒƒCƒ„[‚ÌŒ»İˆÊ’u‚ğXV
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç¾åœ¨ä½ç½®ã‚’æ›´æ–°
   player_pos = player_->GetPosition();
   const float move_speed = player_->move_speed_;
   const float move_distance = move_speed * delta_time;
 
-  // Ÿ‚ÌˆÊ’u‚ğŒvZ
+  // æ¬¡ã®ä½ç½®ã‚’è¨ˆç®—
   Vec2 horizontal_next_pos = player_pos;
   horizontal_next_pos.x += move_input.x * move_distance;
 
-  // ƒvƒŒƒCƒ„[‚Ì¶‰E’[‚ğŒvZ
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å·¦å³ç«¯ã‚’è¨ˆç®—
   const float player_left_h = horizontal_next_pos.x - player_half_width;
   const float player_right_h = horizontal_next_pos.x + player_half_width;
   const float player_top_h = horizontal_next_pos.y - player_->GetHeight() / 2.0f;
   const float player_bottom_h = horizontal_next_pos.y + player_->GetHeight() / 2.0f;
 
-  // ƒuƒƒbƒN‚Æ‚Ì¶‰EÕ“Ë”»’è
+  // ãƒ–ãƒ­ãƒƒã‚¯ã¨ã®å·¦å³è¡çªåˆ¤å®š
   bool can_move = true;
 
   for (size_t i = 0; i < block_grid_.size(); i++) {
     for (size_t j = 0; j < block_grid_[i].size(); j++) {
       const Block& block = block_grid_[i][j];
 
-      // ‹ó‚Ü‚½‚Í”j‰ó‚³‚ê‚½ƒuƒƒbƒN‚ÍƒXƒLƒbƒvi•Ç‚ÍÕ“Ë‘ÎÛj
+      // ç©ºã¾ãŸã¯ç ´å£Šã•ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—ï¼ˆå£ã¯è¡çªå¯¾è±¡ï¼‰
       if (block.isEmpty() && !block.isWall()) {
         continue;
       }
@@ -801,32 +801,32 @@ void Game::UpdatePlayerMovement(float delta_time)
       const float block_top = block_pos.y;
       const float block_bottom = block_pos.y + InGameConstants::kBlockSize;
 
-      // ƒvƒŒƒCƒ„[‚ÆƒuƒƒbƒN‚ÌYÀ•W‚ªd‚È‚Á‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN
+      // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ãƒ–ãƒ­ãƒƒã‚¯ã®Yåº§æ¨™ãŒé‡ãªã£ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
       const bool y_overlap = !(player_bottom_h <= block_top || player_top_h >= block_bottom);
 
       if (!y_overlap) {
         continue;
       }
 
-      // ¶‚ÉˆÚ“®‚·‚éê‡
+      // å·¦ã«ç§»å‹•ã™ã‚‹å ´åˆ
       if (move_input.x < 0) {
         player_->SetPose(Player::Pose::kStrafeLeft);
 
-        // ƒvƒŒƒCƒ„[‚Ì¶’[‚ªƒuƒƒbƒN‚Ì‰E’[‚æ‚è¶‚É‚ ‚èA‚©‚ÂÕ“Ë‚·‚éê‡
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å·¦ç«¯ãŒãƒ–ãƒ­ãƒƒã‚¯ã®å³ç«¯ã‚ˆã‚Šå·¦ã«ã‚ã‚Šã€ã‹ã¤è¡çªã™ã‚‹å ´åˆ
         if (player_left_h < block_right && player_right_h > block_right) {
-          // ƒuƒƒbƒN‚Ì‰E’[‚ÉƒvƒŒƒCƒ„[‚Ì¶’[‚ğ”z’u
+          // ãƒ–ãƒ­ãƒƒã‚¯ã®å³ç«¯ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å·¦ç«¯ã‚’é…ç½®
           horizontal_next_pos.x = block_right + player_half_width;
           can_move = false;
           break;
         }
       }
-      // ‰E‚ÉˆÚ“®‚·‚éê‡
+      // å³ã«ç§»å‹•ã™ã‚‹å ´åˆ
       else if (move_input.x > 0) {
         player_->SetPose(Player::Pose::kStrafeRight);
 
-        // ƒvƒŒƒCƒ„[‚Ì‰E’[‚ªƒuƒƒbƒN‚Ì¶’[‚æ‚è‰E‚É‚ ‚èA‚©‚ÂÕ“Ë‚·‚éê‡
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å³ç«¯ãŒãƒ–ãƒ­ãƒƒã‚¯ã®å·¦ç«¯ã‚ˆã‚Šå³ã«ã‚ã‚Šã€ã‹ã¤è¡çªã™ã‚‹å ´åˆ
         if (player_right_h > block_left && player_left_h < block_left) {
-          // ƒuƒƒbƒN‚Ì¶’[‚ÉƒvƒŒƒCƒ„[‚Ì‰E’[‚ğ”z’u
+          // ãƒ–ãƒ­ãƒƒã‚¯ã®å·¦ç«¯ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å³ç«¯ã‚’é…ç½®
           horizontal_next_pos.x = block_left - player_half_width;
           can_move = false;
           break;
@@ -839,20 +839,20 @@ void Game::UpdatePlayerMovement(float delta_time)
     }
   }
 
-  // ‰æ–Ê’[ƒ`ƒFƒbƒN
+  // ç”»é¢ç«¯ãƒã‚§ãƒƒã‚¯
   if (horizontal_next_pos.x - player_half_width < 0) {
     horizontal_next_pos.x = player_half_width;
   } else if (horizontal_next_pos.x + player_half_width > InGameConstants::kScreenWidth) {
     horizontal_next_pos.x = InGameConstants::kScreenWidth - player_half_width;
   }
 
-  // ˆÊ’u‚ğXV
+  // ä½ç½®ã‚’æ›´æ–°
   player_->SetPosition(horizontal_next_pos.x, player_pos.y);
 }
 
 void Game::update()
 {
-  // Esc ƒL[‚Åƒƒjƒ…[ŠJ•Â
+  // Esc ã‚­ãƒ¼ã§ãƒ¡ãƒ‹ãƒ¥ãƒ¼é–‹é–‰
   if (KeyEscape.down())
   {
     PRINT << U"Toggle Menu";
@@ -870,14 +870,14 @@ void Game::update()
     }
   }
 
-  // ƒƒjƒ…[‚ªŠJ‚¢‚Ä‚¢‚éê‡
+  // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒé–‹ã„ã¦ã„ã‚‹å ´åˆ
   if (menu_->IsOpen())
   {
     if (!KeyEscape.down())
     {
       menu_->Update();
 
-      // ƒQ[ƒ€I—¹‚ªƒŠƒNƒGƒXƒg‚³‚ê‚½‚©ƒ`ƒFƒbƒN
+      // ã‚²ãƒ¼ãƒ çµ‚äº†ãŒãƒªã‚¯ã‚¨ã‚¹ãƒˆã•ã‚ŒãŸã‹ãƒã‚§ãƒƒã‚¯
       if (menu_->IsQuitRequested())
       {
         System::Exit();
@@ -885,7 +885,7 @@ void Game::update()
       }
 
 #if _DEBUG
-      // ƒQ[ƒ€Ä‹N“®‚ªƒŠƒNƒGƒXƒg‚³‚ê‚½‚©ƒ`ƒFƒbƒNiDEBUG‚Ì‚İj
+      // ã‚²ãƒ¼ãƒ å†èµ·å‹•ãŒãƒªã‚¯ã‚¨ã‚¹ãƒˆã•ã‚ŒãŸã‹ãƒã‚§ãƒƒã‚¯ï¼ˆDEBUGã®ã¿ï¼‰
       if (menu_->IsRestartRequested())
       {
         changeScene(EnumScene::kInGame, 0s);
@@ -894,64 +894,64 @@ void Game::update()
 #endif
     }
 
-    return;  // ƒQ[ƒ€ƒƒWƒbƒN‚ÍXV‚µ‚È‚¢
+    return;  // ã‚²ãƒ¼ãƒ ãƒ­ã‚¸ãƒƒã‚¯ã¯æ›´æ–°ã—ãªã„
   }
 
-  // ƒQ[ƒ€ƒI[ƒo[ˆ—
+  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼å‡¦ç†
   if (is_game_over_)
   {
     game_over_timer_ += Scene::DeltaTime();
 
-    // –AƒGƒtƒFƒNƒg‚ÌXV
+    // æ³¡ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ›´æ–°
     if (bubble_effect_)
     {
       bubble_effect_->Update(Scene::DeltaTime());
     }
 
-    // ˆê’èŠÔŒo‰ßŒã‚Éƒ^ƒCƒgƒ‹‚É–ß‚é
+    // ä¸€å®šæ™‚é–“çµŒéå¾Œã«ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
     if (game_over_timer_ >= InGameConstants::kGameOverDuration)
     {
       changeScene(EnumScene::kTitle, 1s);
     }
 
-    return;  // ƒQ[ƒ€ƒI[ƒo[’†‚Í’Êí‚ÌXVˆ—‚ğƒXƒLƒbƒv
+    return;  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ä¸­ã¯é€šå¸¸ã®æ›´æ–°å‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—
   }
 
-  // ƒQ[ƒ€ƒNƒŠƒAˆ—
+  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢å‡¦ç†
   if (is_game_clear_)
   {
     game_clear_timer_ += Scene::DeltaTime();
 
-    // ˆê’èŠÔŒo‰ßŒã‚Éƒ^ƒCƒgƒ‹‚É–ß‚é
+    // ä¸€å®šæ™‚é–“çµŒéå¾Œã«ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
     if (game_clear_timer_ >= InGameConstants::kGameClearDuration)
     {
       changeScene(EnumScene::kTitle, 1s);
     }
 
-    return;  // ƒQ[ƒ€ƒNƒŠƒA’†‚Í’Êí‚ÌXVˆ—‚ğƒXƒLƒbƒv
+    return;  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ä¸­ã¯é€šå¸¸ã®æ›´æ–°å‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—
   }
 
-  // ƒuƒƒbƒN”j‰ó‰‰o‚ğXV
+  // ãƒ–ãƒ­ãƒƒã‚¯ç ´å£Šæ¼”å‡ºã‚’æ›´æ–°
   if (block_destroy_effect_)
   {
     block_destroy_effect_->Update(Scene::DeltaTime());
   }
   
-  // ƒqƒbƒg‰‰o‚ÌXV
+  // ãƒ’ãƒƒãƒˆæ¼”å‡ºã®æ›´æ–°
   hit_effect_.Update(Scene::DeltaTime());
 
-  // have_words_‚ğ˜AŒ‹‚µ‚Ä1s‚Å•\¦iŒİŠ·«‚Ì‚½‚ßˆÛj
+  // have_words_ã‚’é€£çµã—ã¦1è¡Œã§è¡¨ç¤ºï¼ˆäº’æ›æ€§ã®ãŸã‚ç¶­æŒï¼‰
   String concatenated;
   for (const auto& word : have_words_) {
     concatenated += word;
   }
 
-  // ’PŒê‚ªŠ®¬‚µ‚½‚©ƒ`ƒFƒbƒNihave_words_‚Æcollected_characters_‚Ì—¼•û‚ÅŠm”Fj
+  // å˜èªãŒå®Œæˆã—ãŸã‹ãƒã‚§ãƒƒã‚¯ï¼ˆhave_words_ã¨collected_characters_ã®ä¸¡æ–¹ã§ç¢ºèªï¼‰
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   if (!result.isEmpty()) {
-    // result‚ÌŠe’PŒê‚É‚Â‚¢‚Äˆ—
+    // resultã®å„å˜èªã«ã¤ã„ã¦å‡¦ç†
     for (const auto& hit_word : result) {
-      // Š®¬‚µ‚½’PŒê‚ğcompleted_words_‚É’Ç‰Áid•¡ƒ`ƒFƒbƒNj
+      // å®Œæˆã—ãŸå˜èªã‚’completed_words_ã«è¿½åŠ ï¼ˆé‡è¤‡ãƒã‚§ãƒƒã‚¯ï¼‰
       if (!completed_words_.includes(hit_word)) {
         completed_words_.push_back(hit_word);
         const auto messageIt = messages.find(hit_word);
@@ -963,23 +963,23 @@ void Game::update()
         else {
           current_message_ = U"";
         }
-        // HitEffect ‚ğƒvƒŒƒCƒ„[‚Ì­‚µã‚É¶¬
+        // HitEffect ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å°‘ã—ä¸Šã«ç”Ÿæˆ
         if (player_) {
           const Vec2 pos = player_->GetPosition() + Vec2{ 0.0, -60.0 };
           hit_effect_.Add(pos, hit_word);
         }
         
-        // ’PŒê‚ğŠ®¬‚³‚¹‚½‚çƒGƒA‚ğ‰ñ•œ
+        // å˜èªã‚’å®Œæˆã•ã›ãŸã‚‰ã‚¨ã‚¢ã‚’å›å¾©
         const size_t word_length = hit_word.length();
         air_amount_ += static_cast<float>(word_length) * InGameConstants::kAirRecoverRate;
         if (air_amount_ > InGameConstants::kAirMax) {
           air_amount_ = InGameConstants::kAirMax;
         }
         
-        // Œø‰Ê‰¹‚È‚Ç“ü‚ê‚é‚È‚ç‚±‚±
+        // åŠ¹æœéŸ³ãªã©å…¥ã‚Œã‚‹ãªã‚‰ã“ã“
         AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
 
-        // ƒNƒŠƒAğŒƒ`ƒFƒbƒN
+        // ã‚¯ãƒªã‚¢æ¡ä»¶ãƒã‚§ãƒƒã‚¯
         if (completed_words_.size() >= static_cast<size_t>(InGameConstants::kClearEvaluationCount))
         {
           StartGameClear();
@@ -988,13 +988,13 @@ void Game::update()
     }
   }
 
-  // ƒGƒAc—Ê‚ªƒ[ƒ‚É‚È‚Á‚½‚çƒQ[ƒ€ƒI[ƒo[
+  // ã‚¨ã‚¢æ®‹é‡ãŒã‚¼ãƒ­ã«ãªã£ãŸã‚‰ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
   if (air_amount_ <= 0.0f && !is_game_over_)
   {
     StartGameOver();
   }
 
-  // ZƒL[‚ÅƒuƒƒbƒN”j‰ó
+  // Zã‚­ãƒ¼ã§ãƒ–ãƒ­ãƒƒã‚¯ç ´å£Š
   if (KeyZ.down())
   {
     DestroyBlockUnderPlayer();
@@ -1020,27 +1020,27 @@ void Game::update()
     }
   }
   
-  // UI‚ÌXViƒƒjƒ…[‚ª•Â‚¶‚Ä‚¢‚é‚Ì‚İj
+  // UIã®æ›´æ–°ï¼ˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒé–‰ã˜ã¦ã„ã‚‹æ™‚ã®ã¿ï¼‰
   if (ui_)
   {
     ui_->Update(static_cast<float>(Scene::DeltaTime()));
     ui_->SetAirGauge(air_amount_);
   }
 
-  // ƒvƒŒƒCƒ„[‚Ì¶‰EˆÚ“®XViÕ“Ë”»’è•t‚«j
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å·¦å³ç§»å‹•æ›´æ–°ï¼ˆè¡çªåˆ¤å®šä»˜ãï¼‰
   UpdatePlayerMovement(static_cast<float>(Scene::DeltaTime()));
 
-  // ƒXƒNƒ[ƒ‹XViV‚µ‚¢ƒuƒƒbƒN‰ò‚Ì¶¬”»’èj
+  // ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ›´æ–°ï¼ˆæ–°ã—ã„ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®ç”Ÿæˆåˆ¤å®šï¼‰
   UpdateScroll();
 
-  // ƒvƒŒƒCƒ„[‚ÌXViƒƒjƒ…[‚ª•Â‚¶‚Ä‚¢‚é‚Ì‚İj
-  // ’FˆÚ“®ˆ—‚Íã‚Ås‚Á‚Ä‚¢‚é‚½‚ßA‚±‚±‚Å‚ÍƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‚İXV
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ›´æ–°ï¼ˆãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒé–‰ã˜ã¦ã„ã‚‹æ™‚ã®ã¿ï¼‰
+  // æ³¨ï¼šç§»å‹•å‡¦ç†ã¯ä¸Šã§è¡Œã£ã¦ã„ã‚‹ãŸã‚ã€ã“ã“ã§ã¯ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ã¿æ›´æ–°
   if (player_)
   {
     player_->Update(static_cast<float>(Scene::DeltaTime()));
   }
 
-  // ƒJƒƒ‰ˆÊ’u‚ğXViƒvƒŒƒCƒ„[‚É’Ç]j
+  // ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’æ›´æ–°ï¼ˆãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è¿½å¾“ï¼‰
   UpdateCamera();
 }
 
@@ -1050,14 +1050,14 @@ void Game::DrawDebugInfo() const
     return;
   }
 
-  // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğæ“¾
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å–å¾—
   const Vec2 player_pos = player_->GetPosition();
 
-  // ƒvƒŒƒCƒ„[‚ÌƒTƒCƒY‚ğæ“¾iƒXƒP[ƒ‹“K—pŒãj
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ï¼ˆã‚¹ã‚±ãƒ¼ãƒ«é©ç”¨å¾Œï¼‰
   const float player_width = player_->GetWidth();
   const float player_height = player_->GetHeight();
 
-  // ƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ğÔF‚Ì˜g‚Å•`‰æ
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å½“ãŸã‚Šåˆ¤å®šã‚’èµ¤è‰²ã®æ ã§æç”»
   const RectF player_hit_box{
     player_pos.x - player_width / 2.0f,
     player_pos.y - player_height / 2.0f,
@@ -1067,13 +1067,13 @@ void Game::DrawDebugInfo() const
 
   player_hit_box.drawFrame(InGameConstants::kDebugFrameThickness, InGameConstants::kDebugFrameColorRed);
 
-  // ƒvƒŒƒCƒ„[‚Ì’†S“_‚ğ•`‰æ
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä¸­å¿ƒç‚¹ã‚’æç”»
   Circle{ player_pos, InGameConstants::kDebugCircleRadius }.draw(InGameConstants::kDebugCircleColorRed);
 
-  // ƒOƒŠƒbƒhˆÊ’u‚ğæ“¾
+  // ã‚°ãƒªãƒƒãƒ‰ä½ç½®ã‚’å–å¾—
   int32 grid_row, grid_col;
   if (GetPlayerGridPosition(grid_row, grid_col)) {
-    // Œ»İ‚ÌƒOƒŠƒbƒh‚ğ—ÎF‚Ì˜g‚Å•`‰æ
+    // ç¾åœ¨ã®ã‚°ãƒªãƒƒãƒ‰ã‚’ç·‘è‰²ã®æ ã§æç”»
     const Vec2 grid_top_left = GetGridTopLeft(grid_row, grid_col);
     const RectF current_grid{
       grid_top_left.x,
@@ -1083,7 +1083,7 @@ void Game::DrawDebugInfo() const
     };
     //current_grid.drawFrame(3.0, Palette::Green);
 
-    // ƒOƒŠƒbƒhÀ•W‚ğ•\¦iƒƒ“ƒo[•Ï”‚ÌƒtƒHƒ“ƒg‚ğg—pj
+    // ã‚°ãƒªãƒƒãƒ‰åº§æ¨™ã‚’è¡¨ç¤ºï¼ˆãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ï¼‰
     debug_font_(U"Grid: ({}, {})"_fmt(grid_col, grid_row))
       .draw(InGameConstants::kDebugTextX, InGameConstants::kDebugTextY1, InGameConstants::kDebugTextColorWhite);
     debug_font_(U"Pos: ({:.1f}, {:.1f})"_fmt(player_pos.x, player_pos.y))
@@ -1102,11 +1102,11 @@ void Game::draw() const
     block_bg_texture_.resized(Scene::Size()).draw(0, 0);
   }
 
-  // ƒJƒƒ‰ƒIƒtƒZƒbƒg‚ğ“K—p‚µ‚½•ÏŠ·‚ğŠJn
+  // ã‚«ãƒ¡ãƒ©ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’é©ç”¨ã—ãŸå¤‰æ›ã‚’é–‹å§‹
   {
     const Transformer2D transformer{ Mat3x2::Translate(-camera_offset_) };
 
-    // ƒuƒƒbƒNƒOƒŠƒbƒh‚Ì•`‰æ
+    // ãƒ–ãƒ­ãƒƒã‚¯ã‚°ãƒªãƒƒãƒ‰ã®æç”»
     const size_t texture_count = block_textures_.size();
     const bool has_block_textures = (texture_count > 0);
     const size_t color_count = InGameConstants::kBlockColors.size();
@@ -1115,32 +1115,32 @@ void Game::draw() const
       for (size_t col = 0; col < block_grid_[row].size(); ++col) {
         const Block& block = block_grid_[row][col];
 
-        // ‹ó‚ÌƒuƒƒbƒN‚Ü‚½‚Í”j‰ó‚³‚ê‚½ƒuƒƒbƒN‚ÍƒXƒLƒbƒvi•Ç‚Í•`‰æ‚·‚éj
+        // ç©ºã®ãƒ–ãƒ­ãƒƒã‚¯ã¾ãŸã¯ç ´å£Šã•ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚¯ã¯ã‚¹ã‚­ãƒƒãƒ—ï¼ˆå£ã¯æç”»ã™ã‚‹ï¼‰
         if (block.isEmpty() && !block.isWall()) {
           continue;
         }
 
-        // ƒuƒƒbƒN‚ÌˆÊ’u‚ğ’¼Úg—piŠù‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Åİ’èÏ‚İj
+        // ãƒ–ãƒ­ãƒƒã‚¯ã®ä½ç½®ã‚’ç›´æ¥ä½¿ç”¨ï¼ˆæ—¢ã«ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§è¨­å®šæ¸ˆã¿ï¼‰
         const Vec2 block_top_left = block.position;
         const Vec2 block_center = block_top_left + Vec2{ InGameConstants::kBlockSize / 2.0f, InGameConstants::kBlockSize / 2.0f };
 
         const RoundRect block_shape{ block_top_left.x, block_top_left.y, InGameConstants::kBlockSize, InGameConstants::kBlockSize, InGameConstants::kBlockRoundRadius };
 
-        // •ÇƒuƒƒbƒN‚Ìê‡
+        // å£ãƒ–ãƒ­ãƒƒã‚¯ã®å ´åˆ
         if (block.isWall()) {
           block_shape.draw(InGameConstants::kWallBlockColor);
           block_shape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kWallBlockFrameColor);
 
-          // •Ç‚Ìƒpƒ^[ƒ“‚ğ•`‰æiÎü‚È‚Çj
+          // å£ã®ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’æç”»ï¼ˆæ–œç·šãªã©ï¼‰
           for (double offset = -InGameConstants::kBlockSize; offset < InGameConstants::kBlockSize * 2; offset += InGameConstants::kWallPatternLineSpacing) {
             const Vec2 start{ block_top_left.x + offset, block_top_left.y };
             const Vec2 end{ block_top_left.x + offset + InGameConstants::kBlockSize, block_top_left.y + InGameConstants::kBlockSize };
             Line{ start, end }.draw(InGameConstants::kWallPatternLineThickness, InGameConstants::kWallPatternColor);
           }
         }
-        // ’Êí‚ÌƒuƒƒbƒN‚Ìê‡
+        // é€šå¸¸ã®ãƒ–ãƒ­ãƒƒã‚¯ã®å ´åˆ
         else {
-          // ƒuƒƒbƒN‚ÌŒ©‚½–Ú‚ğˆÊ’uˆË‘¶‚ÌƒV[ƒh‚ÅŒˆ’è
+          // ãƒ–ãƒ­ãƒƒã‚¯ã®è¦‹ãŸç›®ã‚’ä½ç½®ä¾å­˜ã®ã‚·ãƒ¼ãƒ‰ã§æ±ºå®š
           const size_t seed = (row * InGameConstants::kSeedMultiplierRow + col * InGameConstants::kSeedMultiplierCol);
 
           if (has_block_textures) {
@@ -1151,15 +1151,15 @@ void Game::draw() const
             block_shape.draw(block_grid_[row][col].color);
           }
 
-          // ƒuƒƒbƒN‚Ì˜gü‚ğ•`‰æ
+          // ãƒ–ãƒ­ãƒƒã‚¯ã®æ ç·šã‚’æç”»
           block_shape.drawFrame(InGameConstants::kBlockFrameThickness, InGameConstants::kBlockFrameColor);
 
-          // ƒuƒƒbƒN“à‚ÌƒeƒLƒXƒg‚ğ’†‰›‚É•`‰æ
+          // ãƒ–ãƒ­ãƒƒã‚¯å†…ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ä¸­å¤®ã«æç”»
           const Vec2 shadow_pos = block_center + InGameConstants::kBlockTextShadowOffset;
           block_font_(block.value).drawAt(shadow_pos.x, shadow_pos.y, InGameConstants::kBlockTextShadowColor);
           block_font_(block.value).drawAt(block_center.x, block_center.y, InGameConstants::kBlockTextColor);
 
-          // ƒvƒŒƒCƒ„[‚É 1 ƒuƒƒbƒNˆÈ“à‚©‚Â first ‚Ìê‡A?‚ğ¬‚³‚­•`‰æiÎ‚ßãj
+          // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã« 1 ãƒ–ãƒ­ãƒƒã‚¯ä»¥å†…ã‹ã¤ first ã®å ´åˆã€?ã‚’å°ã•ãæç”»ï¼ˆæ–œã‚ä¸Šï¼‰
           if (block.is_first && player_)
           {
             const Vec2 player_pos = player_->GetPosition();
@@ -1168,27 +1168,27 @@ void Game::draw() const
             const bool within_one = (dx <= InGameConstants::kBlockSize && dy <= InGameConstants::kBlockSize);
             if (within_one && !sparkle_tex_.isEmpty())
             {
-              // ˆÊ’ui­‚µã‚É•‚‚©‚¹‚éj
+              // ä½ç½®ï¼ˆå°‘ã—ä¸Šã«æµ®ã‹ã›ã‚‹ï¼‰
               const Vec2 base_pos = block_top_left + Vec2{ InGameConstants::kBlockSize * 0.75f, InGameConstants::kBlockSize * 0.25f };
 
-              // ƒLƒ‰ƒLƒ‰‚Ìƒpƒ‰ƒ[ƒ^iŠÔ‚Å–¬“®{‰ñ“]j
+              // ã‚­ãƒ©ã‚­ãƒ©ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ï¼ˆæ™‚é–“ã§è„ˆå‹•ï¼‹å›è»¢ï¼‰
               const double t = Scene::Time();
               const double pulse = 1.0 + 0.25 * Sin(t * 8.0);
               const double rot = t * 2.5;
-              const double baseScale = 0.28; // ‘S‘ÌƒTƒCƒY‚ğ­‚µ¬‚³‚­
+              const double baseScale = 0.28; // å…¨ä½“ã‚µã‚¤ã‚ºã‚’å°‘ã—å°ã•ã
               const double scale = baseScale * pulse;
-              const Vec2 pos = base_pos + Vec2{ 0.0, Sin(t * 4.0) * 2.0 }; // ‚í‚¸‚©‚Éã‰º‚É—h‚ê‚é
+              const Vec2 pos = base_pos + Vec2{ 0.0, Sin(t * 4.0) * 2.0 }; // ã‚ãšã‹ã«ä¸Šä¸‹ã«æºã‚Œã‚‹
 
-              // ‰ÁZ‡¬‚ÅŒõÊ‚ğd‚Ë‚Ä–Ú—§‚½‚¹‚é
+              // åŠ ç®—åˆæˆã§å…‰å½©ã‚’é‡ã­ã¦ç›®ç«‹ãŸã›ã‚‹
               const ScopedRenderStates2D addBlend{ BlendState::Additive };
 
-              // ŠO‘¤‚Ì’W‚¢Œõi‘å‚«‚­A“§–¾j
+              // å¤–å´ã®æ·¡ã„å…‰ï¼ˆå¤§ããã€é€æ˜ï¼‰
               sparkle_tex_.scaled(scale * 1.7).rotated(rot * 0.5)
                 .drawAt(pos, ColorF{ 1.0, 0.95, 0.4, 0.18 });
-              // ’†ŠÔ‚ÌŒõ
+              // ä¸­é–“ã®å…‰
               sparkle_tex_.scaled(scale * 1.3).rotated(-rot * 0.8)
                 .drawAt(pos, ColorF{ 1.0, 0.95, 0.6, 0.28 });
-              // –{‘Ìi”’‚Á‚Û‚­‹­‚¢Œõj
+              // æœ¬ä½“ï¼ˆç™½ã£ã½ãå¼·ã„å…‰ï¼‰
               sparkle_tex_.scaled(scale).rotated(rot)
                 .drawAt(pos, ColorF{ 1.0, 1.0, 1.0, 0.95 });
             }
@@ -1197,20 +1197,20 @@ void Game::draw() const
       }
     }
 
-    // ƒuƒƒbƒN”j‰ó‰‰o‚Ì•`‰æiƒJƒƒ‰ƒIƒtƒZƒbƒg“K—p”ÍˆÍ“àj
+    // ãƒ–ãƒ­ãƒƒã‚¯ç ´å£Šæ¼”å‡ºã®æç”»ï¼ˆã‚«ãƒ¡ãƒ©ã‚ªãƒ•ã‚»ãƒƒãƒˆé©ç”¨ç¯„å›²å†…ï¼‰
     if (block_destroy_effect_)
     {
       block_destroy_effect_->Draw();
     }
 
-    // –AƒGƒtƒFƒNƒg‚Ì•`‰æiƒQ[ƒ€ƒI[ƒo[‰‰oj
+    // æ³¡ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»ï¼ˆã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ¼”å‡ºï¼‰
     if (bubble_effect_ && is_game_over_)
     {
       bubble_effect_->Draw();
     }
 
-    // ƒvƒŒƒCƒ„[‚Ì•`‰æiƒJƒƒ‰ƒIƒtƒZƒbƒg“K—p”ÍˆÍ“àj
-    // ƒQ[ƒ€ƒI[ƒo[‚Í™X‚É“§–¾‚É‚·‚é
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æç”»ï¼ˆã‚«ãƒ¡ãƒ©ã‚ªãƒ•ã‚»ãƒƒãƒˆé©ç”¨ç¯„å›²å†…ï¼‰
+    // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã¯å¾ã€…ã«é€æ˜ã«ã™ã‚‹
     if (player_)
     {
       const Vec2 player_pos = player_->GetPosition();
@@ -1223,13 +1223,13 @@ void Game::draw() const
         
         if (is_game_over_)
         {
-          // ƒQ[ƒ€ƒI[ƒo[‚ÍƒtƒF[ƒhƒAƒEƒg
+          // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã¯ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
           const double alpha = Max(0.0, 1.0 - (game_over_timer_ / (InGameConstants::kGameOverDuration * 0.5)));
           texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y, ColorF{ 1.0, 1.0, 1.0, alpha });
         }
         else if (is_game_clear_)
         {
-          // ƒQ[ƒ€ƒNƒŠƒA‚Í’Êí•\¦iƒtƒF[ƒh‚È‚µj
+          // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢æ™‚ã¯é€šå¸¸è¡¨ç¤ºï¼ˆãƒ•ã‚§ãƒ¼ãƒ‰ãªã—ï¼‰
           texture->scaled(scale_x, scale_y).drawAt(player_pos.x, player_pos.y);
         }
         else
@@ -1238,7 +1238,7 @@ void Game::draw() const
         }
       }
 
-      // ƒQ[ƒ€ƒI[ƒo[EƒQ[ƒ€ƒNƒŠƒA‚Í•Ší‚ğ”ñ•\¦
+      // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ãƒ»ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢æ™‚ã¯æ­¦å™¨ã‚’éè¡¨ç¤º
       if (!is_game_over_ && !is_game_clear_ && player_->IsWeaponVisible())
       {
         const Vec2 weapon_pos = player_->GetWeaponPosition();
@@ -1249,28 +1249,28 @@ void Game::draw() const
         const Transformer2D weapon_transform{ Mat3x2::Rotate(weapon_rotation, weapon_pos), TransformCursor::No };
         if (weapon_texture_.isEmpty())
         {
-          // ƒeƒNƒXƒ`ƒƒ‚ª‚È‚¢ê‡‚Í]—ˆ‚Ì‹éŒ`
+          // ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒãªã„å ´åˆã¯å¾“æ¥ã®çŸ©å½¢
           RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
         }
         else
         {
-          // •Ší‚Ìu’·‚³vicƒTƒCƒYj‚ÍŠù‘¶‚Ì‚‚³‚ğˆÛ‚µA•‚ÍƒeƒNƒXƒ`ƒƒ‚Ìc‰¡”ä‚©‚çŒvZ
-          // pen.png ‚Í 1500x300ic‰¡”ä 5:1 ‚Ì‰¡’·jB
+          // æ­¦å™¨ã®ã€Œé•·ã•ã€ï¼ˆç¸¦ã‚µã‚¤ã‚ºï¼‰ã¯æ—¢å­˜ã®é«˜ã•ã‚’ç¶­æŒã—ã€å¹…ã¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦æ¨ªæ¯”ã‹ã‚‰è¨ˆç®—
+          // pen.png ã¯ 1500x300ï¼ˆç¸¦æ¨ªæ¯” 5:1 ã®æ¨ªé•·ï¼‰ã€‚
           const double texW = weapon_texture_.width();
           const double texH = weapon_texture_.height();
           const double aspect = (texW > 0 && texH > 0) ? (texW / texH) : 5.0; // 1500/300=5
 
-          // Šù‘¶‚Ì•ŠíƒTƒCƒY (w,h) ‚Ì‚¤‚¿A’·‚³‚Æ‚İ‚È‚·‚Ì‚Í heightic•ûŒüjB
+          // æ—¢å­˜ã®æ­¦å™¨ã‚µã‚¤ã‚º (w,h) ã®ã†ã¡ã€é•·ã•ã¨ã¿ãªã™ã®ã¯ heightï¼ˆç¸¦æ–¹å‘ï¼‰ã€‚
           const double targetH = weapon_size.y;
           const double targetW = targetH * aspect;
 
           const RectF weapon_rect{ Arg::center(weapon_pos), targetW, targetH };
-          // ƒeƒNƒXƒ`ƒƒ‚Ì–{—ˆ‚ÌF‚Å•`‰æiFæZ‚µ‚È‚¢j
+          // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æœ¬æ¥ã®è‰²ã§æç”»ï¼ˆè‰²ä¹—ç®—ã—ãªã„ï¼‰
           weapon_texture_.resized(weapon_rect.size).drawAt(weapon_pos);
         }
       }
 
-      // ƒQ[ƒ€ƒI[ƒo[‚Í‚«o‚µ”ñ•\¦
+      // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã¯å¹ãå‡ºã—éè¡¨ç¤º
       if (!is_game_over_ && !is_game_clear_)
       {
         String bubble_text;
@@ -1298,24 +1298,24 @@ void Game::draw() const
       }
     }
 
-    // ƒfƒoƒbƒOî•ñ‚Ì•`‰æiƒJƒƒ‰ƒIƒtƒZƒbƒg“K—p”ÍˆÍ“àj
+    // ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã®æç”»ï¼ˆã‚«ãƒ¡ãƒ©ã‚ªãƒ•ã‚»ãƒƒãƒˆé©ç”¨ç¯„å›²å†…ï¼‰
     // DrawDebugInfo();
 
-    // Å‘O–Ê‚Éƒqƒbƒg‰‰o‚ğ•`‰æ
+    // æœ€å‰é¢ã«ãƒ’ãƒƒãƒˆæ¼”å‡ºã‚’æç”»
     hit_effect_.Draw();
   }
-  // ƒJƒƒ‰ƒIƒtƒZƒbƒg“K—p”ÍˆÍ‚±‚±‚Ü‚Å
+  // ã‚«ãƒ¡ãƒ©ã‚ªãƒ•ã‚»ãƒƒãƒˆé©ç”¨ç¯„å›²ã“ã“ã¾ã§
 
-  // UI ‚Ì•`‰æiƒJƒƒ‰‚Ì‰e‹¿‚ğó‚¯‚È‚¢A‰æ–ÊŒÅ’èj
+  // UI ã®æç”»ï¼ˆã‚«ãƒ¡ãƒ©ã®å½±éŸ¿ã‚’å—ã‘ãªã„ã€ç”»é¢å›ºå®šï¼‰
   if (ui_)
   {
     ui_->Render();
   }
 
-  // •¶š•\¦ƒ{ƒbƒNƒX‚Ì•`‰æi‚à‚¶‚Ò‚Á‚½‚ñ•—UIj
+  // æ–‡å­—è¡¨ç¤ºãƒœãƒƒã‚¯ã‚¹ã®æç”»ï¼ˆã‚‚ã˜ã´ã£ãŸã‚“é¢¨UIï¼‰
   if (word_display_box_)
   {
-    // CollectedCharacters‚©‚ç•¶š”z—ñ‚ğæ“¾iŒİŠ·«‚Ì‚½‚ßhave_words_‚àİ’èj
+    // CollectedCharactersã‹ã‚‰æ–‡å­—é…åˆ—ã‚’å–å¾—ï¼ˆäº’æ›æ€§ã®ãŸã‚have_words_ã‚‚è¨­å®šï¼‰
     if (collected_characters_)
     {
       word_display_box_->SetWords(collected_characters_->GetCharacters());
@@ -1328,12 +1328,12 @@ void Game::draw() const
     word_display_box_->Draw(block_font_);
   }
 
-  //------- ‰E‘¤‚Ìƒ{[ƒhFŠ®¬‚µ‚½’PŒê‚ğ•\¦ - ‰æ–ÊŒÅ’è
-  // ƒ{[ƒh‚Ì”wŒi‚ğ•`‰æ
+  //------- å³å´ã®ãƒœãƒ¼ãƒ‰ï¼šå®Œæˆã—ãŸå˜èªã‚’è¡¨ç¤º - ç”»é¢å›ºå®š
+  // ãƒœãƒ¼ãƒ‰ã®èƒŒæ™¯ã‚’æç”»
   const RoundRect board_area{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius };
   board_area.draw(InGameConstants::kCompletedBoardBackgroundColor);
 
-  // Š®¬”‚ğ‘å‚«‚­”–‚­•\¦‚µ‚Ä”wŒi‚ÉƒAƒNƒZƒ“ƒg
+  // å®Œæˆæ•°ã‚’å¤§ããè–„ãè¡¨ç¤ºã—ã¦èƒŒæ™¯ã«ã‚¢ã‚¯ã‚»ãƒ³ãƒˆ
   const auto overlay_text = U"{}"_fmt(completed_words_.size());
   if (!overlay_text.isEmpty()) {
     const Vec2 overlay_center{
@@ -1347,10 +1347,10 @@ void Game::draw() const
 
   board_area.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
 
-  // ƒ^ƒCƒgƒ‹‚ğ•`‰æ
-  block_font_(U"Š®¬‚µ‚½’PŒê").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
+  // ã‚¿ã‚¤ãƒˆãƒ«ã‚’æç”»
+  block_font_(U"å®Œæˆã—ãŸå˜èª").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
 
-  // Š®¬‚µ‚½’PŒê‚ğ4—ñƒOƒŠƒbƒh‚Å”z’u
+  // å®Œæˆã—ãŸå˜èªã‚’4åˆ—ã‚°ãƒªãƒƒãƒ‰ã§é…ç½®
   const double column_width = InGameConstants::kCompletedBoardWidth / static_cast<double>(InGameConstants::kCompletedBoardColumns);
   const double row_start_y = InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardContentStartY;
   const double row_height = InGameConstants::kCompletedBoardLineHeight;
@@ -1363,39 +1363,39 @@ void Game::draw() const
     completed_word_font_(completed_words_[index]).draw(text_x, text_y, InGameConstants::kCompletedWordTextColor);
   }
 
-  // Š®¬‚µ‚½’PŒê‚Ì”‚ğ•\¦
-  debug_font_(U"Š®¬”: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
+  // å®Œæˆã—ãŸå˜èªã®æ•°ã‚’è¡¨ç¤º
+  debug_font_(U"å®Œæˆæ•°: {}"_fmt(completed_words_.size())).draw(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardCountOffsetX, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight - InGameConstants::kCompletedBoardCountOffsetY, ColorF{ 1.0 });
 
-  // ƒQ[ƒ€ƒI[ƒo[‚Ì•\¦
+  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã®è¡¨ç¤º
   if (is_game_over_)
   {
-    // ”¼“§–¾‚Ì•”wŒi
+    // åŠé€æ˜ã®é»’èƒŒæ™¯
     Scene::Rect().draw(ColorF{ 0.0, 0.0, 0.0, Min(0.7, game_over_timer_ * 0.5) });
 
-    // ƒQ[ƒ€ƒI[ƒo[ƒeƒLƒXƒgiƒtƒF[ƒhƒCƒ“j
+    // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ãƒ†ã‚­ã‚¹ãƒˆï¼ˆãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ï¼‰
     const double text_alpha = Min(1.0, game_over_timer_);
     ColorF text_color = InGameConstants::kGameOverTextColor;
     text_color.a = text_alpha;
     game_over_font_(U"GAME OVER").drawAt(Scene::Center(), text_color);
   }
 
-  // ƒQ[ƒ€ƒNƒŠƒA‚Ì•\¦
+  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢æ™‚ã®è¡¨ç¤º
   if (is_game_clear_)
   {
-    // ”¼“§–¾‚Ì”’”wŒi
+    // åŠé€æ˜ã®ç™½èƒŒæ™¯
     Scene::Rect().draw(ColorF{ 1.0, 1.0, 1.0, Min(0.7, game_clear_timer_ * 0.5) });
 
-    // ƒQ[ƒ€ƒNƒŠƒAƒeƒLƒXƒgiƒtƒF[ƒhƒCƒ“j
+    // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ãƒ†ã‚­ã‚¹ãƒˆï¼ˆãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ï¼‰
     const double text_alpha = Min(1.0, game_clear_timer_);
     ColorF text_color = InGameConstants::kGameClearTextColor;
     text_color.a = text_alpha;
     game_over_font_(U"GAME CLEAR!").drawAt(Scene::Center(), text_color);
   }
 
-  // –¾‚é‚³İ’è‚ğ“K—p
+  // æ˜ã‚‹ã•è¨­å®šã‚’é©ç”¨
   GameSettings::GetInstance()->ApplyBrightness();
 
-  // ƒƒjƒ…[‚ÆƒIƒvƒVƒ‡ƒ“‚ğÅ‘O–Ê‚É•`‰æ
+  // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¨ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’æœ€å‰é¢ã«æç”»
   if (menu_->IsOpen())
   {
     menu_->Draw();
@@ -1404,40 +1404,40 @@ void Game::draw() const
 
 void Game::UpdateCamera()
 {
-  // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğæ“¾
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å–å¾—
   const Vec2 player_pos = player_->GetPosition();
 
-  // c•ûŒü‚ÌŒ©‚½–ÚƒIƒtƒZƒbƒgiƒuƒƒbƒN2ŒÂ•ªAålŒö‚ğ‰æ–Ê“à‚Å‚‚­Œ©‚¹‚éj
+  // ç¸¦æ–¹å‘ã®è¦‹ãŸç›®ã‚ªãƒ•ã‚»ãƒƒãƒˆï¼ˆãƒ–ãƒ­ãƒƒã‚¯2å€‹åˆ†ã€ä¸»äººå…¬ã‚’ç”»é¢å†…ã§é«˜ãè¦‹ã›ã‚‹ï¼‰
   const float y_bias = static_cast<float>(InGameConstants::kBlockSize * InGameConstants::kCameraVerticalBiasBlocks);
 
-  // ƒJƒƒ‰‚Ì–Ú•WˆÊ’u‚ğŒvZiƒvƒŒƒCƒ„[‚ğ‰æ–Ê’†‰›‚æ‚èã‚É”z’uj
+  // ã‚«ãƒ¡ãƒ©ã®ç›®æ¨™ä½ç½®ã‚’è¨ˆç®—ï¼ˆãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ç”»é¢ä¸­å¤®ã‚ˆã‚Šä¸Šã«é…ç½®ï¼‰
   const Vec2 target_camera_pos = Vec2{
     player_pos.x - Scene::Width() / 2.0f,
     player_pos.y - Scene::Height() / 2.0f + y_bias
   };
 
-  // ƒJƒƒ‰ˆÊ’u‚ğƒXƒ€[ƒY‚ÉXViüŒ`•âŠÔj
+  // ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’ã‚¹ãƒ ãƒ¼ã‚ºã«æ›´æ–°ï¼ˆç·šå½¢è£œé–“ï¼‰
   camera_offset_ += (target_camera_pos - camera_offset_) * InGameConstants::kCameraFollowSpeed;
 
-  // ƒJƒƒ‰‚ÌˆÚ“®”ÍˆÍ‚ğ§ŒÀi•K—v‚É‰‚¶‚Äj
-  // —áF¶’[‚æ‚è¶‚É‚ÍˆÚ“®‚µ‚È‚¢
+  // ã‚«ãƒ¡ãƒ©ã®ç§»å‹•ç¯„å›²ã‚’åˆ¶é™ï¼ˆå¿…è¦ã«å¿œã˜ã¦ï¼‰
+  // ä¾‹ï¼šå·¦ç«¯ã‚ˆã‚Šå·¦ã«ã¯ç§»å‹•ã—ãªã„
   if (camera_offset_.x < 0) {
     camera_offset_.x = 0;
   }
 
-  // ã’[‚æ‚èã‚É‚ÍˆÚ“®‚µ‚È‚¢i•Ç‚ÌÅã•”‚ğl—¶j
+  // ä¸Šç«¯ã‚ˆã‚Šä¸Šã«ã¯ç§»å‹•ã—ãªã„ï¼ˆå£ã®æœ€ä¸Šéƒ¨ã‚’è€ƒæ…®ï¼‰
   if (camera_offset_.y < InGameConstants::kWallStartY) {
     camera_offset_.y = InGameConstants::kWallStartY;
   }
 
-  // ‰E’[‚Ì§ŒÀiƒuƒƒbƒNƒOƒŠƒbƒh‚ÌƒTƒCƒY‚É‰‚¶‚Äj
+  // å³ç«¯ã®åˆ¶é™ï¼ˆãƒ–ãƒ­ãƒƒã‚¯ã‚°ãƒªãƒƒãƒ‰ã®ã‚µã‚¤ã‚ºã«å¿œã˜ã¦ï¼‰
   const float world_width = InGameConstants::kStartX + block_grid_[0].size() * InGameConstants::kBlockSize;
   const float max_camera_x = world_width - Scene::Width();
   if (camera_offset_.x > max_camera_x && max_camera_x > 0) {
     camera_offset_.x = max_camera_x;
   }
 
-  // ‰º’[‚Ì§ŒÀiƒuƒƒbƒNƒOƒŠƒbƒh‚ÌƒTƒCƒY‚É‰‚¶‚Äj
+  // ä¸‹ç«¯ã®åˆ¶é™ï¼ˆãƒ–ãƒ­ãƒƒã‚¯ã‚°ãƒªãƒƒãƒ‰ã®ã‚µã‚¤ã‚ºã«å¿œã˜ã¦ï¼‰
   const float world_height = InGameConstants::kWallStartY + block_grid_.size() * InGameConstants::kBlockSize;
   const float max_camera_y = world_height - Scene::Height();
   if (camera_offset_.y > max_camera_y && max_camera_y > 0) {
@@ -1470,7 +1470,7 @@ void Game::UpdateHint()
       {
         if (ch == entry.second.front())
         {
-          ch = U'Z';
+          ch = U'ã€‡';
         }
       }
       candidates << masked;
@@ -1496,19 +1496,19 @@ void Game::StartGameOver()
   is_game_over_ = true;
   game_over_timer_ = 0.0;
 
-  // ƒvƒŒƒCƒ„[‚Ìƒ|[ƒY‚ğƒQ[ƒ€ƒI[ƒo[‚Éİ’è
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ãƒãƒ¼ã‚ºã‚’ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã«è¨­å®š
   if (player_)
   {
     player_->SetPose(Player::Pose::kGameOver);
   }
 
-  // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚É–AƒGƒtƒFƒNƒg‚ğ”­¶
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã«æ³¡ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ç™ºç”Ÿ
   if (player_ && bubble_effect_)
   {
     bubble_effect_->AddEffect(player_->GetPosition());
   }
 
-  // ƒQ[ƒ€ƒI[ƒo[Œø‰Ê‰¹‚ğÄ¶
+  // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼åŠ¹æœéŸ³ã‚’å†ç”Ÿ
   AudioManager::GetInstance()->PlaySe(SeKind::kGameOver);
 }
 
@@ -1517,13 +1517,13 @@ void Game::StartGameClear()
   is_game_clear_ = true;
   game_clear_timer_ = 0.0;
 
-  // ƒvƒŒƒCƒ„[‚Ìƒ|[ƒY‚ğ‘Ò‹@‚Éİ’è
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ãƒãƒ¼ã‚ºã‚’å¾…æ©Ÿã«è¨­å®š
   if (player_)
   {
     player_->SetPose(Player::Pose::kIdle);
   }
 
-  // ƒQ[ƒ€ƒNƒŠƒAŒø‰Ê‰¹‚ğÄ¶iŠ®¬’PŒê‚Æ“¯‚¶‰¹‚ğg—pj
+  // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢åŠ¹æœéŸ³ã‚’å†ç”Ÿï¼ˆå®Œæˆå˜èªã¨åŒã˜éŸ³ã‚’ä½¿ç”¨ï¼‰
   AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
 }
 
@@ -1536,7 +1536,7 @@ void Game::UpdateScroll()
 
   const Vec2 player_pos = player_->GetPosition();
   
-  // ƒvƒŒƒCƒ„[‚ªƒgƒŠƒK[ˆÊ’u‚ğ’´‚¦‚½‚çŸ‚ÌƒuƒƒbƒN‰ò‚ğ¶¬
+  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒˆãƒªã‚¬ãƒ¼ä½ç½®ã‚’è¶…ãˆãŸã‚‰æ¬¡ã®ãƒ–ãƒ­ãƒƒã‚¯å¡Šã‚’ç”Ÿæˆ
   if (player_pos.y >= next_chunk_trigger_y_)
   {
     GenerateNextBlockChunk();
@@ -1545,7 +1545,7 @@ void Game::UpdateScroll()
 
 void Game::GenerateNextBlockChunk()
 {
-  // V‚µ‚¢ƒuƒƒbƒN‰ò‚ğ¶¬
+  // æ–°ã—ã„ãƒ–ãƒ­ãƒƒã‚¯å¡Šã‚’ç”Ÿæˆ
   const Array<Array<std::pair<String, bool>>> new_string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
@@ -1558,20 +1558,20 @@ void Game::GenerateNextBlockChunk()
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
   const int32 new_chunk_rows = static_cast<int32>(new_string_grid.size());
   
-  // V‚µ‚¢ƒuƒƒbƒN‰ò‚ÌŠJnYÀ•Wi‘O‚Ì‰ò‚©‚ç500px—£‚·j
+  // æ–°ã—ã„ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®é–‹å§‹Yåº§æ¨™ï¼ˆå‰ã®å¡Šã‹ã‚‰500pxé›¢ã™ï¼‰
   const float new_chunk_start_y = current_chunk_bottom_y_ + kChunkSpacing;
   
-  // •Ç‚ğŠÜ‚ß‚½V‚µ‚¢s”‚ğŒvZ
+  // å£ã‚’å«ã‚ãŸæ–°ã—ã„è¡Œæ•°ã‚’è¨ˆç®—
   const int32 wall_rows_before_chunk = static_cast<int32>((new_chunk_start_y - InGameConstants::kWallStartY) / InGameConstants::kBlockSize);
   const int32 total_new_rows = wall_rows_before_chunk + new_chunk_rows;
   
-  // ƒOƒŠƒbƒh‚ğŠg’£
+  // ã‚°ãƒªãƒƒãƒ‰ã‚’æ‹¡å¼µ
   const size_t old_size = block_grid_.size();
   if (static_cast<size_t>(total_new_rows) > old_size)
   {
     block_grid_.resize(total_new_rows);
     
-    // V‚µ‚­’Ç‰Á‚³‚ê‚½s‚ğ‰Šú‰»
+    // æ–°ã—ãè¿½åŠ ã•ã‚ŒãŸè¡Œã‚’åˆæœŸåŒ–
     for (size_t row = old_size; row < static_cast<size_t>(total_new_rows); ++row)
     {
       block_grid_[row].resize(total_columns);
@@ -1583,7 +1583,7 @@ void Game::GenerateNextBlockChunk()
         
         if (is_wall_column)
         {
-          // •ÇƒuƒƒbƒN‚ğ”z’u
+          // å£ãƒ–ãƒ­ãƒƒã‚¯ã‚’é…ç½®
           block_grid_[row][col] = Block(Block::Type::kWall);
           const float wall_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
           const float wall_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
@@ -1591,7 +1591,7 @@ void Game::GenerateNextBlockChunk()
         }
         else
         {
-          // V‚µ‚¢ƒuƒƒbƒN‰ò‚Ì”ÍˆÍ“à‚©ƒ`ƒFƒbƒN
+          // æ–°ã—ã„ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®ç¯„å›²å†…ã‹ãƒã‚§ãƒƒã‚¯
           if (static_cast<int32>(row) >= wall_rows_before_chunk && 
               static_cast<int32>(row) < wall_rows_before_chunk + new_chunk_rows)
           {
@@ -1606,7 +1606,7 @@ void Game::GenerateNextBlockChunk()
           }
           else
           {
-            // ‹óƒuƒƒbƒN
+            // ç©ºãƒ–ãƒ­ãƒƒã‚¯
             block_grid_[row][col] = Block();
             const float empty_x = InGameConstants::kStartX + static_cast<int32>(col) * InGameConstants::kBlockSize;
             const float empty_y = InGameConstants::kWallStartY + static_cast<int32>(row) * InGameConstants::kBlockSize;
@@ -1617,9 +1617,9 @@ void Game::GenerateNextBlockChunk()
     }
   }
   
-  // Œ»İ‚ÌƒuƒƒbƒN‰ò‚Ì‰º’[‚ğXV
+  // ç¾åœ¨ã®ãƒ–ãƒ­ãƒƒã‚¯å¡Šã®ä¸‹ç«¯ã‚’æ›´æ–°
   current_chunk_bottom_y_ = new_chunk_start_y + new_chunk_rows * InGameConstants::kBlockSize;
   
-  // Ÿ‚ÌƒgƒŠƒK[ˆÊ’u‚ğXV
+  // æ¬¡ã®ãƒˆãƒªã‚¬ãƒ¼ä½ç½®ã‚’æ›´æ–°
   next_chunk_trigger_y_ = current_chunk_bottom_y_ - kChunkSpacing;
 }
