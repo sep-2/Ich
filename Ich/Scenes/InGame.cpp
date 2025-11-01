@@ -148,8 +148,11 @@ namespace InGameConstants
   constexpr double kCompletedBoardOverlayScale = 3.6;
 
   // エア量調整パラメータ
-  constexpr float kAirDecreaseRate = 0.1f;        // エア減少率（10秒で空になる）
-  constexpr float kAirIncreaseRate = 0.5f;        // エア回復率（2秒で満タン）
+
+  /// <summary>
+  /// エア回復単位
+  /// </summary>
+  constexpr float kAirDecreaseRate = 0.01f;
 
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
@@ -209,7 +212,7 @@ namespace InGameConstants
   /// <summary>
   /// 1ブロック当たりのエア消費量
   /// </summary>
-  const float kAirConsumeRate = 0.08f;
+  const float kAirConsumeRate = 0.05f;
 
   /// <summary>
   /// 単語を作成したときのエア回復量
@@ -994,6 +997,21 @@ void Game::update()
   if (air_amount_ <= 0.0f && !is_game_over_)
   {
     StartGameOver();
+  }
+
+  // 時間経過によるエア減少（ポーズ中・ゲームオーバー・ゲームクリア時は減少しない）
+  if (!is_paused_ && !is_game_over_ && !is_game_clear_)
+  {
+#if _DEBUG
+    // デバッグモードでエア無限が有効な場合はエアを減少させない
+    if (!menu_ || !menu_->IsInfiniteAirEnabled())
+#endif
+    {
+      air_amount_ -= InGameConstants::kAirDecreaseRate * static_cast<float>(Scene::DeltaTime());
+      if (air_amount_ < 0.0f) {
+        air_amount_ = 0.0f;
+      }
+    }
   }
 
   // Zキーでブロック破壊

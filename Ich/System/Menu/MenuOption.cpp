@@ -9,13 +9,16 @@ MenuOption::MenuOption()
   , volume_slider_area_(440, 260, kSliderWidth, kSliderHeight)  // 画面中央に配置（1280x720）
   , brightness_slider_area_(440, 360, kSliderWidth, kSliderHeight)  // 画面中央に配置
   , back_button_(540, 510, 200, 50)  // 画面中央に配置
-  , selected_item_(0) {
+  , selected_item_(0)
+{
 }
 
-MenuOption::~MenuOption() {
+MenuOption::~MenuOption()
+{
 }
 
-bool MenuOption::Update() {
+bool MenuOption::Update()
+{
   auto* settings = GameSettings::GetInstance();
   auto* sound = MenuSoundManager::GetInstance();
 
@@ -39,7 +42,7 @@ bool MenuOption::Update() {
 
   // 左右キーでスライダーを調整
   const OptionItem selected = static_cast<OptionItem>(selected_item_);
-  
+
   if (selected == OptionItem::kVolume) {
     if (KeyLeft.down() || KeyA.down()) {
       double new_volume = Clamp(settings->GetVolume() - kSliderAdjustStep, 0.0, 1.0);
@@ -80,7 +83,8 @@ bool MenuOption::Update() {
   return false;
 }
 
-void MenuOption::Draw() const {
+void MenuOption::Draw() const
+{
   auto* settings = GameSettings::GetInstance();
 
   // 背景
@@ -106,60 +110,56 @@ void MenuOption::Draw() const {
 
   // 音量
   const bool is_volume_selected = (selected == OptionItem::kVolume);
-  if (is_volume_selected)
-  {
+  if (is_volume_selected) {
     // マーカーをラベルの左側に描画（黄色）
     const Vec2 cursor_pos(320 + cursor_sway, 260);
     font_(U"▶").draw(cursor_pos, cursor_color);
     font_(U"音量").draw(340, 260, Palette::Yellow);
   }
-  else
-  {
+  else {
     font_(U"音量").draw(340, 260, Palette::White);
   }
-  
+
   // スライダー背景（選択時は明るく）
-  const ColorF slider_bg_color = is_volume_selected 
-    ? ColorF(0.6) 
+  const ColorF slider_bg_color = is_volume_selected
+    ? ColorF(0.6)
     : ColorF(0.5).lerp(ColorF(0.55), pulse);
   volume_slider_area_.draw(slider_bg_color);
-  
+
   // 音量バー
   const ColorF volume_bar_color = is_volume_selected ? ColorF(Palette::Orange) : ColorF(Palette::Orange, 0.7);
   Rect(volume_slider_area_.x, volume_slider_area_.y,
-       static_cast<int>(volume_slider_area_.w * settings->GetVolume()), volume_slider_area_.h)
-      .draw(volume_bar_color);
-  
+    static_cast<int>(volume_slider_area_.w * settings->GetVolume()), volume_slider_area_.h)
+    .draw(volume_bar_color);
+
   // 音量の値を表示
   font_(U"{:.0f}%"_fmt(settings->GetVolume() * 100))
     .draw(volume_slider_area_.x + volume_slider_area_.w + 20, 260, Palette::White);
 
   // 明るさ
   const bool is_brightness_selected = (selected == OptionItem::kBrightness);
-  if (is_brightness_selected)
-  {
+  if (is_brightness_selected) {
     // マーカーをラベルの左側に描画（黄色）
     const Vec2 cursor_pos(320 + cursor_sway, 360);
     font_(U"▶").draw(cursor_pos, cursor_color);
     font_(U"明るさ").draw(340, 360, Palette::Yellow);
   }
-  else
-  {
+  else {
     font_(U"明るさ").draw(340, 360, Palette::White);
   }
-  
+
   // スライダー背景（選択時は明るく）
-  const ColorF brightness_bg_color = is_brightness_selected 
-    ? ColorF(0.6) 
+  const ColorF brightness_bg_color = is_brightness_selected
+    ? ColorF(0.6)
     : ColorF(0.5).lerp(ColorF(0.55), pulse);
   brightness_slider_area_.draw(brightness_bg_color);
-  
+
   // 明るさバー
   const ColorF brightness_bar_color = is_brightness_selected ? ColorF(Palette::Yellow) : ColorF(Palette::Yellow, 0.7);
   Rect(brightness_slider_area_.x, brightness_slider_area_.y,
-       static_cast<int>(brightness_slider_area_.w * settings->GetBrightness()), brightness_slider_area_.h)
-      .draw(brightness_bar_color);
-  
+    static_cast<int>(brightness_slider_area_.w * settings->GetBrightness()), brightness_slider_area_.h)
+    .draw(brightness_bar_color);
+
   // 明るさの値を表示
   font_(U"{:.0f}%"_fmt(settings->GetBrightness() * 100))
     .draw(brightness_slider_area_.x + brightness_slider_area_.w + 20, 360, Palette::White);
@@ -180,7 +180,7 @@ void MenuOption::Draw() const {
     back_button_.draw(button_color);
     font_(U"戻る").drawAt(back_button_.center(), Palette::White);
   }
-  
+
   // 操作説明
   help_font_(U"↑↓: 項目選択  ←→: 値調整  Enter/Esc: 戻る")
     .drawAt(kScreenCenterX, 620, ColorF(1.0, 1.0, 1.0, 0.7));
