@@ -142,6 +142,36 @@ private:
     std::shared_ptr<TextureWrapper> air_gauge_right_wrapper_;
 
     /// <summary>
+    /// エアゲージ（赤色・低残量用）のテクスチャ（左端）
+    /// </summary>
+    std::shared_ptr<Texture> air_gauge_red_left_texture_;
+
+    /// <summary>
+    /// エアゲージ（赤色・低残量用）のテクスチャ（中央部分）
+    /// </summary>
+    std::shared_ptr<Texture> air_gauge_red_center_texture_;
+
+    /// <summary>
+    /// エアゲージ（赤色・低残量用）のテクスチャ（右端）
+    /// </summary>
+    std::shared_ptr<Texture> air_gauge_red_right_texture_;
+
+    /// <summary>
+    /// エアゲージ（赤色・低残量用）の左端表示用ラッパー
+    /// </summary>
+    std::shared_ptr<TextureWrapper> air_gauge_red_left_wrapper_;
+
+    /// <summary>
+    /// エアゲージ（赤色・低残量用）の中央部分表示用ラッパー
+    /// </summary>
+    std::shared_ptr<TextureWrapper> air_gauge_red_center_wrapper_;
+
+    /// <summary>
+    /// エアゲージ（赤色・低残量用）の右端表示用ラッパー
+    /// </summary>
+    std::shared_ptr<TextureWrapper> air_gauge_red_right_wrapper_;
+
+    /// <summary>
     /// サイドボックス（インフォメーション表示用）のテクスチャ
     /// </summary>
     std::shared_ptr<Texture> side_box_texture_;

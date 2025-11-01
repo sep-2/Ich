@@ -8,6 +8,14 @@ namespace UiConstants {
   const String kAirGaugeLeftImagePath = U"Assets/Image/Ui/barBlue_horizontalLeft.png";
   const String kAirGaugeCenterImagePath = U"Assets/Image/Ui/barBlue_horizontalBlue.png";
   const String kAirGaugeRightImagePath = U"Assets/Image/Ui/barBlue_horizontalRight.png";
+
+  /// <summary>
+  /// エアが少ない時の色
+  /// </summary>
+  const String kAirRedGaugeLeftImagePath = U"Assets/Image/Ui/barRed_horizontalLeft.png";
+  const String kAirRedGaugeCenterImagePath = U"Assets/Image/Ui/barRed_horizontalMid.png";
+  const String kAirRedGaugeRightImagePath = U"Assets/Image/Ui/barRed_horizontalRight.png";
+
   
   // 背景ゲージ用の画像パス
   const String kAirGaugeBackLeftImagePath = U"Assets/Image/Ui/barBack_horizontalLeft.png";
@@ -57,6 +65,11 @@ Ui::Ui()
   air_gauge_center_texture_ = std::make_shared<Texture>(UiConstants::kAirGaugeCenterImagePath);
   air_gauge_right_texture_ = std::make_shared<Texture>(UiConstants::kAirGaugeRightImagePath);
 
+  // 赤色エアゲージのテクスチャを読み込み
+  air_gauge_red_left_texture_ = std::make_shared<Texture>(UiConstants::kAirRedGaugeLeftImagePath);
+  air_gauge_red_center_texture_ = std::make_shared<Texture>(UiConstants::kAirRedGaugeCenterImagePath);
+  air_gauge_red_right_texture_ = std::make_shared<Texture>(UiConstants::kAirRedGaugeRightImagePath);
+
   // サイドボックスの元画像を読み込み、Nine-Patchで分割
   Image side_box_image = Image(UiConstants::kSideBoxImagePath);
   int border = side_box_border_size_;
@@ -103,6 +116,11 @@ Ui::Ui()
   air_gauge_left_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_left_texture_, gauge_x_, gauge_y_);
   air_gauge_center_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_center_texture_, gauge_x_ + air_gauge_left_texture_->width(), gauge_y_);
   air_gauge_right_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_right_texture_, gauge_x_ + air_gauge_left_texture_->width() + center_width_, gauge_y_);
+
+  // 赤色エアゲージのTextureWrapperを初期化
+  air_gauge_red_left_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_red_left_texture_, gauge_x_, gauge_y_);
+  air_gauge_red_center_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_red_center_texture_, gauge_x_ + air_gauge_red_left_texture_->width(), gauge_y_);
+  air_gauge_red_right_wrapper_ = std::make_shared<TextureWrapper>(air_gauge_red_right_texture_, gauge_x_ + air_gauge_red_left_texture_->width() + center_width_, gauge_y_);
 
   // 背景ゲージの中央部分をフルサイズでスケール設定
   float back_scale_x = static_cast<float>(center_width_) / static_cast<float>(air_gauge_back_center_texture_->width());
@@ -180,6 +198,34 @@ void Ui::Update(float delta_time)
     air_gauge_right_wrapper_->SetScale(right_scale, 1.0f);
   }
 
+  // 赤色エアゲージの位置更新
+  if (air_gauge_red_left_wrapper_) {
+    air_gauge_red_left_wrapper_->SetPosition(gauge_x_, gauge_y_);
+    air_gauge_red_left_wrapper_->SetScale(left_scale, 1.0f);
+  }
+
+  if (air_gauge_red_center_wrapper_) {
+    int left_width_scaled = static_cast<int>(air_gauge_red_left_texture_->width() * left_scale);
+    int center_x = gauge_x_ + left_width_scaled;
+    air_gauge_red_center_wrapper_->SetPosition(center_x, gauge_y_);
+
+    float scale_x = (center_width_ * air_ratio_) / static_cast<float>(air_gauge_red_center_texture_->width());
+    if (scale_x > 0.0f) {
+      air_gauge_red_center_wrapper_->SetScale(scale_x, 1.0f);
+    } else {
+      air_gauge_red_center_wrapper_->SetScale(0.0f, 1.0f);
+    }
+  }
+
+  if (air_gauge_red_right_wrapper_) {
+    int left_width_scaled = static_cast<int>(air_gauge_red_left_texture_->width() * left_scale);
+    int center_width_scaled = static_cast<int>(center_width_ * air_ratio_);
+    int right_x = gauge_x_ + left_width_scaled + center_width_scaled;
+    
+    air_gauge_red_right_wrapper_->SetPosition(right_x, gauge_y_);
+    air_gauge_red_right_wrapper_->SetScale(right_scale, 1.0f);
+  }
+
   // Nine-Patchサイドボックスの位置更新
   UpdateNinePatchPositions();
 }
@@ -206,19 +252,34 @@ void Ui::Render()
     }
 
     // エアゲージを描画（前面に表示）
+    // エア残量に応じて青色または赤色のゲージを表示
+    const bool use_red_gauge = (air_ratio_ <= UiConstants::kLowAirThreshold);
+    
     // エア残量がある場合のみ左端を表示
-    if (air_ratio_ > 0.0f && air_gauge_left_wrapper_) {
-      renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_left_wrapper_));
+    if (air_ratio_ > 0.0f) {
+      if (use_red_gauge && air_gauge_red_left_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_red_left_wrapper_));
+      } else if (!use_red_gauge && air_gauge_left_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_left_wrapper_));
+      }
     }
 
     // エア残量がある場合のみ中央部分を表示
-    if (air_ratio_ > 0.0f && air_gauge_center_wrapper_) {
-      renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_center_wrapper_));
+    if (air_ratio_ > 0.0f) {
+      if (use_red_gauge && air_gauge_red_center_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_red_center_wrapper_));
+      } else if (!use_red_gauge && air_gauge_center_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_center_wrapper_));
+      }
     }
 
     // エア残量がある場合のみ右端を表示
-    if (air_ratio_ > 0.0f && air_gauge_right_wrapper_) {
-      renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_right_wrapper_));
+    if (air_ratio_ > 0.0f) {
+      if (use_red_gauge && air_gauge_red_right_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_red_right_wrapper_));
+      } else if (!use_red_gauge && air_gauge_right_wrapper_) {
+        renderer->Push(Priority::kSideUiPriority, std::static_pointer_cast<Task>(air_gauge_right_wrapper_));
+      }
     }
 
     // Nine-Patchサイドボックスを描画（インフォメーション表示用）
