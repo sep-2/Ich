@@ -160,7 +160,7 @@ void Title::update()
         current_menu_item_ = MenuItem::kCredits;
         break;
     }
-    AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
+    AudioManager::GetInstance()->PlaySe(SeKind::kTitleCursorMove);
   }
 
   // 下キーでメニュー項目を下に移動
@@ -176,7 +176,7 @@ void Title::update()
         current_menu_item_ = MenuItem::kGameStart;
         break;
     }
-    AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
+    AudioManager::GetInstance()->PlaySe(SeKind::kTitleCursorMove);
   }
 
   // Enterキーまたはスペースキーで選択
@@ -187,13 +187,13 @@ void Title::update()
       case MenuItem::kGameStart:
         // ゲーム開始
         changeScene(EnumScene::kInGame);
-        AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+        AudioManager::GetInstance()->PlaySe(SeKind::kTitleDecide);
         break;
       
       case MenuItem::kCredits:
         // クレジット表示
         show_credits_ = true;
-        AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+        AudioManager::GetInstance()->PlaySe(SeKind::kTitleDecide);
         break;
       
       case MenuItem::kExit:
