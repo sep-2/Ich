@@ -277,6 +277,7 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x6列、バッチサイズ20）
+  const bool fill_random_hiragana = ((stage_ % 2) == 0);
   const Array<Array<std::pair<String, bool>>> string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
@@ -284,7 +285,7 @@ Game::Game(const InitData& init)
     10,
     keywords,
     3,
-    false
+    fill_random_hiragana
   );
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
@@ -1576,6 +1577,7 @@ void Game::UpdateScroll()
 void Game::GenerateNextBlockChunk()
 {
   ++stage_;
+  const bool fill_random_hiragana = ((stage_ % 2) == 0);
 
   // 新しいブロック塊を生成
   const Array<Array<std::pair<String, bool>>> new_string_grid = block_manager_.GenerateBlockGrid(
@@ -1585,7 +1587,7 @@ void Game::GenerateNextBlockChunk()
     10,
     keywords,
     3,
-    false
+    fill_random_hiragana
   );
 
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;
