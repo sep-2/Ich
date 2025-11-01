@@ -13,6 +13,7 @@
 #include "InGame/WordDisplayBox.h"
 #include "InGame/CollectedCharacters.h"
 #include "InGame/WaveBackgroundEffect.h"
+#include "InGame/MissionBanner.h"
 #include "Player.hpp"
 #include "System/System/BlockManager.h"
 
@@ -290,6 +291,9 @@ private:
 
   // 波背景エフェクト（夢の世界の雰囲気）
   std::unique_ptr<WaveBackgroundEffect> wave_background_effect_;
+
+  // ミッション開始バナー（スパロボ風演出）
+  std::unique_ptr<MissionBanner> mission_banner_;
 
   // 現在のブロック塊のY座標（下端）
   float current_chunk_bottom_y_ = 0.0f;

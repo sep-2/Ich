@@ -122,6 +122,7 @@
     <ClCompile Include="InGame\BlockDestroyEffect.cpp" />
     <ClCompile Include="InGame\BubbleEffect.cpp" />
     <ClCompile Include="InGame\CollectedCharacters.cpp" />
+    <ClCompile Include="InGame\MissionBanner.cpp" />
     <ClCompile Include="InGame\Ui.cpp" />
     <ClCompile Include="InGame\WaveBackgroundEffect.cpp" />
     <ClCompile Include="InGame\WordDisplayBox.cpp" />
@@ -355,6 +356,7 @@
     <ClInclude Include="InGame\BlockDestroyEffect.h" />
     <ClInclude Include="InGame\BubbleEffect.h" />
     <ClInclude Include="InGame\CollectedCharacters.h" />
+    <ClInclude Include="InGame\MissionBanner.h" />
     <ClInclude Include="InGame\Ui.h" />
     <ClInclude Include="InGame\WaveBackgroundEffect.h" />
     <ClInclude Include="InGame\WordDisplayBox.h" />
