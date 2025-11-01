@@ -283,7 +283,8 @@ Game::Game(const InitData& init)
     30,
     10,
     keywords,
-    3
+    3,
+    false
   );
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
@@ -1583,7 +1584,8 @@ void Game::GenerateNextBlockChunk()
     30,
     10,
     keywords,
-    3
+    3,
+    false
   );
 
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;

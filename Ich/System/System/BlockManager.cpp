@@ -148,7 +148,7 @@ Array<std::pair<String, String>> BlockManager::GetReachWords(const Array<String>
   return {};
 }
 
-Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 segmentCount) const
+Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int32 row, const int32 column, const int32 requestedCount, const int32 attemptsPerWord, const Array<String>& dictionary, const int32 segmentCount, const bool fill_empty_with_random) const
 {
   if (row <= 0 || column <= 0 || requestedCount <= 0 || attemptsPerWord <= 0 || dictionary.isEmpty() || segmentCount <= 0)
   {
@@ -285,7 +285,14 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
     {
       if (grid[y][x].first.isEmpty())
       {
-        grid[y][x] = { U"×", false };
+        if (fill_empty_with_random)
+        {
+          grid[y][x] = { RandomHiragana(), false };
+        }
+        else
+        {
+          grid[y][x] = { U"×", false };
+        }
       }
     }
   }
