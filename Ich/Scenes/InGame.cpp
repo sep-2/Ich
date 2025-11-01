@@ -155,6 +155,9 @@ namespace InGameConstants
   /// </summary>
   constexpr float kAirDecreaseRate = 0.005f;
 
+  // フォントファイルパス（InGame用）
+  const String kInGameFontPath = U"Assets/Font/MochiyPopOne-Regular.ttf";
+
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
   constexpr int32 kCompletedWordFontSize = 16;
@@ -241,11 +244,11 @@ Game::Game(const InitData& init)
   , is_game_clear_(false)
   , game_over_timer_(0.0)
   , game_clear_timer_(0.0)
-  , block_font_{ InGameConstants::kBlockFontSize, Typeface::Bold }
-  , completed_word_font_{ InGameConstants::kCompletedWordFontSize }
-  , hint_font_{ InGameConstants::kHintFontSize }
+  , block_font_(FontMethod::MSDF, InGameConstants::kBlockFontSize, InGameConstants::kInGameFontPath, FontStyle::Bold)
+  , completed_word_font_(FontMethod::MSDF, InGameConstants::kCompletedWordFontSize, InGameConstants::kInGameFontPath)
+  , hint_font_(FontMethod::MSDF, InGameConstants::kHintFontSize, InGameConstants::kInGameFontPath)
   , debug_font_{ InGameConstants::kDebugFontSize }
-  , game_over_font_{ InGameConstants::kGameOverFontSize, Typeface::Bold }
+  , game_over_font_(FontMethod::MSDF, InGameConstants::kGameOverFontSize, InGameConstants::kInGameFontPath, FontStyle::Bold)
 {
   // BGM 再生（シーン開始時）
   AudioManager::GetInstance()->PlayBgm(BgmKind::kMain);
