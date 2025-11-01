@@ -4,4 +4,5 @@ enum class EnumScene
 {
   kTitle,
   kInGame,
+  kResult,
 };

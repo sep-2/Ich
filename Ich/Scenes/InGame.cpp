@@ -62,12 +62,11 @@ namespace InGameConstants
   constexpr double kHintUpdateInterval = 3.0;
   constexpr double kMessageDisplayDuration = 3.0;
 
-  // ブロック破壊判定パラメータ
-  constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // 上下のブロック破壊判定の閾値
-
-  // 物理演算パラメータ
-  constexpr float kSimpleGravity = 4.0f;          // 簡易重力（UpdatePlayerMovement用）
-  constexpr float kGravityMargin = 5.0f;          // 重力適用時のマージン
+  // Block destruction parameters
+  constexpr float kBlockDestroyVerticalThreshold = 10.0f;  // Threshold for upward block destruction
+  // Simple gravity parameters
+  constexpr float kSimpleGravity = 4.0f;          // Simple gravity used by UpdatePlayerMovement
+  constexpr float kGravityMargin = 5.0f;          // Margin applied during gravity collision checks
 
   // 画面サイズ
   constexpr int32 kScreenWidth = 1280;
@@ -220,7 +219,7 @@ namespace InGameConstants
   /// <summary>
   /// クリアまでの単語の完成数
   /// </summary>
-  const int kClearEvaluationCount = 1;
+  const int kClearEvaluationCount = 20;
 }
 
 Game::Game(const InitData& init)
@@ -246,6 +245,10 @@ Game::Game(const InitData& init)
 {
   // BGM 再生（シーン開始時）
   AudioManager::GetInstance()->PlayBgm(BgmKind::kMain);
+  auto& shared_data = getData<SaveData>();
+  shared_data.last_game_cleared_ = false;
+  shared_data.last_completed_words_.clear();
+
 
   // ? テクスチャを生成（絵文字）
   sparkle_tex_ = Texture{ Emoji{ U"✨" } };
@@ -260,8 +263,6 @@ Game::Game(const InitData& init)
     }
     block_textures_ << texture;
   }
-
-  auto& data = getData<SaveData>();
 
 
   // UIの初期設定（1280x720対応）
@@ -911,7 +912,7 @@ void Game::update()
     // 一定時間経過後にタイトルに戻る
     if (game_over_timer_ >= InGameConstants::kGameOverDuration)
     {
-      changeScene(EnumScene::kTitle, 1s);
+      TransitionToResult(false);
     }
 
     return;  // ゲームオーバー中は通常の更新処理をスキップ
@@ -925,7 +926,7 @@ void Game::update()
     // 一定時間経過後にタイトルに戻る
     if (game_clear_timer_ >= InGameConstants::kGameClearDuration)
     {
-      changeScene(EnumScene::kTitle, 1s);
+      TransitionToResult(true);
     }
 
     return;  // ゲームクリア中は通常の更新処理をスキップ
@@ -1525,6 +1526,15 @@ void Game::StartGameClear()
 
   // ゲームクリア効果音を再生（完成単語と同じ音を使用）
   AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+}
+
+void Game::TransitionToResult(bool cleared)
+{
+  auto& shared = getData<SaveData>();
+  shared.last_game_cleared_ = cleared;
+  shared.last_completed_words_ = completed_words_;
+
+  changeScene(EnumScene::kResult, 0s);
 }
 
 void Game::UpdateScroll()

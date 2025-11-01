@@ -131,6 +131,7 @@
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Scenes\InGame.cpp" />
     <ClCompile Include="Scenes\Title.cpp" />
+    <ClCompile Include="Scenes\Result.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -361,6 +362,7 @@
     <ClInclude Include="Scenes\InGame.h" />
     <ClInclude Include="Scenes\InGame\HitEffect.h" />
     <ClInclude Include="Scenes\Title.h" />
+    <ClInclude Include="Scenes\Result.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="System\Audio\AudioManager.h" />
     <ClInclude Include="System\Menu\GameSettings.h" />

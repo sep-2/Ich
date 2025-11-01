@@ -5,6 +5,7 @@
 #include "Scenes/Enum.h"
 #include "Scenes/Title.h"
 #include "Scenes/InGame.h"
+#include "Scenes/Result.h"
 #include "System/Task/TaskManager.h"
 #include "System/Renderer/Renderer.h"
 #include "System/SaveData/SaveData.hpp"
@@ -82,6 +83,7 @@ void Main()
   // 各シーンを登録する
   manager.add<Title>(EnumScene::kTitle);
   manager.add<Game>(EnumScene::kInGame);
+  manager.add<Result>(EnumScene::kResult);
 
   // 最初のシーンを指定
   manager.init(EnumScene::kInGame);
