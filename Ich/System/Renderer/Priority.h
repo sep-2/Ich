@@ -50,6 +50,11 @@ namespace Priority {
   static const int kSideUiPriority = 800;
 
   /// <summary>
+  /// メニューの優先順位（最前面）
+  /// </summary>
+  static const int kMenuPriority = 2000;
+
+  /// <summary>
   /// タイトルロゴ画像の優先順位
   /// </summary>
   static const int kTitleLogoPriority = 10;
