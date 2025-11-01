@@ -69,15 +69,15 @@ private:
   bool IsInCompletedWord(const String& word) const;
 
   /// <summary>
-  /// エフェクト情報（文字数ベース、下から適用）
+  /// エフェクト情報（単語の文字列を保存、毎フレーム追跡）
   /// </summary>
   struct CharacterEffect
   {
-    size_t char_count;      // エフェクト対象の文字数（下から数えて）
+    String target_word;     // エフェクト対象の単語（完成した単語の文字列）
     double elapsed;         // 経過時間
     bool active;            // エフェクトが有効か
     
-    CharacterEffect() : char_count(0), elapsed(0.0), active(false) {}
+    CharacterEffect() : target_word(U""), elapsed(0.0), active(false) {}
   };
 
   Array<String> words_;                // 表示する文字配列
@@ -86,6 +86,7 @@ private:
   int32 position_y_;                   // 表示位置Y
   int32 box_size_;                     // ボックスサイズ
   int32 box_spacing_;                  // ボックス間の隙間
+  size_t previous_word_count_;         // 前回のキューサイズ（変化検出用、未使用）
 
   Array<CharacterEffect> effects_;     // 各単語のエフェクト情報
 

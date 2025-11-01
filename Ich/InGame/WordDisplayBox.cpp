@@ -15,6 +15,7 @@ WordDisplayBox::WordDisplayBox()
   , position_y_(kDefaultPositionY)
   , box_size_(kDefaultBoxSize)
   , box_spacing_(kDefaultBoxSpacing)
+  , previous_word_count_(0)
 {
 }
 
@@ -62,21 +63,49 @@ void WordDisplayBox::Draw(const Font& blockFont) const
     {
       if (!effect.active) continue;
       
-      // 現在の文字数
-      const size_t current_size = words_.size();
+      // エフェクト対象の単語を現在のキューから探す
+      // 単語の各文字を下から順番に探す
+      Array<size_t> target_indices;
+      size_t search_start = 0;
       
-      // エフェクト対象の開始位置を計算（下からchar_count文字分）
-      // 例：キューが8文字、単語が4文字なら、インデックス4, 5, 6, 7がエフェクト対象
-      const size_t effect_start_index = (current_size >= effect.char_count) 
-                                       ? (current_size - effect.char_count) 
-                                       : 0;
-      const size_t effect_end_index = current_size;
-      
-      // このエフェクトの対象範囲内かチェック（下からeffect_char_count文字分）
-      if (i >= effect_start_index && i < effect_end_index)
+      for (size_t char_idx = 0; char_idx < effect.target_word.length(); char_idx++)
       {
-        // エフェクト開始インデックスからの相対位置（0が下から1番目）
-        const size_t char_position = i - effect_start_index;
+        const String target_char = effect.target_word.substr(char_idx, 1);
+        bool found = false;
+        
+        // search_startから順番に探す（前から順に使う）
+        for (size_t word_idx = search_start; word_idx < words_.size(); word_idx++)
+        {
+          if (words_[word_idx] == target_char)
+          {
+            target_indices.push_back(word_idx);
+            search_start = word_idx + 1;
+            found = true;
+            break;
+          }
+        }
+        
+        if (!found)
+        {
+          // 単語の文字が見つからない場合は、このエフェクトは適用しない
+          target_indices.clear();
+          break;
+        }
+      }
+      
+      // 現在の文字がエフェクト対象かチェック
+      if (target_indices.includes(i))
+      {
+        // 単語内でこの文字が何番目かを探す
+        size_t char_position = 0;
+        for (size_t j = 0; j < target_indices.size(); j++)
+        {
+          if (target_indices[j] == i)
+          {
+            char_position = j;
+            break;
+          }
+        }
         
         // この文字のエフェクト開始タイミングを計算（下から順番に）
         const double char_delay = static_cast<double>(char_position) * kEffectDelayPerChar;
@@ -164,9 +193,9 @@ void WordDisplayBox::SetBoxSpacing(int32 spacing)
 
 void WordDisplayBox::TriggerCompletionEffect(const String& completedWord)
 {
-  // 新しいエフェクトを追加（文字数のみ記録）
+  // 新しいエフェクトを追加（完成した単語の文字列を保存）
   CharacterEffect effect;
-  effect.char_count = completedWord.length();
+  effect.target_word = completedWord;  // 完成した単語を保存
   effect.elapsed = 0.0;
   effect.active = true;
   
