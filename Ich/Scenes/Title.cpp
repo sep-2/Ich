@@ -11,7 +11,11 @@ namespace TitleConstants
   // タイトル名
   const String kTitleText = U"わードリーム";
   const String kSubtitleText = U"～文字を集めて単語を作ろう～";
-  const String kPressKeyText = U"Enterでスタート";
+  
+  // メニュー項目
+  const String kMenuGameStart = U"ゲーム開始";
+  const String kMenuCredits = U"クレジット";
+  const String kMenuExit = U"ゲーム終了";
 
   // フォントファイルパス
   const String kFontPath = U"Assets/Font/PottaOne-Regular.ttf";
@@ -19,7 +23,7 @@ namespace TitleConstants
   // フォントサイズ
   constexpr int32 kTitleFontSize = 120;
   constexpr int32 kSubtitleFontSize = 32;
-  constexpr int32 kPressKeyFontSize = 40;
+  constexpr int32 kMenuFontSize = 40;
 
   // 色設定（時間の経過による背景変化）
   // 夜景の色
@@ -33,18 +37,22 @@ namespace TitleConstants
   const ColorF kTitleColor{ 1.0, 1.0, 0.3 };            // 黄色
   const ColorF kTitleShadowColor{ 0.3, 0.1, 0.0, 0.8 }; // 影
   const ColorF kSubtitleColor{ 1.0, 1.0, 1.0 };         // 白
-  const ColorF kPressKeyColor{ 1.0, 1.0, 1.0 };         // 白
+  const ColorF kMenuDefaultColor{ 0.8, 0.8, 0.8 };      // 非選択メニュー色
+  const ColorF kMenuSelectedColor{ 1.0, 1.0, 0.3 };     // 選択中メニュー色（黄色）
+  const ColorF kMenuShadowColor{ 0.2, 0.2, 0.2, 0.8 };  // メニュー影色
 
   // 位置設定
   const Vec2 kTitleShadowOffset{ 4.0, 4.0 };
+  const Vec2 kMenuShadowOffset{ 2.0, 2.0 };
   constexpr int32 kTitleY = 200;
   constexpr int32 kSubtitleY = 340;
-  constexpr int32 kPressKeyY = 550;
+  constexpr int32 kMenuStartY = 420;        // メニュー開始Y座標
+  constexpr int32 kMenuItemSpacing = 60;     // メニュー項目間隔
 
   // アニメーション設定
-  constexpr double kPressKeyBlinkInterval = 1.0;  // 点滅間隔（秒）
   constexpr double kTitlePulseInterval = 2.0;     // タイトルの脈動間隔（秒）
   constexpr double kDayNightCycleInterval = 20.0; // 昼夜サイクルの周期（秒）
+  constexpr double kMenuItemScaleFactor = 1.1;    // 選択中メニューのスケール係数
   
   // 波のアニメーション設定
   constexpr int32 kWaveCount = 40;                // 波の数
@@ -58,6 +66,32 @@ namespace TitleConstants
   constexpr double kShootingStarInterval = 0.5;   // 流れ星の発生間隔（秒）
   constexpr double kShootingStarLifetime = 3.0;   // 流れ星の寿命（秒）
   constexpr double kShootingStarTailLength = 100.0; // 流れ星の尾の長さ
+  
+  // クレジット情報
+  const String kCreditsTitle = U"クレジット";
+  const Array<String> kCreditsLines = {
+    U"",
+    U"ゲームデザイン・プログラム",
+    U"  あなたの名前",
+    U"",
+    U"グラフィック",
+    U"  Kenney (www.kenney.nl)",
+    U"",
+    U"フォント",
+    U"  Potta One (Google Fonts)",
+    U"",
+    U"音楽・効果音",
+    U"  あなたの名前",
+    U"",
+    U"制作ツール",
+    U"  Siv3D",
+    U"  Visual Studio",
+    U"",
+    U"スペシャルサンクス",
+    U"  あなた！",
+    U"",
+    U"Escキーで戻る"
+  };
 }
 
 // コンストラクタ（必ず実装する）
@@ -65,7 +99,9 @@ Title::Title(const InitData& init)
   : IScene{ init }
   , title_font_(FontMethod::MSDF, TitleConstants::kTitleFontSize, TitleConstants::kFontPath, FontStyle::Bold)
   , subtitle_font_(FontMethod::MSDF, TitleConstants::kSubtitleFontSize, TitleConstants::kFontPath)
-  , press_key_font_(FontMethod::MSDF, TitleConstants::kPressKeyFontSize, TitleConstants::kFontPath, FontStyle::Bold)
+  , menu_font_(FontMethod::MSDF, TitleConstants::kMenuFontSize, TitleConstants::kFontPath, FontStyle::Bold)
+  , current_menu_item_(MenuItem::kGameStart)
+  , show_credits_(false)
 {
   PRINT << U"Title::Title()";
 
@@ -101,13 +137,70 @@ Title::~Title()
 // 更新関数
 void Title::update()
 {
-  // クリックまたはEnterキーでゲーム開始
-  if (KeyEnter.down()) {
+  // クレジット表示中の場合
+  if (show_credits_) {
+    // Escキーでクレジットを閉じる
+    if (KeyEscape.down()) {
+      show_credits_ = false;
+      AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+    }
+    return;
+  }
+
+  // 上キーでメニュー項目を上に移動
+  if (KeyUp.down()) {
+    switch (current_menu_item_) {
+      case MenuItem::kGameStart:
+        current_menu_item_ = MenuItem::kExit;
+        break;
+      case MenuItem::kCredits:
+        current_menu_item_ = MenuItem::kGameStart;
+        break;
+      case MenuItem::kExit:
+        current_menu_item_ = MenuItem::kCredits;
+        break;
+    }
+    AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
+  }
+
+  // 下キーでメニュー項目を下に移動
+  if (KeyDown.down()) {
+    switch (current_menu_item_) {
+      case MenuItem::kGameStart:
+        current_menu_item_ = MenuItem::kCredits;
+        break;
+      case MenuItem::kCredits:
+        current_menu_item_ = MenuItem::kExit;
+        break;
+      case MenuItem::kExit:
+        current_menu_item_ = MenuItem::kGameStart;
+        break;
+    }
+    AudioManager::GetInstance()->PlaySe(SeKind::kDestroyBlock);
+  }
+
+  // Enterキーまたはスペースキーで選択
+  if (KeyEnter.down() || KeySpace.down()) {
     stopwatch_.pause();
 
-    // ゲームシーンに遷移
-    changeScene(EnumScene::kInGame);
-    AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+    switch (current_menu_item_) {
+      case MenuItem::kGameStart:
+        // ゲーム開始
+        changeScene(EnumScene::kInGame);
+        AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+        break;
+      
+      case MenuItem::kCredits:
+        // クレジット表示
+        show_credits_ = true;
+        AudioManager::GetInstance()->PlaySe(SeKind::kCompleteWord);
+        break;
+      
+      case MenuItem::kExit:
+        // ゲーム終了
+        System::Exit();
+        break;
+    }
   }
 }
 
@@ -187,32 +280,7 @@ void Title::draw() const
     Polygon{ wave_points }.draw(wave_color);
   }
 
-  // タイトルテキスト（影付き、脈動アニメーション）
-  const double title_pulse = 1.0 + 0.05 * Sin(t * Math::TwoPi / TitleConstants::kTitlePulseInterval);
-  const auto title_glyph = title_font_(TitleConstants::kTitleText);
-  const Vec2 title_center{ Scene::Center().x, TitleConstants::kTitleY };
-
-  // タイトルの影
-  title_glyph.drawAt(title_center + TitleConstants::kTitleShadowOffset, TitleConstants::kTitleShadowColor);
-
-  // タイトル本体（脈動）
-  {
-    const Transformer2D transform{ Mat3x2::Scale(title_pulse, title_center) };
-    title_glyph.drawAt(title_center, TitleConstants::kTitleColor);
-  }
-
-  // サブタイトル
-  const auto subtitle_glyph = subtitle_font_(TitleConstants::kSubtitleText);
-  const Vec2 subtitle_pos{ Scene::Center().x, TitleConstants::kSubtitleY };
-  subtitle_glyph.drawAt(subtitle_pos, TitleConstants::kSubtitleColor);
-
-  // 「クリックしてスタート」テキスト（点滅）
-  const double blink_alpha = 0.3 + 0.7 * Periodic::Sine0_1(TitleConstants::kPressKeyBlinkInterval * 2.0, t);
-  const auto press_key_glyph = press_key_font_(TitleConstants::kPressKeyText);
-  const Vec2 press_key_pos{ Scene::Center().x, TitleConstants::kPressKeyY };
-  press_key_glyph.drawAt(press_key_pos, ColorF{ TitleConstants::kPressKeyColor, blink_alpha });
-
-  // 装飾的な要素（流れ星エフェクト）
+  // 流れ星エフェクト
   for (int i = 0; i < TitleConstants::kShootingStarCount; ++i) {
     // 各流れ星の開始時刻を計算
     const double star_start_time = i * TitleConstants::kShootingStarInterval;
@@ -263,6 +331,90 @@ void Title::draw() const
       // 流れ星の頭部（円）
       Circle{ current_x, current_y, 5.0 }.draw(star_color_head);
       Circle{ current_x, current_y, 3.0 }.draw(ColorF{ 1.0, 1.0, 1.0, alpha });
+    }
+  }
+
+  // クレジット表示中の場合
+  if (show_credits_) {
+    // 半透明の黒背景
+    Scene::Rect().draw(ColorF{ 0.0, 0.0, 0.0, 0.8 });
+    
+    // クレジット内容を表示
+    const int32 start_y = 80;
+    const int32 line_height = 32;
+    
+    // タイトル
+    title_font_(TitleConstants::kCreditsTitle).drawAt(Scene::Center().x, start_y, TitleConstants::kTitleColor);
+    
+    // 各行を表示
+    for (size_t i = 0; i < TitleConstants::kCreditsLines.size(); ++i) {
+      const int32 y = start_y + 80 + static_cast<int32>(i) * line_height;
+      menu_font_(TitleConstants::kCreditsLines[i]).drawAt(Scene::Center().x, y, ColorF{ 1.0, 1.0, 1.0 });
+    }
+  }
+  // 通常のタイトル画面表示
+  else {
+    // タイトルテキスト（影付き、脈動アニメーション）
+    const double title_pulse = 1.0 + 0.05 * Sin(t * Math::TwoPi / TitleConstants::kTitlePulseInterval);
+    const auto title_glyph = title_font_(TitleConstants::kTitleText);
+    const Vec2 title_center{ Scene::Center().x, TitleConstants::kTitleY };
+
+    // タイトルの影
+    title_glyph.drawAt(title_center + TitleConstants::kTitleShadowOffset, TitleConstants::kTitleShadowColor);
+
+    // タイトル本体（脈動）
+    {
+      const Transformer2D transform{ Mat3x2::Scale(title_pulse, title_center) };
+      title_glyph.drawAt(title_center, TitleConstants::kTitleColor);
+    }
+
+    // サブタイトル
+    const auto subtitle_glyph = subtitle_font_(TitleConstants::kSubtitleText);
+    const Vec2 subtitle_pos{ Scene::Center().x, TitleConstants::kSubtitleY };
+    subtitle_glyph.drawAt(subtitle_pos, TitleConstants::kSubtitleColor);
+
+    // メニュー項目を描画
+    const Array<std::pair<MenuItem, String>> menu_items = {
+      { MenuItem::kGameStart, TitleConstants::kMenuGameStart },
+      { MenuItem::kCredits, TitleConstants::kMenuCredits },
+      { MenuItem::kExit, TitleConstants::kMenuExit }
+    };
+
+    for (size_t i = 0; i < menu_items.size(); ++i) {
+      const auto& [item, text] = menu_items[i];
+      const bool is_selected = (item == current_menu_item_);
+      const int32 y = TitleConstants::kMenuStartY + static_cast<int32>(i) * TitleConstants::kMenuItemSpacing;
+      const Vec2 menu_pos{ Scene::Center().x, y };
+
+      // 選択中の項目は拡大
+      const double scale = is_selected ? TitleConstants::kMenuItemScaleFactor : 1.0;
+      const ColorF color = is_selected ? TitleConstants::kMenuSelectedColor : TitleConstants::kMenuDefaultColor;
+
+      // 影
+      menu_font_(text).drawAt(menu_pos + TitleConstants::kMenuShadowOffset, TitleConstants::kMenuShadowColor);
+
+      // 本体
+      {
+        const Transformer2D transform{ Mat3x2::Scale(scale, menu_pos) };
+        menu_font_(text).drawAt(menu_pos, color);
+      }
+
+      // 選択中の項目には矢印を表示
+      if (is_selected) {
+        const double arrow_offset = 150.0 + 10.0 * Sin(t * 6.0);
+        const Vec2 left_arrow_pos{ menu_pos.x - arrow_offset, menu_pos.y };
+        const Vec2 right_arrow_pos{ menu_pos.x + arrow_offset, menu_pos.y };
+        
+        // 丸い印（やわらかい感じ）
+        const double circle_radius = 8.0 + 2.0 * Sin(t * 8.0);  // 脈動する丸
+        Circle{ left_arrow_pos, circle_radius }.draw(color);
+        Circle{ right_arrow_pos, circle_radius }.draw(color);
+        
+        // より小さな白い丸を中に描画してハイライト効果
+        const double inner_radius = circle_radius * 0.5;
+        Circle{ left_arrow_pos, inner_radius }.draw(ColorF{ 1.0, 1.0, 1.0, 0.6 });
+        Circle{ right_arrow_pos, inner_radius }.draw(ColorF{ 1.0, 1.0, 1.0, 0.6 });
+      }
     }
   }
 

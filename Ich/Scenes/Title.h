@@ -22,18 +22,29 @@ public:
   void drawFadeOut(double t) const override;
 
 private:
+  // メニュー項目
+  enum class MenuItem
+  {
+    kGameStart,   // ゲーム開始
+    kCredits,     // クレジット
+    kExit         // ゲーム終了
+  };
+
   // タイトルロゴ用フォント
   Font title_font_;
-
+  
   // サブタイトル用フォント
   Font subtitle_font_;
-
-  // プレスキー用フォント
-  Font press_key_font_;
-
+  
+  // メニュー用フォント
+  Font menu_font_;
+  
   // アニメーション用タイマー
   Stopwatch stopwatch_;
-
-  // 背景グラデーション用テクスチャ
-  Texture background_texture_;
+  
+  // 現在選択中のメニュー項目
+  MenuItem current_menu_item_;
+  
+  // クレジット表示フラグ
+  bool show_credits_;
 };
