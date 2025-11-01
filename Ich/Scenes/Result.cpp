@@ -47,10 +47,12 @@ void Result::draw() const
   const Texture& banner = cleared ? game_clear_texture_ : game_over_texture_;
   if (!banner.isEmpty()) {
     const double scale = Min(ResultConstants::kImageMaxWidth / banner.width(), 1.0);
-    banner.scaled(scale).drawAt(Scene::Center().x, ResultConstants::kImageCenterY);
+    banner.scaled(scale * (3.0 / 5.0)).drawAt(Scene::Center().x, ResultConstants::kImageCenterY);
   }
 
   const String title = cleared ? U"ゲームクリア！" : U"ゲームオーバー";
+  const Vec2 title_shadow_offset{ 2.0, 2.0 };
+  title_font_(title).drawAt(Scene::Center().x + title_shadow_offset.x, 120 + title_shadow_offset.y, ColorF{ 0.0, 0.0, 0.0, 0.45 });
   title_font_(title).drawAt(Scene::Center().x, 120, Palette::White);
 
   DrawWordList();
@@ -65,6 +67,16 @@ void Result::DrawWordList() const
   list_area.drawFrame(2.0, ColorF{ 1.0, 1.0, 1.0, 0.35 });
 
   const auto& words = shared_data_.last_completed_words_;
+
+  // 背景に単語数を大きく薄く表示してアクセントを付ける
+  const String overlay_text = U"{}"_fmt(words.size());
+  if (!overlay_text.isEmpty()) {
+    const Vec2 overlay_center = list_area.center();
+    const double overlay_scale = 3.6;
+    const Transformer2D overlay_transform{ Mat3x2::Scale(overlay_scale, overlay_center) };
+    title_font_(overlay_text).drawAt(overlay_center, ColorF{ 1.0, 1.0, 1.0, 0.12 });
+  }
+
   if (words.isEmpty()) {
     word_font_(U"完成した単語はありません").drawAt(list_area.center(), Palette::White);
     return;
@@ -89,7 +101,6 @@ void Result::DrawWordList() const
     word_font_(U"{:>2}. {}"_fmt(i + 1, words[i])).draw(x, y, Palette::White);
   }
 }
-
 bool Result::IsAnyKeyTriggered() const
 {
   return KeyEnter.down()

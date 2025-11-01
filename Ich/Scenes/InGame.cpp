@@ -910,6 +910,7 @@ void Game::update()
     }
 
     // 一定時間経過後にタイトルに戻る
+    Scene::SetBackground(ColorF{ 0.0, 0.0, 0.0, Min(0.7, game_over_timer_ * 0.5) });
     if (game_over_timer_ >= InGameConstants::kGameOverDuration)
     {
       TransitionToResult(false);
