@@ -249,6 +249,8 @@ Game::Game(const InitData& init)
 
   // ✨ テクスチャを生成（絵文字）
   sparkle_tex_ = Texture{ Emoji{ U"✨" } };
+  // 武器テクスチャを読み込み
+  weapon_texture_ = Texture{ U"Assets/Image/pen.png" };
 
   for (const auto& path : InGameConstants::kBlockTexturePaths) {
     Texture texture{ path };
@@ -1245,7 +1247,27 @@ void Game::draw() const
         const ColorF weapon_color = player_->GetWeaponColor();
 
         const Transformer2D weapon_transform{ Mat3x2::Rotate(weapon_rotation, weapon_pos), TransformCursor::No };
-        RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
+        if (weapon_texture_.isEmpty())
+        {
+          // テクスチャがない場合は従来の矩形
+          RoundRect{ Arg::center(weapon_pos), weapon_size, InGameConstants::kWeaponRoundRadius }.draw(weapon_color);
+        }
+        else
+        {
+          // 武器の「長さ」（縦サイズ）は既存の高さを維持し、幅はテクスチャの縦横比から計算
+          // pen.png は 1500x300（縦横比 5:1 の横長）。
+          const double texW = weapon_texture_.width();
+          const double texH = weapon_texture_.height();
+          const double aspect = (texW > 0 && texH > 0) ? (texW / texH) : 5.0; // 1500/300=5
+
+          // 既存の武器サイズ (w,h) のうち、長さとみなすのは height（縦方向）。
+          const double targetH = weapon_size.y;
+          const double targetW = targetH * aspect;
+
+          const RectF weapon_rect{ Arg::center(weapon_pos), targetW, targetH };
+          // テクスチャの本来の色で描画（色乗算しない）
+          weapon_texture_.resized(weapon_rect.size).drawAt(weapon_pos);
+        }
       }
 
       // ゲームオーバー時は吹き出し非表示
