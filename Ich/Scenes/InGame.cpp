@@ -915,6 +915,13 @@ void Game::update()
         return;
       }
 
+      // タイトルに戻るがリクエストされたかチェック
+      if (menu_->IsReturnToTitleRequested())
+      {
+        changeScene(EnumScene::kTitle, 0s);
+        return;
+      }
+
 #if _DEBUG
       // ゲーム再起動がリクエストされたかチェック（DEBUGのみ）
       if (menu_->IsRestartRequested())

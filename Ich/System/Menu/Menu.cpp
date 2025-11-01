@@ -24,10 +24,12 @@ namespace MenuConstants
   constexpr int32 kRestartButtonY = 310;
   constexpr int32 kInfiniteAirToggleY = 390;
   constexpr int32 kOptionButtonYDebug = 470;
-  constexpr int32 kQuitButtonYDebug = 550;
+  constexpr int32 kReturnToTitleButtonYDebug = 550;
+  constexpr int32 kQuitButtonYDebug = 630;
 #else
   constexpr int32 kOptionButtonYRelease = 310;
-  constexpr int32 kQuitButtonYRelease = 390;
+  constexpr int32 kReturnToTitleButtonYRelease = 390;
+  constexpr int32 kQuitButtonYRelease = 470;
 #endif
   
   // 終了確認ダイアログ
@@ -66,16 +68,20 @@ Menu::Menu()
   , restart_button_(MenuConstants::kButtonX, MenuConstants::kRestartButtonY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , infinite_air_toggle_(MenuConstants::kButtonX, MenuConstants::kInfiniteAirToggleY, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , return_to_title_button_(MenuConstants::kButtonX, MenuConstants::kReturnToTitleButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYDebug, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , infinite_air_(false)
 #else
   , option_button_(MenuConstants::kButtonX, MenuConstants::kOptionButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
+  , return_to_title_button_(MenuConstants::kButtonX, MenuConstants::kReturnToTitleButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
   , quit_button_(MenuConstants::kButtonX, MenuConstants::kQuitButtonYRelease, MenuConstants::kButtonWidth, MenuConstants::kButtonHeight)
 #endif
   , quit_no_button_(MenuConstants::kDialogNoButtonX, MenuConstants::kDialogButtonY, MenuConstants::kDialogButtonWidth, MenuConstants::kDialogButtonHeight)
   , quit_yes_button_(MenuConstants::kDialogYesButtonX, MenuConstants::kDialogButtonY, MenuConstants::kDialogButtonWidth, MenuConstants::kDialogButtonHeight)
+  , current_confirm_dialog_(ConfirmDialogType::kNone)
   , menu_option_(std::make_unique<MenuOption>())
   , quit_requested_(false)
+  , return_to_title_requested_(false)
 #if _DEBUG
   , restart_requested_(false)
 #endif
@@ -167,8 +173,15 @@ bool Menu::Update()
         state_ = MenuState::kOption;
         break;
         
+      case MainMenuItem::kReturnToTitle:
+        state_ = MenuState::kQuitConfirm;
+        current_confirm_dialog_ = ConfirmDialogType::kReturnToTitle;
+        selected_quit_item_ = 0;  // 確認ダイアログの選択をリセット
+        break;
+        
       case MainMenuItem::kQuit:
         state_ = MenuState::kQuitConfirm;
+        current_confirm_dialog_ = ConfirmDialogType::kQuit;
         selected_quit_item_ = 0;  // 終了確認ダイアログの選択をリセット
         break;
         
@@ -187,8 +200,15 @@ bool Menu::Update()
         state_ = MenuState::kOption;
         break;
         
-      case 2: // 終了
+      case 2: // タイトルに戻る
         state_ = MenuState::kQuitConfirm;
+        current_confirm_dialog_ = ConfirmDialogType::kReturnToTitle;
+        selected_quit_item_ = 0;
+        break;
+        
+      case 3: // 終了
+        state_ = MenuState::kQuitConfirm;
+        current_confirm_dialog_ = ConfirmDialogType::kQuit;
         selected_quit_item_ = 0;
         break;
         
@@ -247,13 +267,21 @@ bool Menu::Update()
       
       if (selected == QuitConfirmItem::kYes)
       {
-        quit_requested_ = true;
+        if (current_confirm_dialog_ == ConfirmDialogType::kQuit)
+        {
+          quit_requested_ = true;
+        }
+        else if (current_confirm_dialog_ == ConfirmDialogType::kReturnToTitle)
+        {
+          return_to_title_requested_ = true;
+        }
         Close();
         return true;
       }
       else // kNo
       {
         state_ = MenuState::kMain;
+        current_confirm_dialog_ = ConfirmDialogType::kNone;
       }
     }
 
@@ -262,6 +290,7 @@ bool Menu::Update()
     {
       sound->PlaySe(MenuSeKind::kClick);
       state_ = MenuState::kMain;
+      current_confirm_dialog_ = ConfirmDialogType::kNone;
     }
   }
 
@@ -379,6 +408,26 @@ void Menu::Draw() const
     }
     current_item++;
 
+    // タイトルに戻るボタン
+    const bool is_return_selected = (selected_main_item_ == current_item);
+    if (is_return_selected)
+    {
+      // 選択時: より明るく
+      return_to_title_button_.draw(Palette::Lightyellow);
+      font_(U"タイトルに戻る").drawAt(return_to_title_button_.center(), Palette::Black);
+      // マーカーをボックスの左側に描画（黄色）
+      const Vec2 cursor_pos(return_to_title_button_.x + MenuConstants::kCursorOffsetX + cursor_sway, return_to_title_button_.y + 15);
+      font_(U"▶").draw(cursor_pos, cursor_color);
+    }
+    else
+    {
+      // 非選択時: 明滅
+      const ColorF button_color = ColorF(Palette::Darkgray).lerp(Palette::Gray, pulse);
+      return_to_title_button_.draw(button_color);
+      font_(U"タイトルに戻る").drawAt(return_to_title_button_.center(), Palette::White);
+    }
+    current_item++;
+
     // ゲーム終了ボタン
     const bool is_quit_selected = (selected_main_item_ == current_item);
     if (is_quit_selected)
@@ -413,7 +462,12 @@ void Menu::Draw() const
     dialog_box.drawFrame(MenuConstants::kDialogBorderThickness, Palette::White);
 
     // 確認メッセージ（メンバ変数のフォントを使用）
-    message_font_(U"本当に終了しますか？").drawAt(MenuConstants::kMenuCenterX, MenuConstants::kDialogMessageY, Palette::White);
+    String message = U"本当に終了しますか？";
+    if (current_confirm_dialog_ == ConfirmDialogType::kReturnToTitle)
+    {
+      message = U"タイトルに戻りますか？";
+    }
+    message_font_(message).drawAt(MenuConstants::kMenuCenterX, MenuConstants::kDialogMessageY, Palette::White);
 
     // 明滅用の係数
     const double pulse = MenuConstants::kPulseMin + (MenuConstants::kPulseMax - MenuConstants::kPulseMin) * Periodic::Sine0_1(MenuConstants::kPulseDuration);
