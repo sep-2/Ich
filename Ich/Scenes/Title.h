@@ -39,6 +39,9 @@ private:
   // メニュー用フォント
   Font menu_font_;
   
+  // 操作説明用フォント
+  Font instruction_font_;
+  
   // アニメーション用タイマー
   Stopwatch stopwatch_;
   

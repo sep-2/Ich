@@ -915,6 +915,14 @@ void Game::update()
         return;
       }
 
+      // タイトルに戻るがリクエストされたかチェック
+      if (menu_->IsReturnToTitleRequested())
+      {
+        AudioManager::GetInstance()->StopBgm();
+        changeScene(EnumScene::kTitle, 1s);  // 1秒のフェード時間
+        return;
+      }
+
 #if _DEBUG
       // ゲーム再起動がリクエストされたかチェック（DEBUGのみ）
       if (menu_->IsRestartRequested())
@@ -1240,10 +1248,34 @@ void Game::draw() const
 
           // ブロック内のテキストを中央に描画
           const Vec2 shadow_pos = block_center + InGameConstants::kBlockTextShadowOffset;
-          block_font_(block.value).drawAt(shadow_pos.x, shadow_pos.y, InGameConstants::kBlockTextShadowColor);
-          block_font_(block.value).drawAt(block_center.x, block_center.y, InGameConstants::kBlockTextColor);
+          
+          // 最初の文字の場合は拡大・収縮アニメーション
+          if (block.is_first)
+          {
+            // 時間ベースの拡大・収縮（0.8～1.2倍の範囲）
+            const double t = Scene::Time();
+            const double scale_factor = 1.0 + 0.2 * Sin(t * 3.0);  // 3Hz で拡大・収縮
+            
+            // 拡大された状態で影を描画
+            {
+              const Transformer2D transform{ Mat3x2::Scale(scale_factor, shadow_pos), TransformCursor::No };
+              block_font_(block.value).drawAt(shadow_pos, InGameConstants::kBlockTextShadowColor);
+            }
+            
+            // 拡大された状態でテキスト本体を描画
+            {
+              const Transformer2D transform{ Mat3x2::Scale(scale_factor, block_center), TransformCursor::No };
+              block_font_(block.value).drawAt(block_center, InGameConstants::kBlockTextColor);
+            }
+          }
+          else
+          {
+            // 通常の文字は従来通り
+            block_font_(block.value).drawAt(shadow_pos.x, shadow_pos.y, InGameConstants::kBlockTextShadowColor);
+            block_font_(block.value).drawAt(block_center.x, block_center.y, InGameConstants::kBlockTextColor);
+          }
 
-          // プレイヤーに 1 ブロック以内かつ first の場合、?を小さく描画（斜め上）
+          // プレイヤーに 1 ブロック以内かつ first の場合、✨を小さく描画（斜め上）
           if (block.is_first && player_)
           {
             const Vec2 player_pos = player_->GetPosition();

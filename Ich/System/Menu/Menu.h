@@ -23,8 +23,18 @@ enum class MainMenuItem {
   kInfiniteAir, // エア無限
 #endif
   kOption,      // オプション
+  kReturnToTitle, // タイトルに戻る
   kQuit,        // 終了
   kCount        // 項目数
+};
+
+/// <summary>
+/// 確認ダイアログの種類
+/// </summary>
+enum class ConfirmDialogType {
+  kNone,          // なし
+  kQuit,          // 終了確認
+  kReturnToTitle  // タイトルに戻る確認
 };
 
 /// <summary>
@@ -75,6 +85,11 @@ public:
   /// </summary>
   bool IsQuitRequested() const { return quit_requested_; }
 
+  /// <summary>
+  /// タイトルに戻るがリクエストされたか
+  /// </summary>
+  bool IsReturnToTitleRequested() const { return return_to_title_requested_; }
+
 #if _DEBUG
   /// <summary>
   /// ゲーム再起動がリクエストされたか
@@ -93,6 +108,7 @@ private:
   Font message_font_;  // 確認ダイアログ用フォント
   Rect resume_button_;
   Rect option_button_;
+  Rect return_to_title_button_;  // タイトルに戻るボタン
   Rect quit_button_;
   
 #if _DEBUG
@@ -104,9 +120,11 @@ private:
   // 終了確認ダイアログ用
   Rect quit_yes_button_;
   Rect quit_no_button_;
+  ConfirmDialogType current_confirm_dialog_ = ConfirmDialogType::kNone;  // 現在表示中の確認ダイアログ
   
   std::unique_ptr<MenuOption> menu_option_;
   bool quit_requested_ = false;
+  bool return_to_title_requested_ = false;  // タイトルに戻るフラグ
 
 #if _DEBUG
   bool restart_requested_ = false;

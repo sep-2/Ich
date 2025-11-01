@@ -43,6 +43,10 @@ private:
     double sinFreq;        // sinの周波数（ランダム）
     double cosFreq;        // cosの周波数（ランダム）
     double movementPhase;  // 動きの位相
+    
+    // 回転パラメータ
+    double rotation;       // 波の回転角度（ラジアン）
+    double rotationSpeed;  // 回転速度
   };
 
   Array<Wave> waves_;      // 波の配列
