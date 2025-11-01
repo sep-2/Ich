@@ -230,6 +230,7 @@ Game::Game(const InitData& init)
   , block_destroy_effect_(std::make_unique<BlockDestroyEffect>())
   , bubble_effect_(std::make_unique<BubbleEffect>())
   , word_display_box_(std::make_unique<WordDisplayBox>())
+  , collected_characters_(std::make_unique<CollectedCharacters>())
   , air_amount_(1.0f)
   , is_game_over_(false)
   , is_game_clear_(false)
@@ -347,6 +348,8 @@ Game::Game(const InitData& init)
   player_->SetPosition(InGameConstants::kPlayerInitialX, InGameConstants::kPlayerInitialY);
   player_->SetMoveSpeed(InGameConstants::kPlayerMoveSpeed);  // 移動速度を200ピクセル/秒に設定
 
+  // CollectedCharactersの初期化（互換性のためhave_words_も維持）
+  collected_characters_->SetMaxSize(max_string_);
   for (size_t i = 0; i < max_string_; i++) {
     have_words_.push_back(U"");
   }
@@ -499,7 +502,13 @@ void Game::DestroyBlockUnderPlayer()
           }
         }
 
-        // 文字を追加
+        // 文字を追加（新しいシステム）
+        if (collected_characters_)
+        {
+          collected_characters_->AddCharacter(block.value);
+        }
+
+        // 文字を追加（互換性のため既存のシステムも維持）
         have_words_.push_back(block.value);
 
         // max_string_を超えたら先頭から削除
@@ -927,13 +936,13 @@ void Game::update()
   // ヒット演出の更新
   hit_effect_.Update(Scene::DeltaTime());
 
-  // have_words_を連結して1行で表示
+  // have_words_を連結して1行で表示（互換性のため維持）
   String concatenated;
   for (const auto& word : have_words_) {
     concatenated += word;
   }
 
-  // 単語が完成したかチェック
+  // 単語が完成したかチェック（have_words_とcollected_characters_の両方で確認）
   Array<String> result = block_manager_.GetHitWords(have_words_, keywords);
   if (!result.isEmpty()) {
     // resultの各単語について処理
@@ -1238,7 +1247,7 @@ void Game::draw() const
       }
 
       // ゲームオーバー時は吹き出し非表示
-      if (!is_game_over_)
+      if (!is_game_over_ && !is_game_clear_)
       {
         String bubble_text;
         if (!current_message_.isEmpty())
@@ -1253,20 +1262,10 @@ void Game::draw() const
         if (!bubble_text.isEmpty()) {
           const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
           const RectF text_region = hint_font_(bubble_text).region();
-          const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBubble1Radius + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
+          const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
           hint_rect.draw(InGameConstants::kHintBackgroundColor);
           hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
           hint_font_(bubble_text).drawAt(hint_center, InGameConstants::kHintTextColor);
-        }
-      // ゲームオーバー時・ゲームクリア時はヒント非表示
-      if (!is_game_over_ && !is_game_clear_ && !current_hint_.isEmpty())
-      {
-        const Vec2 hint_center = player_pos + InGameConstants::kHintBoxOffset;
-        const RectF text_region = hint_font_(current_hint_).region();
-        const RoundRect hint_rect{ Arg::center(hint_center), text_region.w + InGameConstants::kHintBoxPadding * 2, text_region.h + InGameConstants::kHintBoxPadding * 2, InGameConstants::kHintBoxRoundRadius };
-        hint_rect.draw(InGameConstants::kHintBackgroundColor);
-        hint_rect.drawFrame(InGameConstants::kHintBoxFrameThickness, InGameConstants::kHintBorderColor);
-        hint_font_(current_hint_).drawAt(hint_center, InGameConstants::kHintTextColor);
 
           const Vec2 bubble_anchor = player_pos + InGameConstants::kHintBubbleAnchorOffset;
           Circle{ bubble_anchor, InGameConstants::kHintBubble1Radius }.draw(InGameConstants::kHintBackgroundColor).drawFrame(InGameConstants::kHintBubbleFrameThickness1, InGameConstants::kHintBorderColor);
@@ -1298,7 +1297,15 @@ void Game::draw() const
   // 文字表示ボックスの描画（もじぴったん風UI）
   if (word_display_box_)
   {
-    word_display_box_->SetWords(have_words_);
+    // CollectedCharactersから文字配列を取得（互換性のためhave_words_も設定）
+    if (collected_characters_)
+    {
+      word_display_box_->SetWords(collected_characters_->GetCharacters());
+    }
+    else
+    {
+      word_display_box_->SetWords(have_words_);
+    }
     word_display_box_->SetCompletedWords(completed_words_);
     word_display_box_->Draw(block_font_);
   }
@@ -1356,25 +1363,6 @@ void Game::draw() const
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
 }
-
-//void Game::drawFadeIn(double t) const
-//{
-//  //draw();
-//
-//  //// 1280x720対応のフェードイン効果
-//  //for (int32 y = 0; y < 8; ++y) {
-//  //  RectF{ (1280 + y * 120 - (1 + t) * 2560), (y * 90), 2560, 90 }.draw(HSV{ (y * 20), 0.2, 1.0 });
-//  //}
-//}
-//
-//void Game::drawFadeOut(double t) const
-//{
-//  //draw();
-//
-//  //// 1280x720対応のフェードアウト効果
-//  //Circle{ 640, 360, 640 }
-//  //.drawFrame((t * 640), 0, ColorF{ 0.2, 0.3, 0.4 });
-//}
 
 void Game::UpdateCamera()
 {
