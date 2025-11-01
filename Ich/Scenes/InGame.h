@@ -153,6 +153,8 @@ private:
 
   // ✨アイコン
   Texture sparkle_tex_;
+  // 武器テクスチャ
+  Texture weapon_texture_;
 
   // エア残量（デモ用）
   float air_amount_ = 1.0f;
