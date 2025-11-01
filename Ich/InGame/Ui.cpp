@@ -29,6 +29,9 @@ namespace UiConstants {
   constexpr float kLowAirThreshold = 0.2f;
   const ColorF kLowAirOverlayColor{ 1.0, 0.0, 0.0, 0.20 };
 
+  // エアゲージの太さ設定
+  constexpr float kAirGaugeThickness = 2.5f;  // 太さ4.5倍（1.5倍の3倍）
+
   // 操作説明テキストの設定
   constexpr int32 kControlHelpFontSize = 40;
   const String kControlHelpText = U"Z:掘る、←↓→:移動";
@@ -45,9 +48,9 @@ Ui::Ui()
   : Task()
   , control_help_font_(UiConstants::kControlHelpFontSize, Typeface::Bold)
   , air_ratio_(1.0f)
-  , gauge_x_(900)
+  , gauge_x_(780)
   , gauge_y_(50)
-  , center_width_(200)
+  , center_width_(350)  // 200から280に変更（1.4倍）
   , side_box_x_(480)
   , side_box_y_(100)
   , side_box_visible_(true)
@@ -115,18 +118,18 @@ void Ui::Render()
 {
   // エアゲージ背景の描画（灰色の背景バー）
   if (air_gauge_back_left_texture_) {
-    air_gauge_back_left_texture_->draw(gauge_x_, gauge_y_);
+    air_gauge_back_left_texture_->scaled(1.0, UiConstants::kAirGaugeThickness).draw(gauge_x_, gauge_y_);
   }
 
   if (air_gauge_back_center_texture_) {
     const int back_center_x = gauge_x_ + air_gauge_back_left_texture_->width();
     const float back_scale_x = static_cast<float>(center_width_) / static_cast<float>(air_gauge_back_center_texture_->width());
-    air_gauge_back_center_texture_->scaled(back_scale_x, 1.0).draw(back_center_x, gauge_y_);
+    air_gauge_back_center_texture_->scaled(back_scale_x, UiConstants::kAirGaugeThickness).draw(back_center_x, gauge_y_);
   }
 
   if (air_gauge_back_right_texture_) {
     const int back_right_x = gauge_x_ + air_gauge_back_left_texture_->width() + center_width_;
-    air_gauge_back_right_texture_->draw(back_right_x, gauge_y_);
+    air_gauge_back_right_texture_->scaled(1.0, UiConstants::kAirGaugeThickness).draw(back_right_x, gauge_y_);
   }
 
   // 左端のスケール計算
@@ -153,7 +156,7 @@ void Ui::Render()
 
     // 左端を描画
     if (left_texture && left_scale > 0.0f) {
-      left_texture->scaled(left_scale, 1.0).draw(gauge_x_, gauge_y_);
+      left_texture->scaled(left_scale, UiConstants::kAirGaugeThickness).draw(gauge_x_, gauge_y_);
     }
 
     // 中央部分を描画
@@ -163,7 +166,7 @@ void Ui::Render()
       const float scale_x = (center_width_ * air_ratio_) / static_cast<float>(center_texture->width());
       
       if (scale_x > 0.0f) {
-        center_texture->scaled(scale_x, 1.0).draw(center_x, gauge_y_);
+        center_texture->scaled(scale_x, UiConstants::kAirGaugeThickness).draw(center_x, gauge_y_);
       }
     }
 
@@ -173,7 +176,7 @@ void Ui::Render()
       const int center_width_scaled = static_cast<int>(center_width_ * air_ratio_);
       const int right_x = gauge_x_ + left_width_scaled + center_width_scaled;
       
-      right_texture->scaled(right_scale, 1.0).draw(right_x, gauge_y_);
+      right_texture->scaled(right_scale, UiConstants::kAirGaugeThickness).draw(right_x, gauge_y_);
     }
   }
 

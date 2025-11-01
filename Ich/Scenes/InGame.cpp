@@ -32,8 +32,8 @@ namespace InGameConstants
   // 文字収集パラメータ
   constexpr size_t kMaxCharacters = 5;            // 最大文字数
   // UIパラメータ
-  constexpr int32 kAirGaugeX = 900;               // エアゲージX座標
-  constexpr int32 kAirGaugeY = 50;                // エアゲージY座標
+  constexpr int32 kAirGaugeX = 850;               // エアゲージX座標
+  constexpr int32 kAirGaugeY = 20;                // エアゲージY座標
   constexpr int32 kSideBoxX = 880;                // サイドボックスX座標
   constexpr int32 kSideBoxY = 120;                // サイドボックスY座標
 
