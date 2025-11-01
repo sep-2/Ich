@@ -918,7 +918,8 @@ void Game::update()
       // タイトルに戻るがリクエストされたかチェック
       if (menu_->IsReturnToTitleRequested())
       {
-        changeScene(EnumScene::kTitle, 0s);
+        AudioManager::GetInstance()->StopBgm();
+        changeScene(EnumScene::kTitle, 1s);  // 1秒のフェード時間
         return;
       }
 

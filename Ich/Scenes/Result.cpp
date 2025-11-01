@@ -38,7 +38,7 @@ void Result::update()
 {
   if (IsAnyKeyTriggered()) {
     AudioManager::GetInstance()->StopBgm();
-    changeScene(EnumScene::kTitle, 0s);
+    changeScene(EnumScene::kTitle, 1s);  // 1秒のフェード時間
   }
 }
 
