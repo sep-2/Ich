@@ -44,7 +44,7 @@ namespace InGameConstants
 
   // プレイヤー初期位置
   constexpr int32 kPlayerInitialX = 200;
-  constexpr int32 kPlayerInitialY = 20;
+  constexpr int32 kPlayerInitialY = -100;
 
   // もじぴったん風UIパラメータ
   constexpr int32 kCharBoxSize = 50;              // 各文字ボックスのサイズ
