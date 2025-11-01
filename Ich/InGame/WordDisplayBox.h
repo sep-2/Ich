@@ -54,6 +54,12 @@ public:
   /// <param name="spacing">隙間サイズ</param>
   void SetBoxSpacing(int32 spacing);
 
+  /// <summary>
+  /// 単語完成時の拡大エフェクトを開始
+  /// </summary>
+  /// <param name="completedWord">完成した単語</param>
+  void TriggerCompletionEffect(const String& completedWord);
+
 private:
   /// <summary>
   /// 文字が完成した単語に含まれているかチェック
@@ -62,12 +68,27 @@ private:
   /// <returns>完成した単語に含まれている場合true</returns>
   bool IsInCompletedWord(const String& word) const;
 
+  /// <summary>
+  /// エフェクト情報（単語の文字列を保存、毎フレーム追跡）
+  /// </summary>
+  struct CharacterEffect
+  {
+    String target_word;     // エフェクト対象の単語（完成した単語の文字列）
+    double elapsed;         // 経過時間
+    bool active;            // エフェクトが有効か
+    
+    CharacterEffect() : target_word(U""), elapsed(0.0), active(false) {}
+  };
+
   Array<String> words_;                // 表示する文字配列
   Array<String> completed_words_;      // 完成した単語リスト
   int32 position_x_;                   // 表示位置X
   int32 position_y_;                   // 表示位置Y
   int32 box_size_;                     // ボックスサイズ
   int32 box_spacing_;                  // ボックス間の隙間
+  size_t previous_word_count_;         // 前回のキューサイズ（変化検出用、未使用）
+
+  Array<CharacterEffect> effects_;     // 各単語のエフェクト情報
 
   // デフォルト値の定数
   static constexpr int32 kDefaultPositionX = 50;
@@ -79,6 +100,13 @@ private:
   static constexpr double kRoundRadius = 5.0;
   static constexpr double kFrameThickness = 3.0;
   static constexpr Vec2 kTextShadowOffset{ 2.0, 2.0 };
+
+  // エフェクト用定数
+  static constexpr double kEffectExpandDuration = 0.5;    // 拡大時間（秒）
+  static constexpr double kEffectShrinkDuration = 0.5;    // 縮小時間（秒）
+  static constexpr double kEffectTotalDuration = 1.0;     // 全体時間（秒）
+  static constexpr double kEffectMaxScale = 2.0;          // 最大スケール
+  static constexpr double kEffectDelayPerChar = 0.1;      // 文字ごとの遅延（秒）
 
   static const ColorF kTextShadowColor;
   static const ColorF kDefaultTextColor;
