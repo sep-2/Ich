@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "Scenes/Enum.h"
-#include "System/Renderer/TextureWrapper.h"
-#include "System/Renderer/Renderer.h"
 #include "System/SaveData/SaveData.hpp"
 
 // タイトルシーン
@@ -24,17 +22,18 @@ public:
   void drawFadeOut(double t) const override;
 
 private:
+  // タイトルロゴ用フォント
+  Font title_font_;
 
-  std::shared_ptr<Texture> title_texture_;
+  // サブタイトル用フォント
+  Font subtitle_font_;
 
-  /// <summary>
-  /// イメージ
-  /// </summary>
-  std::shared_ptr<TextureWrapper> title_wrapper_;
+  // プレスキー用フォント
+  Font press_key_font_;
 
-  std::shared_ptr<Texture> animals_texture_;
+  // アニメーション用タイマー
+  Stopwatch stopwatch_;
 
-  std::shared_ptr<TextureWrapper> animals_;
-
-  Stopwatch m_stopwatch_;
+  // 背景グラデーション用テクスチャ
+  Texture background_texture_;
 };
