@@ -292,6 +292,11 @@ bool Player::IsWeaponVisible() const
   return weapon_active_;
 }
 
+void Player::SetWeaponActive(bool active)
+{
+  weapon_active_ = active;
+}
+
 Vec2 Player::GetWeaponPosition() const
 {
   return weapon_position_;
@@ -392,8 +397,7 @@ void Player::UpdateWeapon(float delta_time)
   weapon_base_position_ = position_ + weapon_forward_dir_ * kWeaponForwardOffset;
   weapon_render_rotation_ = std::atan2(weapon_forward_dir_.y, weapon_forward_dir_.x);
 
-  if (KeyZ.pressed()) {
-    weapon_active_ = true;
+  if (weapon_active_) {
     weapon_angle_ += kWeaponAngularSpeed * delta_time;
     weapon_angle_ = std::fmod(weapon_angle_, Math::TwoPi);
     if (weapon_angle_ < 0.0) {
@@ -406,7 +410,6 @@ void Player::UpdateWeapon(float delta_time)
     };
     weapon_position_ = weapon_base_position_ + offset;
   } else {
-    weapon_active_ = false;
     weapon_position_ = weapon_base_position_;
   }
 }
