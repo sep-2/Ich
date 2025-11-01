@@ -86,7 +86,8 @@ void Main()
   manager.add<Result>(EnumScene::kResult);
 
   // 最初のシーンを指定
-  manager.init(EnumScene::kTitle);
+  //manager.init(EnumScene::kTitle);
+  manager.init(EnumScene::kInGame);
 
   while (System::Update()) {
     task_manager->UpdateTask(static_cast<float>(Scene::DeltaTime()));
