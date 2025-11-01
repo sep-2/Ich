@@ -156,7 +156,7 @@ namespace InGameConstants
   constexpr float kAirDecreaseRate = 0.005f;
 
   // フォントファイルパス（InGame用）
-  const String kInGameFontPath = U"Assets/Font/MochiyPopOne-Regular.ttf";
+  const String kInGameFontPath = U"Assets/Font/Kosugi-Regular.ttf";
 
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
