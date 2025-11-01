@@ -238,6 +238,7 @@ Game::Game(const InitData& init)
   , block_destroy_effect_(std::make_unique<BlockDestroyEffect>())
   , bubble_effect_(std::make_unique<BubbleEffect>())
   , word_display_box_(std::make_unique<WordDisplayBox>())
+  , wave_background_effect_(std::make_unique<WaveBackgroundEffect>())
   , collected_characters_(std::make_unique<CollectedCharacters>())
   , air_amount_(1.0f)
   , is_game_over_(false)
@@ -1077,6 +1078,12 @@ void Game::update()
     word_display_box_->Update(Scene::DeltaTime());
   }
 
+  // 波背景エフェクトの更新（常に更新、ポーズ中も動く）
+  if (wave_background_effect_)
+  {
+    wave_background_effect_->Update(Scene::DeltaTime());
+  }
+
   // プレイヤーの左右移動更新（衝突判定付き）
   UpdatePlayerMovement(static_cast<float>(Scene::DeltaTime()));
 
@@ -1150,6 +1157,13 @@ void Game::draw() const
   if (!block_bg_texture_.isEmpty())
   {
     block_bg_texture_.resized(Scene::Size()).draw(0, 0);
+  }
+
+  // 波背景エフェクトの描画（背景画像の上、ゲーム要素の下）
+  // カメラオフセットを渡して縦スクロールに対応
+  if (wave_background_effect_)
+  {
+    wave_background_effect_->Draw(camera_offset_.y);
   }
 
   // カメラオフセットを適用した変換を開始

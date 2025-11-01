@@ -243,6 +243,9 @@
     <ClCompile Include="InGame\CollectedCharacters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InGame\WaveBackgroundEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -978,6 +981,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InGame\CollectedCharacters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InGame\WaveBackgroundEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
