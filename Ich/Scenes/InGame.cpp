@@ -639,8 +639,8 @@ void Game::UpdatePlayerMovement(float delta_time)
   bool is_moving = false;
   bool facing_left = false;
 
-  const bool walk_forward_left = KeyUp.pressed() || KeyW.pressed();
-  const bool walk_forward_right = KeyDown.pressed() || KeyS.pressed();
+  const bool walk_forward_left = KeyUp.pressed();
+  const bool walk_forward_right = KeyDown.pressed();
 
   // 上下入力は「その場で向きを変えるだけ」なので歩行アニメーションには移行させず、待機ポーズを使用する。
   if (walk_forward_left || walk_forward_right) {
@@ -648,11 +648,11 @@ void Game::UpdatePlayerMovement(float delta_time)
     player_->SetPose(Player::Pose::kIdle);
   }
 
-  if (KeyLeft.pressed() || KeyA.pressed()) {
+  if (KeyLeft.pressed()) {
     move_input.x = -1.0f;
     is_moving = true;
     facing_left = true;
-  } else if (KeyRight.pressed() || KeyD.pressed()) {
+  } else if (KeyRight.pressed()) {
     move_input.x = 1.0f;
     is_moving = true;
     facing_left = false;
