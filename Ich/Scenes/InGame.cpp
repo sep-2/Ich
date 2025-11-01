@@ -240,6 +240,8 @@ Game::Game(const InitData& init)
   , word_display_box_(std::make_unique<WordDisplayBox>())
   , wave_background_effect_(std::make_unique<WaveBackgroundEffect>())
   , collected_characters_(std::make_unique<CollectedCharacters>())
+
+  , mission_banner_(std::make_unique<MissionBanner>())
   , air_amount_(1.0f)
   , is_game_over_(false)
   , is_game_clear_(false)
@@ -378,6 +380,12 @@ Game::Game(const InitData& init)
   }
 
   UpdateHint();
+
+  // ミッションバナーを開始（フェードイン後に自動表示）
+  if (mission_banner_)
+  {
+    mission_banner_->Start(InGameConstants::kClearEvaluationCount);
+  }
 }
 Game::~Game()
 {
@@ -863,6 +871,18 @@ void Game::UpdatePlayerMovement(float delta_time)
 
 void Game::update()
 {
+  // ミッションバナー演出の更新（最優先）
+  if (mission_banner_ && !mission_banner_->IsFinished())
+  {
+    mission_banner_->Update(Scene::DeltaTime());
+    
+    // バナー演出中は他の処理をスキップ
+    if (!mission_banner_->IsFinished())
+    {
+      return;
+    }
+  }
+
   // Esc キーでメニュー開閉
   if (KeyEscape.down())
   {
@@ -1458,6 +1478,12 @@ void Game::draw() const
 
   // 明るさ設定を適用
   GameSettings::GetInstance()->ApplyBrightness();
+
+  // ミッションバナーの描画（最前面）
+  if (mission_banner_)
+  {
+    mission_banner_->Draw();
+  }
 
   // メニューとオプションを最前面に描画
   if (menu_->IsOpen())
