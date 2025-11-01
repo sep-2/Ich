@@ -6,12 +6,13 @@ namespace ResultConstants {
   const String kGameClearImagePath = U"Assets/Image/Player/GameClear.png";
   const String kGameOverImagePath = U"Assets/Image/Player/GameOver2.png";
   constexpr double kImageMaxWidth = 900.0;
-  constexpr double kImageCenterY = 240.0;
-  constexpr double kListAreaMargin = 100.0;
-  constexpr double kListTop = 360.0;
-  constexpr double kColumnWidth = 320.0;
-  constexpr double kLineSpacing = 8.0;
-  constexpr int32 kColumnCount = 3;
+  constexpr double kImageCenterY = 220.0;
+  constexpr double kListAreaMargin = 80.0;
+  constexpr double kListTop = 300.0;
+  constexpr double kListBottomMargin = 100.0;
+  constexpr double kColumnWidth = 240.0;
+  constexpr double kLineSpacing = 4.0;
+  constexpr int32 kColumnCount = 4;
 }
 
 Result::Result(const InitData& init)
@@ -20,8 +21,8 @@ Result::Result(const InitData& init)
   , game_clear_texture_(ResultConstants::kGameClearImagePath)
   , game_over_texture_(ResultConstants::kGameOverImagePath)
   , title_font_{ 56, Typeface::Bold }
-  , word_font_{ 28 }
-  , instruction_font_{ 24 }
+  , word_font_{ 24 }
+  , instruction_font_{ 22 }
 {
   if (game_clear_texture_.isEmpty()) {
     PRINT << U"[Result] 画像の読み込みに失敗しました: " << ResultConstants::kGameClearImagePath;
@@ -62,7 +63,12 @@ void Result::draw() const
 
 void Result::DrawWordList() const
 {
-  const RectF list_area{ ResultConstants::kListAreaMargin, ResultConstants::kListTop, Scene::Width() - ResultConstants::kListAreaMargin * 2.0, Scene::Height() - ResultConstants::kListTop - 120.0 };
+  const RectF list_area{
+    ResultConstants::kListAreaMargin,
+    ResultConstants::kListTop,
+    Scene::Width() - ResultConstants::kListAreaMargin * 2.0,
+    Scene::Height() - ResultConstants::kListTop - ResultConstants::kListBottomMargin
+  };
   list_area.draw(ColorF{ 0.0, 0.0, 0.0, 0.45 });
   list_area.drawFrame(2.0, ColorF{ 1.0, 1.0, 1.0, 0.35 });
 
@@ -72,7 +78,7 @@ void Result::DrawWordList() const
   const String overlay_text = U"{}"_fmt(words.size());
   if (!overlay_text.isEmpty()) {
     const Vec2 overlay_center = list_area.center();
-    const double overlay_scale = 3.6;
+    const double overlay_scale = 3.2;
     const Transformer2D overlay_transform{ Mat3x2::Scale(overlay_scale, overlay_center) };
     title_font_(overlay_text).drawAt(overlay_center, ColorF{ 1.0, 1.0, 1.0, 0.12 });
   }
