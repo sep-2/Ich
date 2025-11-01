@@ -212,7 +212,7 @@ namespace InGameConstants
   /// <summary>
   /// 1ブロック当たりのエア消費量
   /// </summary>
-  const float kAirConsumeRate = 0.05f;
+  const float kAirConsumeRate = 0.02f;
 
   /// <summary>
   /// 単語を作成したときのエア回復量
@@ -222,7 +222,7 @@ namespace InGameConstants
   /// <summary>
   /// クリアまでの単語の完成数
   /// </summary>
-  const int kClearEvaluationCount = 20;
+  const int kClearEvaluationCount = 50;
 }
 
 Game::Game(const InitData& init)
@@ -504,7 +504,7 @@ void Game::DestroyBlockUnderPlayer()
         if (!menu_ || !menu_->IsInfiniteAirEnabled())
 #endif
         {
-          air_amount_ -= InGameConstants::kAirConsumeRate;
+          air_amount_ -= InGameConstants::kAirConsumeRate * static_cast<float>(std::sqrt(static_cast<float>(stage_)));
           if (air_amount_ < 0.0f) {
             air_amount_ = 0.0f;
           }
