@@ -285,7 +285,7 @@ Array<Array<std::pair<String, bool>>> BlockManager::GenerateBlockGrid(const int3
     {
       if (grid[y][x].first.isEmpty())
       {
-        grid[y][x] = { U"*", false };
+        grid[y][x] = { U"×", false };
       }
     }
   }
