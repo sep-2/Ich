@@ -96,6 +96,7 @@ namespace InGameConstants
   const ColorF kCompletedBoardBorderColor{ 0.8, 0.8, 0.8 };
   const ColorF kCompletedBoardTitleColor{ 1.0, 1.0, 0.0 };
   const ColorF kCompletedWordTextColor{ 0.0, 1.0, 0.0 };
+  const ColorF kCompletedBoardOverlayColor{ 1.0, 1.0, 1.0, 0.2 };
   const ColorF kBackgroundColor{ 0.6, 0.8, 0.7 };
   const ColorF kHintBackgroundColor{ 1.0, 1.0, 1.0, 0.92 };
   const ColorF kHintBorderColor{ 0.2, 0.3, 0.5, 0.9 };
@@ -145,6 +146,7 @@ namespace InGameConstants
   constexpr int32 kCompletedBoardContentStartY = 60;
   constexpr int32 kCompletedBoardCountOffsetX = 10;
   constexpr int32 kCompletedBoardCountOffsetY = 25;
+  constexpr double kCompletedBoardOverlayScale = 3.6;
 
   // エア量調整パラメータ
   constexpr float kAirDecreaseRate = 0.1f;        // エア減少率（10秒で空になる）
@@ -1305,8 +1307,22 @@ void Game::draw() const
 
   //------- 右側のボード：完成した単語を表示 - 画面固定
   // ボードの背景を描画
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.draw(InGameConstants::kCompletedBoardBackgroundColor);
-  RoundRect{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius }.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
+  const RoundRect board_area{ InGameConstants::kCompletedBoardX, InGameConstants::kCompletedBoardY, InGameConstants::kCompletedBoardWidth, InGameConstants::kCompletedBoardHeight, InGameConstants::kCompletedBoardRoundRadius };
+  board_area.draw(InGameConstants::kCompletedBoardBackgroundColor);
+
+  // 完成数を大きく薄く表示して背景にアクセント
+  const auto overlay_text = U"{}"_fmt(completed_words_.size());
+  if (!overlay_text.isEmpty()) {
+    const Vec2 overlay_center{
+      InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2.0,
+      InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardHeight / 2.0
+    };
+    const double overlay_scale = InGameConstants::kCompletedBoardOverlayScale;
+    const Transformer2D overlay_transform{ Mat3x2::Scale(overlay_scale, overlay_center) };
+    block_font_(overlay_text).drawAt(overlay_center, InGameConstants::kCompletedBoardOverlayColor);
+  }
+
+  board_area.drawFrame(InGameConstants::kCompletedBoardFrameThickness, InGameConstants::kCompletedBoardBorderColor);
 
   // タイトルを描画
   block_font_(U"完成した単語").drawAt(InGameConstants::kCompletedBoardX + InGameConstants::kCompletedBoardWidth / 2, InGameConstants::kCompletedBoardY + InGameConstants::kCompletedBoardTitleOffsetY, InGameConstants::kCompletedBoardTitleColor);
