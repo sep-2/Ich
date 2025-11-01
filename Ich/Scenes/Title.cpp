@@ -48,11 +48,18 @@ namespace TitleConstants
   constexpr int32 kSubtitleY = 340;
   constexpr int32 kMenuStartY = 420;        // メニュー開始Y座標
   constexpr int32 kMenuItemSpacing = 60;     // メニュー項目間隔
+  constexpr int32 kInstructionY = 650;       // 操作説明のY座標
+
+  // 操作説明テキスト
+  const String kInstructionText = U"Enterで決定";
+  constexpr int32 kInstructionFontSize = 24;
+  const ColorF kInstructionColor{ 0.9, 0.9, 0.9, 0.8 }; // やや薄い白
 
   // アニメーション設定
   constexpr double kTitlePulseInterval = 2.0;     // タイトルの脈動間隔（秒）
   constexpr double kDayNightCycleInterval = 20.0; // 昼夜サイクルの周期（秒）
   constexpr double kMenuItemScaleFactor = 1.1;    // 選択中メニューのスケール係数
+  constexpr double kInstructionBlinkInterval = 1.5; // 操作説明の点滅間隔（秒）
 
   // 波のアニメーション設定
   constexpr int32 kWaveCount = 40;                // 波の数
@@ -100,6 +107,7 @@ Title::Title(const InitData& init)
   , title_font_(FontMethod::MSDF, TitleConstants::kTitleFontSize, TitleConstants::kFontPath, FontStyle::Bold)
   , subtitle_font_(FontMethod::MSDF, TitleConstants::kSubtitleFontSize, TitleConstants::kFontPath)
   , menu_font_(FontMethod::MSDF, TitleConstants::kMenuFontSize, TitleConstants::kFontPath, FontStyle::Bold)
+  , instruction_font_(FontMethod::MSDF, TitleConstants::kInstructionFontSize, TitleConstants::kFontPath)
   , current_menu_item_(MenuItem::kGameStart)
   , show_credits_(false)
 {
@@ -422,6 +430,16 @@ void Title::draw() const
         Circle{ right_arrow_pos, inner_radius }.draw(ColorF{ 1.0, 1.0, 1.0, 0.6 });
       }
     }
+
+    // 操作説明を表示（点滅アニメーション付き）
+    const double blink_progress = std::fmod(t, TitleConstants::kInstructionBlinkInterval) / TitleConstants::kInstructionBlinkInterval;
+    const double blink_alpha = 0.5 + 0.5 * Sin(blink_progress * Math::TwoPi);
+    
+    ColorF instruction_color = TitleConstants::kInstructionColor;
+    instruction_color.a *= blink_alpha;
+    
+    const Vec2 instruction_pos{ Scene::Center().x, TitleConstants::kInstructionY };
+    instruction_font_(TitleConstants::kInstructionText).drawAt(instruction_pos, instruction_color);
   }
 
   // 明るさ設定を適用
