@@ -10,6 +10,10 @@ struct SaveData
 
   Array<int32> item_counts_;
 
+  // 直近の結果画面表示用データ（セーブ対象外）
+  bool last_game_cleared_ = false;
+  Array<String> last_completed_words_;
+
   /// <summary>
   /// シリアライズに対応させるためのメンバ関数を定義する
   /// </summary>

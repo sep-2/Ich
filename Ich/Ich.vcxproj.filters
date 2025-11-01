@@ -198,6 +198,9 @@
     <ClCompile Include="Scenes\Title.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Scenes\Result.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
     <ClCompile Include="System\Menu\GameSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -927,6 +930,9 @@
       <Filter>Source Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Scenes\Title.h">
+      <Filter>Source Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes\Result.h">
       <Filter>Source Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Scenes\Enum.h">

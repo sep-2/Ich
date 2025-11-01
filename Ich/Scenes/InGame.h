@@ -116,6 +116,11 @@ private:
   void StartGameClear();
 
   /// <summary>
+  /// リザルトシーンへ遷移
+  /// </summary>
+  void TransitionToResult(bool cleared);
+
+  /// <summary>
   /// 次のブロック塊を生成
   /// </summary>
   void GenerateNextBlockChunk();
