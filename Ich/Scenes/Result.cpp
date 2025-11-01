@@ -8,11 +8,11 @@ namespace ResultConstants {
   constexpr double kImageMaxWidth = 900.0;
   constexpr double kImageCenterY = 220.0;
   constexpr double kListAreaMargin = 80.0;
-  constexpr double kListTop = 300.0;
-  constexpr double kListBottomMargin = 100.0;
-  constexpr double kColumnWidth = 240.0;
+  constexpr double kListTop = 220.0;
+  constexpr double kListBottomMargin = 40.0;
+  constexpr double kColumnWidth = 200.0;
   constexpr double kLineSpacing = 4.0;
-  constexpr int32 kColumnCount = 4;
+  constexpr int32 kColumnCount = 5;
 }
 
 Result::Result(const InitData& init)

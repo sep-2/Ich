@@ -152,7 +152,7 @@ namespace InGameConstants
   /// <summary>
   /// エア回復単位
   /// </summary>
-  constexpr float kAirDecreaseRate = 0.01f;
+  constexpr float kAirDecreaseRate = 0.005f;
 
   // フォントサイズ
   constexpr int32 kBlockFontSize = 40;
@@ -212,7 +212,7 @@ namespace InGameConstants
   /// <summary>
   /// 1ブロック当たりのエア消費量
   /// </summary>
-  const float kAirConsumeRate = 0.05f;
+  const float kAirConsumeRate = 0.02f;
 
   /// <summary>
   /// 単語を作成したときのエア回復量
@@ -222,7 +222,7 @@ namespace InGameConstants
   /// <summary>
   /// クリアまでの単語の完成数
   /// </summary>
-  const int kClearEvaluationCount = 20;
+  const int kClearEvaluationCount = 50;
 }
 
 Game::Game(const InitData& init)
@@ -277,13 +277,15 @@ Game::Game(const InitData& init)
   ui_->SetSideBoxVisible(true);
 
   // ブロックグリッドを生成（10行x6列、バッチサイズ20）
+  const bool fill_random_hiragana = ((stage_ % 2) == 0);
   const Array<Array<std::pair<String, bool>>> string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
     InGameConstants::kGridColumns,
     30,
     10,
     keywords,
-    3
+    3,
+    fill_random_hiragana
   );
 
   // String配列をBlock配列に変換（壁を含む拡張グリッドを作成）
@@ -504,7 +506,7 @@ void Game::DestroyBlockUnderPlayer()
         if (!menu_ || !menu_->IsInfiniteAirEnabled())
 #endif
         {
-          air_amount_ -= InGameConstants::kAirConsumeRate;
+          air_amount_ -= InGameConstants::kAirConsumeRate * static_cast<float>(std::sqrt(static_cast<float>(stage_)));
           if (air_amount_ < 0.0f) {
             air_amount_ = 0.0f;
           }
@@ -1007,7 +1009,7 @@ void Game::update()
     if (!menu_ || !menu_->IsInfiniteAirEnabled())
 #endif
     {
-      air_amount_ -= InGameConstants::kAirDecreaseRate * static_cast<float>(Scene::DeltaTime());
+      air_amount_ -= InGameConstants::kAirDecreaseRate * static_cast<float>(Scene::DeltaTime()) * static_cast<float>(std::sqrt(static_cast<float>(stage_)));
       if (air_amount_ < 0.0f) {
         air_amount_ = 0.0f;
       }
@@ -1574,6 +1576,9 @@ void Game::UpdateScroll()
 
 void Game::GenerateNextBlockChunk()
 {
+  ++stage_;
+  const bool fill_random_hiragana = ((stage_ % 2) == 0);
+
   // 新しいブロック塊を生成
   const Array<Array<std::pair<String, bool>>> new_string_grid = block_manager_.GenerateBlockGrid(
     InGameConstants::kGridRows,
@@ -1581,7 +1586,8 @@ void Game::GenerateNextBlockChunk()
     30,
     10,
     keywords,
-    3
+    3,
+    fill_random_hiragana
   );
 
   const int32 total_columns = InGameConstants::kGridColumns + InGameConstants::kWallThickness * 2;

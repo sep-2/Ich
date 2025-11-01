@@ -46,5 +46,6 @@ public:
   /// <param name="attemptsPerWord">1 単語あたりの試行回数</param>
   /// <param name="dictionary">配置に用いる単語辞書</param>
   /// <param name="segmentCount">セグメント数。デフォルト 1</param>
-  Array<Array<std::pair<String, bool>>> GenerateBlockGrid(int32 row, int32 column, int32 requestedCount, int32 attemptsPerWord, const Array<String>& dictionary, int32 segmentCount = 1) const;
+  /// <param name="fill_empty_with_random">空マスをランダムひらがなで埋める場合 true</param>
+  Array<Array<std::pair<String, bool>>> GenerateBlockGrid(int32 row, int32 column, int32 requestedCount, int32 attemptsPerWord, const Array<String>& dictionary, int32 segmentCount = 1, bool fill_empty_with_random = false) const;
 };
