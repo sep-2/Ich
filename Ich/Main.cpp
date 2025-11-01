@@ -57,7 +57,7 @@ void Main()
 {
   // 画面サイズを1280x720に設定
   Window::Resize(MainConstants::kWindowWidth, MainConstants::kWindowHeight);
-  Window::SetTitle(U"Ich Game - 1280x720");
+  Window::SetTitle(U"わードリーム");
 
   // ウィンドウを閉じるユーザアクションのみを終了操作に設定する
   System::SetTerminationTriggers(UserAction::CloseButtonClicked);
@@ -86,8 +86,11 @@ void Main()
   manager.add<Result>(EnumScene::kResult);
 
   // 最初のシーンを指定
-  //manager.init(EnumScene::kTitle);
+#if _DEBUG
   manager.init(EnumScene::kInGame);
+#else
+  manager.init(EnumScene::kTitle);
+#endif
 
   while (System::Update()) {
     task_manager->UpdateTask(static_cast<float>(Scene::DeltaTime()));
