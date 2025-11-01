@@ -121,6 +121,10 @@ public:
   bool IsWeaponVisible() const;
 
   /// <summary>
+  /// 武器の表示状態を設定
+  /// </summary>
+  void SetWeaponActive(bool active);
+  /// <summary>
   /// 武器の描画中心座標
   /// </summary>
   Vec2 GetWeaponPosition() const;

@@ -112,6 +112,7 @@ namespace InGameConstants
   constexpr double kCompletedBoardRoundRadius = 10.0;
   constexpr double kHintBoxRoundRadius = 18.0;
   constexpr double kWeaponRoundRadius = 10.0;
+  constexpr double kWeaponDisplayDuration = 0.5;
 
   // 線の太さ
   constexpr double kBlockFrameThickness = 2.0;
@@ -1016,10 +1017,22 @@ void Game::update()
     }
   }
 
+  weapon_display_timer_ -= Scene::DeltaTime();
+  if (weapon_display_timer_ < 0.0)
+  {
+    weapon_display_timer_ = 0.0;
+  }
+
   // Zキーでブロック破壊
   if (KeyZ.down())
   {
+    weapon_display_timer_ = InGameConstants::kWeaponDisplayDuration;
     DestroyBlockUnderPlayer();
+  }
+
+  if (player_)
+  {
+    player_->SetWeaponActive(weapon_display_timer_ > 0.0);
   }
 
   if (!is_paused_)
