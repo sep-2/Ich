@@ -14,6 +14,29 @@ enum class MenuState {
 };
 
 /// <summary>
+/// メインメニューの選択肢
+/// </summary>
+enum class MainMenuItem {
+  kResume,      // 戻る
+#if _DEBUG
+  kRestart,     // 再起動
+  kInfiniteAir, // エア無限
+#endif
+  kOption,      // オプション
+  kQuit,        // 終了
+  kCount        // 項目数
+};
+
+/// <summary>
+/// 終了確認ダイアログの選択肢
+/// </summary>
+enum class QuitConfirmItem {
+  kNo,    // いいえ（左側、デフォルト選択）
+  kYes,   // はい（右側）
+  kCount  // 項目数
+};
+
+/// <summary>
 /// メニュークラス
 /// </summary>
 class Menu {
@@ -88,4 +111,8 @@ private:
 #if _DEBUG
   bool restart_requested_ = false;
 #endif
+
+  // キーボード操作用
+  int32 selected_main_item_ = 0;  // メインメニューの選択中の項目
+  int32 selected_quit_item_ = 0;  // 終了確認ダイアログの選択中の項目
 };
