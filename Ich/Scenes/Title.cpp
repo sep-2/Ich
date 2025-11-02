@@ -177,7 +177,8 @@ void Title::update()
   if (KeyDown.down()) {
     switch (current_menu_item_) {
     case MenuItem::kGameStart:
-      current_menu_item_ = MenuItem::kCredits;
+      //current_menu_item_ = MenuItem::kCredits;
+      current_menu_item_ = MenuItem::kExit;
       break;
     case MenuItem::kCredits:
       current_menu_item_ = MenuItem::kExit;
@@ -390,7 +391,7 @@ void Title::draw() const
     // メニュー項目を描画
     const Array<std::pair<MenuItem, String>> menu_items = {
       { MenuItem::kGameStart, TitleConstants::kMenuGameStart },
-      { MenuItem::kCredits, TitleConstants::kMenuCredits },
+      //{ MenuItem::kCredits, TitleConstants::kMenuCredits },
       { MenuItem::kExit, TitleConstants::kMenuExit }
     };
 
