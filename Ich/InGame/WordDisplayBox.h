@@ -30,6 +30,11 @@ public:
   void SetWords(const Array<String>& words);
 
   /// <summary>
+  /// 文字を追加
+  /// </summary>
+  void PushCharacter(const String character);
+
+  /// <summary>
   /// 完成した単語リストを設定（文字の色を変えるため）
   /// </summary>
   /// <param name="completedWords">完成した単語リスト</param>
@@ -89,6 +94,15 @@ private:
   size_t previous_word_count_;         // 前回のキューサイズ（変化検出用、未使用）
 
   Array<CharacterEffect> effects_;     // 各単語のエフェクト情報
+  /// <summary>
+  /// 各単語のエフェクト有効フラグ
+  /// </summary>
+  std::deque<CharacterEffect> word_effects_queue_;
+
+  /// <summary>
+  /// 完成した単語
+  /// </summary>
+  int32 completed_word_length_ = 0;
 
   // デフォルト値の定数
   static constexpr int32 kDefaultPositionX = 50;
