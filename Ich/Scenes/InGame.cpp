@@ -529,6 +529,7 @@ void Game::DestroyBlockUnderPlayer()
         if (collected_characters_)
         {
           collected_characters_->AddCharacter(block.value);
+          word_display_box_->PushCharacter(block.value);
         }
 
         // 文字を追加（互換性のため既存のシステムも維持）
