@@ -167,7 +167,8 @@ void Title::update()
       current_menu_item_ = MenuItem::kGameStart;
       break;
     case MenuItem::kExit:
-      current_menu_item_ = MenuItem::kCredits;
+      //current_menu_item_ = MenuItem::kCredits;
+      current_menu_item_ = MenuItem::kGameStart;
       break;
     }
     AudioManager::GetInstance()->PlaySe(SeKind::kTitleCursorMove);
