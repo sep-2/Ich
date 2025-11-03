@@ -123,7 +123,7 @@ bool Menu::Update()
 #if _DEBUG
     const int32 item_count = static_cast<int32>(MainMenuItem::kCount);
 #else
-    const int32 item_count = 3; // 戻る、オプション、終了
+    const int32 item_count = 4; // 戻る、オプション、タイトルに戻る、終了
 #endif
 
     // 上下キーで選択を移動
